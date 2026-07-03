@@ -413,7 +413,7 @@ async function loadGroupMembersData(groupId) {
   document.getElementById('member-group-title').textContent = currentGroupDetails.name;
   document.getElementById('lbl-group-passcode').textContent = currentGroupDetails.passcode;
 
-  const directLink = `${window.location.origin}/pray.html?groupId=${groupId}`;
+  const directLink = `${window.location.origin}/?groupId=${groupId}`;
   const lnkShare = document.getElementById('lnk-group-share');
   lnkShare.href = directLink;
   lnkShare.textContent = directLink;

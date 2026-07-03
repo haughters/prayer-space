@@ -100,9 +100,32 @@ document.addEventListener('DOMContentLoaded', async () => {
     // 4. Fetch prayers
     await fetchUserPrayers();
 
+    // 4.5. Check for groupId query param to pre-select circle
+    await checkUrlForGroup();
+
     // 5. Play introduction animations
     play();
 });
+
+async function checkUrlForGroup() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const groupId = urlParams.get('groupId');
+    if (!groupId) return;
+
+    try {
+        const res = await fetch(`/api/groups/${groupId}`);
+        if (res.ok) {
+            const group = await res.json();
+            selectedGroupId = group.groupId;
+            selectedGroupName = group.name;
+            circleLabel.textContent = group.name;
+            circleSelect.classList.add("specific");
+            circleSelect.setAttribute("aria-label", "Select circle - currently " + group.name);
+        }
+    } catch (e) {
+        console.warn('Failed to pre-select group from URL param', e);
+    }
+}
 
 // === 1. Device ID Management ===
 async function initDevice() {
@@ -743,7 +766,7 @@ function initEventListeners() {
                 qrbox: { width: 220, height: 220 },
             },
             async (qrText) => {
-                const match = qrText.match(/\/group\/([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})/i);
+                const match = qrText.match(/(?:group\/|groupId=)([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})/i);
                 const extractedId = match ? match[1] : qrText.trim();
 
                 qrFeedback.textContent = 'Verifying scanned group...';
