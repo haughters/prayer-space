@@ -1,6 +1,6 @@
-# Prayer Link
+# Prayer Space
 
-Prayer Link is a platform connecting people needing prayer with intercessors in their community.
+Prayer Space is a platform connecting people needing prayer with intercessors in their community.
 
 ## Repository Structure
 
