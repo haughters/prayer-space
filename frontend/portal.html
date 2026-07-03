@@ -6,15 +6,12 @@
     <title>Prayer Link - Portal</title>
     <meta name="description" content="Access the Prayer Link portal to manage prayer circles or support community requests." />
 
-    <!-- Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap"
-      rel="stylesheet"
-    />
+    <!-- Google Fonts & Fontshare -->
+    <link rel="preconnect" href="https://api.fontshare.com" crossorigin />
+    <link rel="stylesheet" href="https://api.fontshare.com/v2/css?f[]=clash-display@600,700&f[]=hanken-grotesk@400,500&display=swap" />
 
     <!-- Stylesheets -->
+    <link rel="stylesheet" href="./src/styles/home.css" />
     <link rel="stylesheet" href="./src/styles/tokens.css" />
     <link rel="stylesheet" href="./src/styles/reset.css" />
     <link rel="stylesheet" href="./src/styles/base.css" />
@@ -38,26 +35,20 @@
       "
     ></div>
 
-    <!-- Glowing Bottom Aurora Waves -->
-    <div class="background-blobs" aria-hidden="true" id="aurora-bg">
-      <div class="blob-wrapper" style="--factor: 0.03">
-        <div class="blob blob-1"></div>
-      </div>
-      <div class="blob-wrapper" style="--factor: -0.05">
-        <div class="blob blob-2"></div>
-      </div>
-      <div class="blob-wrapper" style="--factor: 0.07">
-        <div class="blob blob-3"></div>
-      </div>
-      <div class="background-giant-text">PORTAL</div>
+    <!-- Glowing Bottom Aurora Waves / Orb Field -->
+    <div class="orb-field orbs-live" id="aurora-bg" aria-hidden="true">
+      <div class="orb orb-1"></div>
+      <div class="orb orb-2"></div>
+      <div class="orb orb-3"></div>
+      <div class="orb orb-4"></div>
     </div>
 
     <!-- === AUTHENTICATION CONTAINER === -->
     <main class="page-main" id="auth-container" style="display: flex;">
       <div class="content-narrow">
         <header class="text-center mb-8">
-          <h1 class="font-display" style="font-size: var(--font-size-3xl); font-style: italic">
-            Prayer Link
+          <h1 class="font-display" style="font-size: var(--font-size-3xl);">
+            Prayer Space
           </h1>
           <p class="color-text-secondary mt-2" style="font-weight: 300;">Access your dashboard</p>
         </header>
@@ -119,6 +110,15 @@
 
     <!-- === ADMIN DASHBOARD CONTAINER === -->
     <div class="admin-layout" id="admin-root" style="display: none">
+      <!-- Mobile Bar -->
+      <div class="mobile-bar">
+        <button class="menu-toggle" aria-label="Open Menu">
+          <svg class="icon-bars" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+            <path d="M4 7h16M4 12h16M4 17h16"/>
+          </svg>
+        </button>
+        <span class="mobile-bar-title">Admin Console</span>
+      </div>
       <!-- Sidebar navigation -->
       <aside class="admin-sidebar" id="sidebar-nav-container">
         <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
@@ -420,6 +420,15 @@
 
     <!-- === INTERCESSOR DASHBOARD CONTAINER === -->
     <div class="admin-layout" id="intercessor-root" style="display: none;">
+      <!-- Mobile Bar -->
+      <div class="mobile-bar">
+        <button class="menu-toggle" aria-label="Open Menu">
+          <svg class="icon-bars" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+            <path d="M4 7h16M4 12h16M4 17h16"/>
+          </svg>
+        </button>
+        <span class="mobile-bar-title">Intercessor Console</span>
+      </div>
       <!-- Sidebar navigation -->
       <aside class="admin-sidebar" id="intercessor-sidebar-nav-container">
         <div>
@@ -641,5 +650,43 @@
 
     <!-- Main Module Entry Point JS -->
     <script type="module" src="./src/portal.js"></script>
+
+    <!-- Drawer backdrop for mobile navigation -->
+    <div class="drawer-backdrop" id="drawerBackdrop"></div>
+
+    <!-- Self-contained drawer toggles for responsive mobile UI -->
+    <script>
+      document.addEventListener('DOMContentLoaded', () => {
+        const backdrop = document.getElementById('drawerBackdrop');
+        
+        document.querySelectorAll('.mobile-bar .menu-toggle').forEach((btn) => {
+          btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const sidebar = btn.closest('.admin-layout').querySelector('.admin-sidebar');
+            if (sidebar) {
+              sidebar.classList.add('open');
+              backdrop.classList.add('show');
+            }
+          });
+        });
+
+        backdrop.addEventListener('click', () => {
+          document.querySelectorAll('.admin-sidebar').forEach((sb) => {
+            sb.classList.remove('open');
+          });
+          backdrop.classList.remove('show');
+        });
+
+        // Close sidebar drawer on link clicks
+        document.addEventListener('click', (e) => {
+          if (e.target.closest('.admin-sidebar__link') || e.target.closest('a')) {
+            document.querySelectorAll('.admin-sidebar').forEach((sb) => {
+              sb.classList.remove('open');
+            });
+            backdrop.classList.remove('show');
+          }
+        });
+      });
+    </script>
   </body>
 </html>

@@ -40,10 +40,8 @@ dist/
 frontend/dist/
 
 ### AWS CDK ###
-*.js
-!infra/cdk/bin/*.ts
-!infra/cdk/lib/*.ts
-*.d.ts
+infra/cdk/**/*.js
+infra/cdk/**/*.d.ts
 cdk.out/
 .cdk.staging/
 
