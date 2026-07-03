@@ -1,0 +1,645 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Prayer Link - Portal</title>
+    <meta name="description" content="Access the Prayer Link portal to manage prayer circles or support community requests." />
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="./src/styles/tokens.css" />
+    <link rel="stylesheet" href="./src/styles/reset.css" />
+    <link rel="stylesheet" href="./src/styles/base.css" />
+    <link rel="stylesheet" href="./src/styles/components.css" />
+    <link rel="stylesheet" href="./src/styles/animations.css" />
+    <link rel="stylesheet" href="./src/styles/layout.css" />
+    <link rel="stylesheet" href="./src/styles/admin.css" />
+  </head>
+  <body>
+    <!-- Toast notifications element container -->
+    <div
+      id="toast-container"
+      style="
+        position: fixed;
+        top: var(--space-4);
+        right: var(--space-4);
+        z-index: 1100;
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-2);
+      "
+    ></div>
+
+    <!-- Glowing Bottom Aurora Waves -->
+    <div class="background-blobs" aria-hidden="true" id="aurora-bg">
+      <div class="blob-wrapper" style="--factor: 0.03">
+        <div class="blob blob-1"></div>
+      </div>
+      <div class="blob-wrapper" style="--factor: -0.05">
+        <div class="blob blob-2"></div>
+      </div>
+      <div class="blob-wrapper" style="--factor: 0.07">
+        <div class="blob blob-3"></div>
+      </div>
+      <div class="background-giant-text">PORTAL</div>
+    </div>
+
+    <!-- === AUTHENTICATION CONTAINER === -->
+    <main class="page-main" id="auth-container" style="display: flex;">
+      <div class="content-narrow">
+        <header class="text-center mb-8">
+          <h1 class="font-display" style="font-size: var(--font-size-3xl); font-style: italic">
+            Prayer Link
+          </h1>
+          <p class="color-text-secondary mt-2" style="font-weight: 300;">Access your dashboard</p>
+        </header>
+
+        <!-- Unified Login Form -->
+        <section class="card" id="login-card" style="border-radius: var(--radius-md); padding: var(--space-8);">
+          <h2 class="font-display mb-6 text-center" style="font-size: var(--font-size-xl);">Log In</h2>
+          <form id="login-form" class="flex flex-col gap-4">
+            <div class="flex flex-col gap-1">
+              <label for="login-identifier" style="font-size: var(--font-size-sm); font-weight: 500;">Username or Email</label>
+              <input type="text" id="login-identifier" class="input" placeholder="Enter username or email" required autocomplete="username" />
+            </div>
+            <div class="flex flex-col gap-1">
+              <label for="login-password" style="font-size: var(--font-size-sm); font-weight: 500;">Password</label>
+              <div style="position: relative; display: flex; align-items: center">
+                <input type="password" id="login-password" class="input" placeholder="••••••••" required autocomplete="current-password" style="width: 100%" />
+                <button type="button" class="btn-toggle-password" style="position: absolute; right: var(--space-3); background: none; border: none; cursor: pointer; color: var(--color-text-muted);" aria-label="Toggle Password Visibility">
+                  👁️
+                </button>
+              </div>
+            </div>
+            <button type="submit" class="btn-primary w-full mt-2" style="min-height: 44px;">Log In</button>
+          </form>
+          <div class="text-center mt-6" style="font-size: var(--font-size-sm);">
+            <span class="color-text-secondary">Are you an invited intercessor?</span>
+            <a href="#register" id="go-to-register" style="color: var(--color-accent); font-weight: 500; text-decoration: none; margin-left: var(--space-1);">Create an Account</a>
+          </div>
+        </section>
+
+        <!-- Register Form (Intercessor Accounts only) -->
+        <section class="card" id="register-card" style="border-radius: var(--radius-md); padding: var(--space-8); display: none;">
+          <h2 class="font-display mb-6 text-center" style="font-size: var(--font-size-xl);">Create Account</h2>
+          <form id="register-form" class="flex flex-col gap-4">
+            <div class="flex flex-col gap-1">
+              <label for="register-name" style="font-size: var(--font-size-sm); font-weight: 500;">Full Name</label>
+              <input type="text" id="register-name" class="input" placeholder="Jane Doe" required />
+            </div>
+            <div class="flex flex-col gap-1">
+              <label for="register-email" style="font-size: var(--font-size-sm); font-weight: 500;">Email Address</label>
+              <input type="email" id="register-email" class="input" placeholder="you@example.com" required />
+            </div>
+            <div class="flex flex-col gap-1">
+              <label for="register-password" style="font-size: var(--font-size-sm); font-weight: 500;">Password</label>
+              <input type="password" id="register-password" class="input" placeholder="Min 8 characters" required />
+            </div>
+            <div class="flex flex-col gap-1">
+              <label for="register-confirm-password" style="font-size: var(--font-size-sm); font-weight: 500;">Confirm Password</label>
+              <input type="password" id="register-confirm-password" class="input" placeholder="Re-enter password" required />
+            </div>
+            <button type="submit" class="btn-primary w-full mt-2" style="min-height: 44px;">Create Account</button>
+          </form>
+          <div class="text-center mt-6" style="font-size: var(--font-size-sm);">
+            <span class="color-text-secondary">Already have an account?</span>
+            <a href="#login" id="go-to-login" style="color: var(--color-accent); font-weight: 500; text-decoration: none; margin-left: var(--space-1);">Log In</a>
+          </div>
+        </section>
+      </div>
+    </main>
+
+    <!-- === ADMIN DASHBOARD CONTAINER === -->
+    <div class="admin-layout" id="admin-root" style="display: none">
+      <!-- Sidebar navigation -->
+      <aside class="admin-sidebar" id="sidebar-nav-container">
+        <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+          <div>
+            <div class="admin-sidebar__title">Prayer Link Admin</div>
+            <div class="color-text-secondary" style="font-size: var(--font-size-xs)" id="sidebar-user-badge">
+              Management console
+            </div>
+          </div>
+          <!-- Hamburger toggle button on mobile -->
+          <button
+            id="btn-sidebar-mobile-toggle"
+            aria-label="Toggle Menu"
+            style="display: none; background: transparent; border: none; font-size: 24px; color: var(--color-admin-sidebar-text); cursor: pointer; padding: var(--space-1);"
+          >
+            ☰
+          </button>
+        </div>
+
+        <nav class="admin-sidebar__nav" id="sidebar-nav-links">
+          <!-- Dynamic sidebar links based on role -->
+        </nav>
+      </aside>
+
+      <!-- Main Content Area -->
+      <main class="admin-content" id="admin-content-view">
+        <!-- 1. Setup Admin Account Form (First-time setup only) -->
+        <section id="setup-view" style="display: none">
+          <div class="card content-narrow" style="margin: 10vh auto 0">
+            <h2 class="font-display text-center mb-2" style="font-size: var(--font-size-xl)">
+              Platform Setup
+            </h2>
+            <p class="color-text-secondary text-center mb-6" style="font-size: var(--font-size-sm)">
+              Create the initial application administrator account to get started.
+            </p>
+            <form id="admin-setup-form">
+              <div class="admin-form-group">
+                <label class="admin-form-label" for="setup-username">Username *</label>
+                <input
+                  class="input"
+                  type="text"
+                  id="setup-username"
+                  required
+                  placeholder="Alphanumeric + underscores"
+                  minlength="3"
+                  maxlength="50"
+                  pattern="^[a-zA-Z0-9_]+$"
+                />
+              </div>
+              <div class="admin-form-group">
+                <label class="admin-form-label" for="setup-password">Password *</label>
+                <div style="position: relative; display: flex; align-items: center">
+                  <input
+                    class="input"
+                    type="password"
+                    id="setup-password"
+                    required
+                    placeholder="Minimum 8 characters"
+                    minlength="8"
+                    style="width: 100%"
+                  />
+                  <button
+                    type="button"
+                    class="btn-toggle-password"
+                    style="position: absolute; right: var(--space-3); background: none; border: none; cursor: pointer; color: var(--color-text-muted);"
+                    aria-label="Toggle Password Visibility"
+                  >
+                    👁️
+                  </button>
+                </div>
+              </div>
+              <div class="admin-form-group">
+                <label class="admin-form-label" for="setup-confirm-password">Confirm Password *</label>
+                <input
+                  class="input"
+                  type="password"
+                  id="setup-confirm-password"
+                  required
+                  placeholder="Re-type password"
+                  minlength="8"
+                />
+              </div>
+              <button class="btn-primary w-full mt-4" type="submit" id="btn-setup-submit">
+                Initialize Admin
+              </button>
+            </form>
+          </div>
+        </section>
+
+        <!-- 2. Prayers Dashboard View -->
+        <section id="dashboard-view" style="display: none">
+          <h2 class="font-display mb-2" style="font-size: var(--font-size-2xl)">
+            Prayer Requests
+          </h2>
+          <p class="color-text-secondary mb-6">
+            Review, filter, and track community and circle prayer requests.
+          </p>
+
+          <!-- Filter Panel -->
+          <div class="card" style="padding: var(--space-4); margin-bottom: var(--space-6)">
+            <form
+              id="filter-prayers-form"
+              style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: var(--space-4); align-items: flex-end;"
+            >
+              <div class="admin-form-group" style="margin-bottom: 0">
+                <label class="admin-form-label" for="filter-status">Status</label>
+                <select id="filter-status" class="input" style="height: 42px">
+                  <option value="all">All Statuses</option>
+                  <option value="OPEN">Open</option>
+                  <option value="CLOSED">Closed</option>
+                </select>
+              </div>
+              <div class="admin-form-group" id="filter-group-wrapper" style="margin-bottom: 0">
+                <label class="admin-form-label" for="filter-group">Group Circle</label>
+                <select id="filter-group" class="input" style="height: 42px">
+                  <option value="all">All Groups</option>
+                </select>
+              </div>
+              <div class="admin-form-group" style="margin-bottom: 0">
+                <label class="admin-form-label" for="filter-from-date">From Date</label>
+                <input type="date" id="filter-from-date" class="input" style="height: 42px" />
+              </div>
+              <div class="admin-form-group" style="margin-bottom: 0">
+                <label class="admin-form-label" for="filter-to-date">To Date</label>
+                <input type="date" id="filter-to-date" class="input" style="height: 42px" />
+              </div>
+              <div style="display: flex; gap: var(--space-2)">
+                <button type="submit" class="btn-primary" style="flex: 1; height: 42px; display: flex; align-items: center; justify-content: center;">
+                  Apply
+                </button>
+                <button type="button" id="btn-reset-filters" class="btn-secondary" style="height: 42px; display: flex; align-items: center; justify-content: center;">
+                  Reset
+                </button>
+              </div>
+            </form>
+          </div>
+
+          <div class="admin-table-container">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th style="cursor: pointer" id="th-prayer-text">Request Preview</th>
+                  <th style="cursor: pointer" id="th-prayer-group">Assigned Circle</th>
+                  <th style="cursor: pointer" id="th-prayer-status">Status</th>
+                  <th style="cursor: pointer; text-align: right" id="th-prayer-count">Prayers</th>
+                  <th style="cursor: pointer; text-align: right" id="th-prayer-date">Date Submitted</th>
+                </tr>
+              </thead>
+              <tbody id="dashboard-prayers-table-body">
+                <!-- Loaded dynamically -->
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Pagination -->
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-top: var(--space-6);">
+            <div class="color-text-secondary" style="font-size: var(--font-size-sm)" id="prayers-page-info">
+              Showing 0-0 of 0 requests
+            </div>
+            <div style="display: flex; gap: var(--space-2)">
+              <button class="btn-secondary" id="btn-prayers-prev" disabled>Previous</button>
+              <button class="btn-secondary" id="btn-prayers-next" disabled>Next</button>
+            </div>
+          </div>
+        </section>
+
+        <!-- 3. Groups Management View -->
+        <section id="groups-view" style="display: none">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-6);">
+            <div>
+              <h2 class="font-display mb-2" style="font-size: var(--font-size-2xl)">
+                Prayer Circles
+              </h2>
+              <p class="color-text-secondary">
+                Organize congregations, church groups, and assign private circle codes.
+              </p>
+            </div>
+            <button class="btn-primary" id="btn-create-group-trigger">+ Create Circle</button>
+          </div>
+
+          <div class="admin-table-container">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>Circle Name</th>
+                  <th style="text-align: right">Intercessors</th>
+                  <th>Passcode</th>
+                  <th>Opt-Out General</th>
+                  <th>Created Date</th>
+                  <th style="text-align: right">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="groups-table-body">
+                <!-- Loaded dynamically -->
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- 4. Member Management View -->
+        <section id="members-view" style="display: none">
+          <div style="margin-bottom: var(--space-6)">
+            <nav style="display: flex; gap: var(--space-2); align-items: center; font-size: var(--font-size-sm); margin-bottom: var(--space-4);" aria-label="Breadcrumb">
+              <a href="#groups" class="color-accent" id="breadcrumb-groups-link" style="text-decoration: none; font-weight: 500">Circles</a>
+              <span class="color-text-muted">/</span>
+              <span id="breadcrumb-group-name" class="color-text-secondary">Group Details</span>
+              <span class="color-text-muted">/</span>
+              <span class="color-text-primary" style="font-weight: 600">Intercessors</span>
+            </nav>
+
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: var(--space-4);">
+              <div>
+                <h2 class="font-display mb-2" id="member-group-title" style="font-size: var(--font-size-2xl)">Circle Members</h2>
+                <p class="color-text-secondary" id="member-group-subtitle">
+                  Intercessors registered to pray for this group's needs.
+                </p>
+              </div>
+              <div style="display: flex; gap: var(--space-2)">
+                <button class="btn-secondary" id="btn-bulk-add-trigger">📂 Bulk CSV Import</button>
+                <button class="btn-primary" id="btn-add-member-trigger">+ Add Single Member</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Group Details Card / QR Section -->
+          <div class="card" style="padding: var(--space-6); margin-bottom: var(--space-6); display: flex; gap: var(--space-8); align-items: center; flex-wrap: wrap;">
+            <div id="member-group-qr-canvas-wrapper" style="background: white; padding: var(--space-3); border-radius: var(--radius-sm); border: 1px solid rgba(0, 0, 0, 0.06); width: 220px; height: 220px; display: flex; align-items: center; justify-content: center;">
+              <canvas id="group-qr-canvas" style="width: 200px; height: 200px"></canvas>
+            </div>
+            <div style="flex: 1; min-width: 250px">
+              <h3 class="font-display mb-2" style="font-size: var(--font-size-lg)">Congregation Share Details</h3>
+              <p class="color-text-secondary mb-4" style="font-size: var(--font-size-sm)">
+                Members can use this QR code or direct URL to submit requests directly to this private circle. Share the passcode to validate intercessors.
+              </p>
+              <div style="display: flex; flex-direction: column; gap: var(--space-2); font-size: var(--font-size-sm);">
+                <div>
+                  <strong>Circle Passcode:</strong>
+                  <code id="lbl-group-passcode" style="background: rgba(0, 0, 0, 0.04); padding: 2px 6px; border-radius: 4px; font-weight: bold; letter-spacing: 1px;">-</code>
+                </div>
+                <div>
+                  <strong>Submission Link:</strong>
+                  <a id="lnk-group-share" href="#" target="_blank" class="color-accent" style="word-break: break-all">-</a>
+                </div>
+              </div>
+              <button class="btn-secondary mt-6" id="btn-download-qr">📥 Download QR Code (.PNG)</button>
+              <button class="btn-secondary mt-6" id="btn-edit-my-group" style="display: none">✏️ Circle Settings</button>
+            </div>
+          </div>
+
+          <div class="admin-table-container">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>Intercessor Name</th>
+                  <th>Email Address</th>
+                  <th>Delivery Status</th>
+                  <th>Date Joined</th>
+                  <th style="text-align: right">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="members-table-body">
+                <!-- Loaded dynamically -->
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- 5. Admin Account Management View (APP_ADMIN only) -->
+        <section id="admins-view" style="display: none">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-6);">
+            <div>
+              <h2 class="font-display mb-2" style="font-size: var(--font-size-2xl)">Console Administrators</h2>
+              <p class="color-text-secondary">
+                Add and manage application administrators and group administrators.
+              </p>
+            </div>
+            <button class="btn-primary" id="btn-create-admin-trigger">+ Create Admin Account</button>
+          </div>
+
+          <div class="admin-table-container">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>Username</th>
+                  <th>System Role</th>
+                  <th>Assigned Circle</th>
+                  <th>Date Created</th>
+                  <th style="text-align: right">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="admins-table-body">
+                <!-- Loaded dynamically -->
+              </tbody>
+            </table>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <!-- === INTERCESSOR DASHBOARD CONTAINER === -->
+    <div class="admin-layout" id="intercessor-root" style="display: none;">
+      <!-- Sidebar navigation -->
+      <aside class="admin-sidebar" id="intercessor-sidebar-nav-container">
+        <div>
+          <div class="admin-sidebar__title">Prayer Link Portal</div>
+          <div class="color-text-secondary" style="font-size: var(--font-size-xs)" id="sidebar-user-name">Loading...</div>
+        </div>
+
+        <nav class="admin-sidebar__nav" style="margin-top: var(--space-6);">
+          <div class="color-text-muted mb-2" style="font-size: var(--font-size-xs); text-transform: uppercase; font-weight: 600; padding: 0 var(--space-3);">
+            My Groups
+          </div>
+          <div id="sidebar-groups-list" class="flex flex-col gap-1">
+            <!-- Dynamically populated -->
+          </div>
+
+          <div style="margin-top: auto; border-top: 1px solid rgba(18, 44, 38, 0.05); padding-top: var(--space-4);">
+            <button id="btn-intercessor-logout" class="admin-sidebar__link text-left w-full" style="background: none; border: none; cursor: pointer; color: var(--color-error);">
+              <span style="margin-right: var(--space-2);">🚪</span> Log Out
+            </button>
+          </div>
+        </nav>
+      </aside>
+
+      <!-- Main panel canvas -->
+      <main class="admin-main">
+        <!-- Dashboard Toolbar -->
+        <header class="admin-header flex justify-between items-center mb-6">
+          <div>
+            <h1 class="admin-header__title font-display" id="main-group-title" style="font-size: var(--font-size-2xl);">Select a Group</h1>
+            <p class="admin-header__subtitle color-text-secondary" id="main-group-subtitle">Choose a prayer circle from the sidebar to view active prayer requests.</p>
+          </div>
+          <div id="filter-toolbar" style="display: none;">
+            <div class="flex gap-2" style="background: rgba(18, 44, 38, 0.03); padding: 2px; border-radius: var(--radius-sm);">
+              <button class="btn-secondary active-filter-btn" id="filter-open" style="border: none; padding: 0.4rem 1rem; font-size: var(--font-size-xs); background: var(--color-surface-solid); border-radius: var(--radius-sm); font-weight: 600; box-shadow: var(--shadow-sm); cursor: pointer;">
+                Active Prayers
+              </button>
+              <button class="btn-secondary active-filter-btn" id="filter-closed" style="border: none; padding: 0.4rem 1rem; font-size: var(--font-size-xs); background: transparent; border-radius: var(--radius-sm); font-weight: 500; cursor: pointer;">
+                Answered/Closed
+              </button>
+            </div>
+          </div>
+        </header>
+
+        <!-- Dynamic Content Area -->
+        <section id="portal-content-canvas">
+          <div id="empty-state" class="text-center py-8">
+            <span style="font-size: var(--font-size-3xl);">🕊️</span>
+            <h3 class="font-display mt-4 mb-2" style="font-size: var(--font-size-lg);">Welcome, Intercessor</h3>
+            <p class="color-text-secondary" style="font-weight: 300;">Please select a prayer circle from the sidebar list to view details.</p>
+          </div>
+
+          <div id="prayers-list-container" class="grid grid-cols-3 gap-6" style="display: none;">
+            <!-- Dynamically populated -->
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <!-- === MODALS === -->
+
+    <!-- A. Group Create/Edit Modal -->
+    <div class="modal-backdrop" id="modal-group-backdrop" style="display: none"></div>
+    <div class="modal card" id="modal-group" style="display: none; padding: var(--space-8); max-width: 480px">
+      <button class="modal-close-x" id="btn-modal-group-close" aria-label="Close">×</button>
+      <h3 class="font-display mb-4" id="group-modal-title" style="font-size: var(--font-size-xl)">Create Circle</h3>
+      <form id="group-form">
+        <input type="hidden" id="group-form-id" />
+        <div class="admin-form-group">
+          <label class="admin-form-label" for="group-form-name">Circle Name *</label>
+          <input type="text" class="input" id="group-form-name" required placeholder="E.g. Grace Fellowship" maxlength="100" />
+        </div>
+        <div class="admin-form-group">
+          <label class="admin-form-label" for="group-form-passcode">Circle Passcode (6-char alphanumeric) *</label>
+          <div style="display: flex; gap: var(--space-2)">
+            <input type="text" class="input" id="group-form-passcode" required maxlength="6" minlength="6" placeholder="E.G. GRACE1" style="text-transform: uppercase; letter-spacing: 2px" />
+            <button type="button" class="btn-secondary" id="btn-group-passcode-generate" style="min-width: 100px">Generate</button>
+          </div>
+          <p id="group-form-passcode-feedback" style="font-size: var(--font-size-xs); display: none; color: var(--color-error); margin-top: 4px;"></p>
+        </div>
+        <div class="mb-6 mt-4" style="display: flex; gap: var(--space-2); align-items: center">
+          <input type="checkbox" id="group-form-optout" style="width: 18px; height: 18px; cursor: pointer" />
+          <label for="group-form-optout" class="admin-form-label" style="margin-bottom: 0; cursor: pointer">Exclude this group from receiving unassigned general prayers</label>
+        </div>
+        <div class="flex justify-end gap-3" style="border-top: 1px solid rgba(0, 0, 0, 0.06); padding-top: var(--space-4);">
+          <button type="button" class="btn-secondary" id="btn-group-form-cancel">Cancel</button>
+          <button type="submit" class="btn-primary" id="btn-group-form-submit">Save Circle</button>
+        </div>
+      </form>
+    </div>
+
+    <!-- B. Single Member Add Modal -->
+    <div class="modal-backdrop" id="modal-member-backdrop" style="display: none"></div>
+    <div class="modal card" id="modal-member" style="display: none; padding: var(--space-8); max-width: 440px">
+      <button class="modal-close-x" id="btn-modal-member-close" aria-label="Close">×</button>
+      <h3 class="font-display mb-4" style="font-size: var(--font-size-xl)">Add Intercessor</h3>
+      <form id="member-form">
+        <div class="admin-form-group">
+          <label class="admin-form-label" for="member-form-name">Intercessor Name *</label>
+          <input type="text" class="input" id="member-form-name" required placeholder="E.g. John Doe" maxlength="100" />
+        </div>
+        <div class="admin-form-group">
+          <label class="admin-form-label" for="member-form-email">Email Address *</label>
+          <input type="email" class="input" id="member-form-email" required placeholder="john.doe@example.com" />
+        </div>
+        <div class="flex justify-end gap-3 mt-6" style="border-top: 1px solid rgba(0, 0, 0, 0.06); padding-top: var(--space-4);">
+          <button type="button" class="btn-secondary" id="btn-member-form-cancel">Cancel</button>
+          <button type="submit" class="btn-primary" id="btn-member-form-submit">Add Intercessor</button>
+        </div>
+      </form>
+    </div>
+
+    <!-- C. Bulk Member Import Modal -->
+    <div class="modal-backdrop" id="modal-member-bulk-backdrop" style="display: none"></div>
+    <div class="modal card" id="modal-member-bulk" style="display: none; padding: var(--space-8); max-width: 580px; width: 90%;">
+      <button class="modal-close-x" id="btn-modal-member-bulk-close" aria-label="Close">×</button>
+      <h3 class="font-display mb-2" style="font-size: var(--font-size-xl)">Bulk CSV Import</h3>
+      <p class="color-text-secondary mb-4" style="font-size: var(--font-size-sm)">
+        Paste CSV records below. Format: <code>Name, Email</code> (one record per line).
+      </p>
+      <form id="member-bulk-form">
+        <div class="admin-form-group">
+          <label class="admin-form-label" for="member-bulk-textarea">CSV Records</label>
+          <textarea id="member-bulk-textarea" class="textarea" rows="8" placeholder="John Smith,john@example.com&#10;Sarah Jenkins,sjenkins@church.org" style="font-family: monospace; font-size: var(--font-size-sm)" required></textarea>
+        </div>
+
+        <!-- Validation preview screen -->
+        <div id="bulk-preview-section" style="display: none; margin-bottom: var(--space-4)">
+          <h4 class="font-display mb-2" style="font-size: var(--font-size-sm)">Validation Summary</h4>
+          <div style="max-height: 180px; overflow-y: auto; border: 1px solid rgba(0, 0, 0, 0.06); border-radius: var(--radius-sm);">
+            <table class="admin-table" style="margin-top: 0; font-size: var(--font-size-xs)">
+              <thead>
+                <tr>
+                  <th>Status</th>
+                  <th>Name</th>
+                  <th>Email</th>
+                  <th>Issue</th>
+                </tr>
+              </thead>
+              <tbody id="bulk-preview-table-body">
+                <!-- Preview items loaded dynamically -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="flex justify-between items-center mt-6" style="border-top: 1px solid rgba(0, 0, 0, 0.06); padding-top: var(--space-4);">
+          <div id="bulk-summary-status" class="color-text-secondary" style="font-size: var(--font-size-xs)">Ready to parse</div>
+          <div class="flex gap-3">
+            <button type="button" class="btn-secondary" id="btn-member-bulk-cancel">Cancel</button>
+            <button type="button" class="btn-secondary" id="btn-member-bulk-validate">Validate CSV</button>
+            <button type="submit" class="btn-primary" id="btn-member-bulk-submit" disabled>Import Valid Rows</button>
+          </div>
+        </div>
+      </form>
+    </div>
+
+    <!-- D. Admin Create Modal -->
+    <div class="modal-backdrop" id="modal-admin-backdrop" style="display: none"></div>
+    <div class="modal card" id="modal-admin" style="display: none; padding: var(--space-8); max-width: 440px">
+      <button class="modal-close-x" id="btn-modal-admin-close" aria-label="Close">×</button>
+      <h3 class="font-display mb-4" style="font-size: var(--font-size-xl)">Create Console Account</h3>
+      <form id="admin-account-form">
+        <div class="admin-form-group">
+          <label class="admin-form-label" for="admin-form-username">Username *</label>
+          <input
+            type="text"
+            class="input"
+            id="admin-form-username"
+            required
+            placeholder="alphanumeric_only"
+            minlength="3"
+            maxlength="50"
+            pattern="^[a-zA-Z0-9_]+$"
+          />
+        </div>
+        <div class="admin-form-group">
+          <label class="admin-form-label" for="admin-form-password">Password *</label>
+          <input type="password" class="input" id="admin-form-password" required placeholder="Minimum 8 characters" minlength="8" />
+        </div>
+        <div class="admin-form-group">
+          <label class="admin-form-label" for="admin-form-role">Console Role *</label>
+          <select id="admin-form-role" class="input" style="height: 42px" required>
+            <option value="APP_ADMIN">App Admin (Full Access)</option>
+            <option value="GROUP_ADMIN">Group Admin (Single Circle)</option>
+          </select>
+        </div>
+        <div class="admin-form-group" id="admin-form-group-select-wrapper" style="display: none">
+          <label class="admin-form-label" for="admin-form-group-select">Assigned Circle *</label>
+          <select id="admin-form-group-select" class="input" style="height: 42px">
+            <!-- Loaded dynamically -->
+          </select>
+        </div>
+        <div class="flex justify-end gap-3 mt-6" style="border-top: 1px solid rgba(0, 0, 0, 0.06); padding-top: var(--space-4);">
+          <button type="button" class="btn-secondary" id="btn-admin-form-cancel">Cancel</button>
+          <button type="submit" class="btn-primary" id="btn-admin-form-submit">Create Console Account</button>
+        </div>
+      </form>
+    </div>
+
+    <!-- E. Prayer Details View Modal -->
+    <div class="modal-backdrop" id="modal-prayer-backdrop" style="display: none"></div>
+    <div class="modal card" id="modal-prayer" style="display: none; padding: var(--space-8); max-width: 580px; width: 90%;">
+      <button class="modal-close-x" id="btn-modal-prayer-close" aria-label="Close">×</button>
+      <div class="text-center" id="prayer-detail-content">
+        <!-- Loaded dynamically -->
+      </div>
+    </div>
+
+    <!-- F. Confirmation Modal -->
+    <div class="modal-backdrop" id="modal-confirm-backdrop" style="display: none; z-index: 1050"></div>
+    <div class="modal card" id="modal-confirm" style="display: none; padding: var(--space-6); max-width: 400px; z-index: 1060;">
+      <h3 class="font-display mb-2" id="confirm-title" style="font-size: var(--font-size-lg)">Are you sure?</h3>
+      <p class="color-text-secondary mb-6" id="confirm-message" style="font-size: var(--font-size-sm); line-height: 1.4"></p>
+      <div class="flex justify-end gap-3">
+        <button type="button" class="btn-secondary" id="btn-confirm-cancel">Cancel</button>
+        <button type="button" class="btn-primary" id="btn-confirm-action" style="background-color: var(--color-error)">Delete</button>
+      </div>
+    </div>
+
+    <!-- Main Module Entry Point JS -->
+    <script type="module" src="./src/portal.js"></script>
+  </body>
+</html>

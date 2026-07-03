@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Prayer Link - Lift in Prayer</title>
+
+    <meta
+      name="description"
+      content="View the details of a prayer request and indicate that you have prayed."
+    />
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="./src/styles/tokens.css" />
+    <link rel="stylesheet" href="./src/styles/reset.css" />
+    <link rel="stylesheet" href="./src/styles/base.css" />
+    <link rel="stylesheet" href="./src/styles/components.css" />
+    <link rel="stylesheet" href="./src/styles/animations.css" />
+    <link rel="stylesheet" href="./src/styles/layout.css" />
+  </head>
+  <body>
+    <!-- Glowing Bottom Aurora Waves & Giant Text -->
+    <div class="background-blobs" aria-hidden="true">
+      <div class="blob-wrapper" style="--factor: 0.03">
+        <div class="blob blob-1"></div>
+      </div>
+      <div class="blob-wrapper" style="--factor: -0.05">
+        <div class="blob blob-2"></div>
+      </div>
+      <div class="blob-wrapper" style="--factor: 0.07">
+        <div class="blob blob-3"></div>
+      </div>
+      <div class="blob-wrapper" style="--factor: -0.04">
+        <div class="blob blob-4"></div>
+      </div>
+      <div class="blob-wrapper" style="--factor: 0.05">
+        <div class="blob blob-5"></div>
+      </div>
+      <div class="background-giant-text">LIFT</div>
+    </div>
+
+    <style>
+      @media (min-width: 768px) {
+        .pray-grid-layout {
+          grid-template-columns: 4fr 6fr !important;
+        }
+        #other-prayers-list {
+          max-height: 500px !important;
+        }
+      }
+      #other-prayers-list::-webkit-scrollbar {
+        width: 6px;
+      }
+      #other-prayers-list::-webkit-scrollbar-track {
+        background: transparent;
+      }
+      #other-prayers-list::-webkit-scrollbar-thumb {
+        background: rgba(18, 44, 38, 0.1);
+        border-radius: 3px;
+      }
+      #other-prayers-list::-webkit-scrollbar-thumb:hover {
+        background: rgba(18, 44, 38, 0.2);
+      }
+    </style>
+
+    <main class="page-main" id="pray-root">
+      <div class="content-wide" id="pray-container" style="max-width: 1000px; display: none; padding: var(--space-4);">
+        <header class="text-center mb-10">
+          <h1
+            class="font-display"
+            id="group-header-title"
+            style="font-size: var(--font-size-3xl); font-style: italic"
+          >
+            Pray with Us
+          </h1>
+        </header>
+
+        <div class="pray-grid-layout" style="display: grid; grid-template-columns: 1fr; gap: var(--space-8); align-items: start;">
+          <!-- Left/Top: Primary Prayer Card -->
+          <div class="primary-prayer-section">
+            <section
+              class="card"
+              id="prayer-display-card"
+              style="border-radius: var(--radius-md); padding: var(--space-8); box-sizing: border-box;"
+            >
+              <!-- Will be populated by JS -->
+            </section>
+          </div>
+
+          <!-- Right/Bottom: Other Prayers List -->
+          <div class="other-prayers-section" id="other-prayers-container" style="display: none;">
+            <h2 class="font-display mb-4" style="font-size: var(--font-size-lg); border-bottom: 1px solid rgba(18, 44, 38, 0.05); padding-bottom: var(--space-2);">
+              Other prayers in this group
+            </h2>
+            <div id="other-prayers-list" class="flex flex-col gap-4" style="max-height: 400px; overflow-y: auto; padding-right: var(--space-2);">
+              <!-- Will be populated by JS -->
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Loading / Error message outside container until loaded -->
+      <div id="status-message-container" class="content-narrow">
+        <section
+          class="card"
+          style="border-radius: var(--radius-md); padding: var(--space-8)"
+        >
+          <p
+            class="text-center color-text-secondary"
+            id="loading-text"
+            style="font-weight: 300"
+          >
+            Loading prayer details...
+          </p>
+        </section>
+      </div>
+    </main>
+
+    <script type="module" src="./src/pray.js"></script>
+  </body>
+</html>
