@@ -803,7 +803,7 @@ function initEventListeners() {
         ).catch((err) => {
             console.error(err);
             btnStartQr.disabled = false;
-            btnStartQr.textContent = '📷 Retry Scanner';
+            btnStartQr.textContent = 'Retry Scanner';
             qrFeedback.textContent = 'Camera permission denied or camera not found.';
             qrFeedback.className = 'feedback-msg error';
             qrFeedback.style.display = 'block';

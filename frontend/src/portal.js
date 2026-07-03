@@ -281,7 +281,7 @@ function renderIntercessorDashboard() {
     const link = document.createElement('a');
     link.href = '#';
     link.className = `admin-sidebar__link ${selectedGroupId === group.groupId ? 'active' : ''}`;
-    link.innerHTML = `<span>👥</span> ${group.name}`;
+    link.innerHTML = `${group.name}`;
 
     link.addEventListener('click', (e) => {
       e.preventDefault();
