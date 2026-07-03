@@ -367,8 +367,8 @@ async function handlePasscodeConfirm() {
         return;
     }
 
-    if (code.length !== 6) {
-        passcodeFeedback.textContent = "Passcode must be exactly 6 characters.";
+    if (code.length < 3 || code.length > 12) {
+        passcodeFeedback.textContent = "Passcode must be between 3 and 12 characters.";
         passcodeFeedback.className = "feedback-msg error";
         passcodeFeedback.style.display = "block";
         return;
