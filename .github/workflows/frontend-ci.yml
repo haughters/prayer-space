@@ -48,3 +48,5 @@ jobs:
         with:
           coverageFile: frontend/coverage/cobertura-coverage.xml
           token: ${{ secrets.GITHUB_TOKEN }}
+          thresholdAll: 0.8
+          title: Coverage Report
