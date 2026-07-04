@@ -1,0 +1,577 @@
+:root {
+  /* Dark theme overrides */
+  --charcoal: #1c1d21;
+  --charcoal-deep: #141416;
+  --panel: #212227;
+  --offwhite: #f4f1ea;
+  --muted: #9a9aa2;
+  --line: rgba(244, 241, 234, 0.12);
+  --cyan: #38b6c4;
+  --magenta: #e0457b;
+  --amber: #e8a13c;
+  --sidebar-w: 280px;
+
+  /* Redefine existing tokens for dark theme look */
+  --color-text-primary: var(--offwhite);
+  --color-text-secondary: var(--muted);
+  --color-text-muted: var(--muted);
+  --color-text-inverse: var(--charcoal-deep);
+
+  --color-accent: var(--cyan);
+  --color-accent-hover: #2ba2b0;
+  --color-accent-light: rgba(56, 182, 196, 0.12);
+
+  --color-surface: rgba(28, 29, 33, 0.45);
+  --color-surface-solid: var(--panel);
+  --color-surface-border: var(--line);
+
+  --color-backdrop: rgba(10, 10, 12, 0.7);
+
+  --color-admin-sidebar: rgba(28, 29, 33, 0.4);
+  --color-admin-sidebar-text: var(--offwhite);
+  --color-admin-sidebar-active: var(--color-accent-light);
+  --color-admin-bg: transparent;
+  --color-admin-table-alt: rgba(255, 255, 255, 0.02);
+
+  --font-body: 'Hanken Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-display: 'Clash Display', Georgia, serif;
+}
+
+html {
+  background: radial-gradient(120% 120% at 70% 20%, #232429 0%, var(--charcoal) 45%, var(--charcoal-deep) 100%) !important;
+  background-color: #141416 !important; /* Deep charcoal matching page theme */
+}
+
+body {
+  background: transparent !important;
+  background-color: transparent !important;
+  color: var(--offwhite) !important;
+  font-family: "Hanken Grotesk", sans-serif !important;
+  min-height: 100vh;
+  position: relative;
+  overflow: auto !important; /* Enable scrolling */
+}
+
+@media (max-width: 768px) {
+  html {
+    background: radial-gradient(100% 100% at 50% 50%, var(--charcoal) 0%, var(--charcoal-deep) 100%) !important;
+    background-color: #141416 !important;
+  }
+  body {
+    background: transparent !important;
+    background-color: transparent !important;
+  }
+}
+
+/* === Layout & Containers === */
+.admin-layout {
+  display: grid;
+  grid-template-columns: var(--sidebar-w) 1fr !important;
+  gap: 1.5rem !important;
+  padding: 1.5rem !important;
+  align-items: start !important;
+  min-height: 100vh !important;
+}
+
+@media (max-width: 768px) {
+  .admin-layout {
+    grid-template-columns: 1fr !important;
+    gap: 1rem !important;
+    padding: 1rem !important;
+  }
+}
+
+/* Sidebar navigation */
+.admin-sidebar {
+  position: sticky !important;
+  top: 1.5rem !important;
+  height: calc(100vh - 3rem) !important;
+  border-radius: 26px !important;
+  background: rgba(28, 29, 33, 0.4) !important;
+  border: 1px solid rgba(244, 241, 234, 0.16) !important;
+  backdrop-filter: blur(28px) saturate(170%) !important;
+  -webkit-backdrop-filter: blur(28px) saturate(170%) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.12),
+    0 30px 70px -28px rgba(0,0,0,0.7) !important;
+  padding: 2rem 1.5rem !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 2rem !important;
+  overflow-y: auto !important;
+}
+
+@media (max-width: 768px) {
+  .admin-sidebar {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    height: 100vh !important;
+    width: min(300px, 84vw) !important;
+    border-radius: 0 26px 26px 0 !important;
+    transform: translateX(-110%) !important;
+    transition: transform 0.35s cubic-bezier(.16,.84,.3,1) !important;
+    z-index: 600 !important;
+  }
+  .admin-sidebar.open {
+    transform: none !important;
+  }
+}
+
+.admin-sidebar__title {
+  font-family: "Clash Display", sans-serif !important;
+  font-size: 1.3rem !important;
+  font-weight: 600 !important;
+  color: var(--offwhite) !important;
+  margin-bottom: 0.2rem !important;
+}
+
+.admin-sidebar__nav {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 0.5rem !important;
+  flex-grow: 1 !important;
+}
+
+.admin-sidebar__link {
+  display: flex !important;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 0.8rem 1rem !important;
+  font-size: 1rem !important;
+  font-family: inherit !important;
+  text-align: left !important;
+  color: var(--offwhite) !important;
+  background: none !important;
+  border: 1px solid transparent !important;
+  border-radius: 12px !important;
+  cursor: pointer !important;
+  transition: background 0.18s ease, border-color 0.18s ease, color 0.18s ease !important;
+  text-decoration: none !important;
+}
+
+.admin-sidebar__link:hover {
+  background: rgba(244, 241, 234, 0.05) !important;
+  color: var(--offwhite) !important;
+}
+
+/* Logout Button Custom Red Styles */
+#nav-logout,
+#btn-intercessor-logout {
+  color: #ff5252 !important; /* Vibrant Red */
+}
+
+#nav-logout:hover,
+#btn-intercessor-logout:hover {
+  background: rgba(255, 82, 82, 0.12) !important;
+  color: #ff7676 !important;
+}
+
+.admin-sidebar__link.active {
+  background: rgba(56, 182, 196, 0.12) !important;
+  border-color: rgba(56, 182, 196, 0.4) !important;
+  color: var(--cyan) !important;
+  font-weight: 600 !important;
+}
+
+/* Main Content Area */
+.admin-content, .admin-main {
+  background: rgba(20, 21, 25, 0.62) !important;
+  border: 1px solid rgba(244, 241, 234, 0.1) !important;
+  backdrop-filter: blur(20px) saturate(130%) !important;
+  -webkit-backdrop-filter: blur(20px) saturate(130%) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.08),
+  0 30px 70px -28px rgba(0,0,0,0.6) !important;
+  min-height: calc(100vh - 3rem) !important;
+  margin: 0 !important;
+  padding: 2.2rem clamp(1.4rem, 3vw, 2.6rem) !important;
+  border-radius: 26px !important;
+}
+
+@media (max-width: 768px) {
+  .admin-content, .admin-main {
+    min-height: auto !important;
+    margin: 1rem 0 0 0 !important;
+    padding: 1.5rem 1.2rem !important;
+  }
+}
+
+/* === Typography Overrides === */
+h1, h2, h3, h4, h5, h6 {
+  font-family: "Clash Display", sans-serif !important;
+  font-weight: 600 !important;
+  color: var(--offwhite) !important;
+  letter-spacing: 0.02em;
+}
+
+.color-text-secondary {
+  color: var(--muted) !important;
+}
+.color-text-muted {
+  color: var(--muted) !important;
+  opacity: 0.7;
+}
+
+/* === Auth Screen Styling === */
+#auth-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 1.5rem;
+  z-index: 10;
+  position: relative;
+}
+
+#auth-container .content-narrow {
+  width: min(440px, 100%) !important;
+}
+
+#auth-container h1 {
+  font-size: 2.5rem !important;
+  margin-bottom: 0.5rem !important;
+  text-align: center;
+}
+
+/* === Cards === */
+.card {
+  background: var(--panel) !important;
+  border: 1px solid var(--line) !important;
+  border-radius: 18px !important;
+  box-shadow: 0 30px 80px -30px rgba(0,0,0,0.85) !important;
+  backdrop-filter: blur(28px) saturate(170%);
+  -webkit-backdrop-filter: blur(28px) saturate(170%);
+  padding: 2rem !important;
+}
+
+/* === Form Inputs & Controls === */
+.admin-form-group {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 0.5rem !important;
+  margin-bottom: 1.2rem !important;
+}
+
+.admin-form-label {
+  font-weight: 500 !important;
+  font-size: 0.88rem !important;
+  color: var(--offwhite) !important;
+  opacity: 0.9;
+}
+
+.input, .textarea, select.input {
+  width: 100%;
+  padding: 0.85rem 1.1rem !important;
+  font-size: 1rem !important;
+  font-family: inherit !important;
+  border-radius: 12px !important;
+  border: 1px solid var(--line) !important;
+  background: rgba(244, 241, 234, 0.05) !important;
+  color: var(--offwhite) !important;
+  outline: none !important;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease !important;
+}
+
+.input:focus, .textarea:focus, select.input:focus {
+  border-color: rgba(56, 182, 196, 0.6) !important;
+  box-shadow: 0 0 0 3px rgba(56, 182, 196, 0.15) !important;
+}
+
+.input::placeholder, .textarea::placeholder {
+  color: var(--muted) !important;
+  opacity: 0.6;
+}
+
+/* Toggle password style positioning */
+.btn-toggle-password {
+  position: absolute !important;
+  right: 1rem !important; /* Position left of the Apple/browser autofill key icon */
+  background: none !important;
+  border: none !important;
+  cursor: pointer !important;
+  color: var(--muted) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 0 !important;
+  z-index: 2 !important;
+}
+
+/* Ensure password fields with toggles have extra right-padding to clear both icons */
+div:has(> .btn-toggle-password) > .input {
+  padding-right: 2.5rem !important;
+}
+
+/* === Buttons === */
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.85rem 1.6rem !important;
+  font-size: 1rem !important;
+  font-weight: 600 !important;
+  font-family: inherit !important;
+  border: none !important;
+  border-radius: 12px !important;
+  cursor: pointer !important;
+  background: var(--offwhite) !important;
+  color: var(--charcoal-deep) !important;
+  transition: transform 0.15s ease, filter 0.2s ease, opacity 0.2s ease !important;
+  text-decoration: none !important;
+}
+
+.btn-primary:hover {
+  transform: translateY(-1px) !important;
+  filter: brightness(1.08) !important;
+}
+
+.btn-primary:active {
+  transform: translateY(0) !important;
+}
+
+.btn-primary:disabled {
+  opacity: 0.6 !important;
+  cursor: not-allowed !important;
+  transform: none !important;
+}
+
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.85rem 1.6rem !important;
+  font-size: 1rem !important;
+  font-weight: 500 !important;
+  font-family: inherit !important;
+  border: 1px solid var(--line) !important;
+  border-radius: 12px !important;
+  cursor: pointer !important;
+  background: rgba(244, 241, 234, 0.04) !important;
+  color: var(--offwhite) !important;
+  transition: transform 0.15s ease, background 0.2s ease, border-color 0.2s ease, color 0.2s ease !important;
+  text-decoration: none !important;
+}
+
+.btn-secondary:hover {
+  background: rgba(244, 241, 234, 0.08) !important;
+  border-color: rgba(244, 241, 234, 0.3) !important;
+}
+
+.btn-secondary:disabled {
+  opacity: 0.4 !important;
+  cursor: not-allowed !important;
+}
+
+.btn-success {
+  background: var(--color-success, #2d6a4f) !important;
+  color: white !important;
+  border-radius: 12px !important;
+  border: none !important;
+  padding: 0.85rem 1.6rem !important;
+  font-weight: 600 !important;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: inherit !important;
+}
+
+/* Sm buttons for actions */
+.btn-sm {
+  padding: 0.45rem 0.9rem !important;
+  font-size: 0.85rem !important;
+  border-radius: 8px !important;
+}
+
+/* === Tables === */
+.admin-table-container {
+  background: rgba(28, 29, 33, 0.45) !important;
+  border: 1px solid var(--line) !important;
+  border-radius: 18px !important;
+  box-shadow: var(--shadow-sm) !important;
+  margin-top: 1.5rem !important;
+  overflow: hidden !important;
+}
+
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+  color: var(--offwhite) !important;
+}
+
+.admin-table th {
+  background: rgba(244, 241, 234, 0.03) !important;
+  color: var(--muted) !important;
+  font-family: "Clash Display", sans-serif !important;
+  font-weight: 600 !important;
+  padding: 1rem 1.2rem !important;
+  border-bottom: 1px solid var(--line) !important;
+  text-transform: uppercase;
+  font-size: 0.78rem;
+  letter-spacing: 0.05em;
+}
+
+.admin-table td {
+  padding: 1rem 1.2rem !important;
+  border-bottom: 1px solid var(--line) !important;
+  color: var(--offwhite) !important;
+  font-size: 0.95rem;
+}
+
+.admin-table tr:hover {
+  background: rgba(244, 241, 234, 0.04) !important;
+}
+
+/* === Code styling === */
+code {
+  background: rgba(244, 241, 234, 0.08) !important;
+  color: var(--cyan) !important;
+  padding: 4px 8px !important;
+  border-radius: 6px !important;
+  font-family: monospace !important;
+  font-weight: bold !important;
+}
+
+/* === Badges & Statuses === */
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.2rem 0.6rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  border-radius: 999px;
+  background: rgba(244, 241, 234, 0.08);
+}
+
+.status-badge.open {
+  color: var(--cyan);
+  background: rgba(56, 182, 196, 0.1);
+}
+
+.status-badge.closed {
+  color: var(--muted);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+/* === Modals === */
+.modal-backdrop {
+  background: rgba(10, 10, 12, 0.6) !important;
+  backdrop-filter: blur(8px) !important;
+  -webkit-backdrop-filter: blur(8px) !important;
+  z-index: 900 !important;
+}
+
+.modal.card {
+  position: fixed !important;
+  top: 50% !important;
+  left: 50% !important;
+  transform: translate(-50%, -50%) !important;
+  z-index: 1000 !important;
+  width: min(520px, 90%) !important;
+  background: var(--panel) !important;
+  border: 1px solid var(--line) !important;
+  box-shadow: 0 30px 80px -20px rgba(0, 0, 0, 0.9) !important;
+  border-radius: 20px !important;
+}
+
+.modal-close-x {
+  background: transparent !important;
+  border: none !important;
+  color: var(--muted) !important;
+  font-size: 1.5rem !important;
+  cursor: pointer !important;
+  position: absolute !important;
+  right: 1.5rem !important;
+  top: 1.5rem !important;
+  transition: color 0.2s ease !important;
+}
+
+.modal-close-x:hover {
+  color: var(--offwhite) !important;
+}
+
+/* === Mobile Top Bar === */
+.mobile-bar {
+  display: none;
+  align-items: center;
+  gap: 0.8rem;
+  padding: 0.6rem 1.2rem;
+  border-radius: 16px;
+  background: rgba(28,29,33,0.55);
+  border: 1px solid rgba(244,241,234,0.14);
+  backdrop-filter: blur(22px) saturate(160%);
+  -webkit-backdrop-filter: blur(22px) saturate(160%);
+  box-shadow: 0 18px 50px -28px rgba(0,0,0,0.7);
+  margin-bottom: 1rem;
+}
+
+.mobile-bar-title {
+  font-family: "Clash Display", sans-serif;
+  font-weight: 600;
+  font-size: 1.15rem;
+  color: var(--offwhite);
+}
+
+.menu-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: rgba(244,241,234,0.06);
+  border: 1px solid var(--line);
+  color: var(--offwhite);
+  cursor: pointer;
+}
+
+.menu-toggle svg {
+  width: 20px;
+  height: 20px;
+}
+
+.drawer-backdrop {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 550;
+  background: rgba(10,10,12,0.5);
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.drawer-backdrop.show {
+  display: block;
+  opacity: 1;
+}
+
+@media (max-width: 768px) {
+  .mobile-bar {
+    display: flex;
+  }
+}
+
+/* === Floating Emojis Burst (Premium micro-interaction) === */
+.floating-emoji {
+  pointer-events: none;
+  animation: emoji-float-drift 1.2s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+}
+
+@keyframes emoji-float-drift {
+  0% {
+    transform: translate(0, 0) scale(0.6) rotate(var(--rotate));
+    opacity: 0;
+  }
+  15% {
+    opacity: 1;
+    transform: translate(var(--drift-x), -30px) scale(1.2) rotate(var(--rotate));
+  }
+  100% {
+    transform: translate(var(--drift-x-end), -160px) scale(0.8) rotate(var(--rotate-end));
+    opacity: 0;
+  }
+}

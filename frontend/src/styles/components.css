@@ -1,0 +1,412 @@
+/* === Button (Primary) === */
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  padding: 0.8rem 2rem;
+  background-color: var(--color-text-primary); /* Dark forest green */
+  color: var(--color-text-inverse); /* White */
+  font-family: var(--font-body);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  border: 1px solid transparent;
+  border-radius: var(--radius-full); /* Pill shape */
+  cursor: pointer;
+  box-shadow: var(--shadow-sm);
+  transition: all var(--transition-base);
+}
+.btn-primary:hover {
+  background-color: var(--color-accent); /* Glows blue on hover */
+  color: var(--color-text-inverse);
+  box-shadow: var(--shadow-md);
+}
+.btn-primary:active {
+  transform: translateY(1px);
+}
+.btn-primary:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+.btn-primary:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* === Button (Secondary) === */
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  padding: 0.8rem 2rem;
+  background-color: transparent;
+  color: var(--color-text-primary);
+  font-family: var(--font-body);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  border: 1px solid rgba(18, 44, 38, 0.15); /* Soft border */
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  transition: all var(--transition-base);
+}
+.btn-secondary:hover {
+  background-color: rgba(18, 44, 38, 0.04);
+  border-color: var(--color-text-primary);
+  color: var(--color-text-primary);
+}
+.btn-secondary:active {
+  transform: translateY(1px);
+}
+.btn-secondary:focus-visible {
+  outline: 2px solid var(--color-text-primary);
+  outline-offset: 2px;
+}
+
+/* === Button (Destructive) === */
+.btn-destructive {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  padding: 0.6rem 1.4rem;
+  background-color: var(--color-error);
+  color: var(--color-text-inverse);
+  font-family: var(--font-body);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  border: none;
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  transition: background-color var(--transition-base);
+}
+.btn-destructive:hover {
+  background-color: #8c1d22;
+}
+
+/* === Card (Solid White/Paper style) === */
+.card {
+  background-color: var(--color-surface-solid);
+  border: 1px solid var(--color-surface-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-8);
+  box-shadow: var(--shadow-sm);
+  transition:
+    border-color var(--transition-base),
+    box-shadow var(--transition-base);
+}
+
+/* === Input / Textarea === */
+.input,
+.textarea {
+  width: 100%;
+  padding: var(--space-3) var(--space-4);
+  background-color: #fcfdfd;
+  border: 1px solid var(--color-surface-border);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-body);
+  font-size: var(--font-size-base);
+  color: var(--color-text-primary);
+  transition:
+    border-color var(--transition-base),
+    box-shadow var(--transition-base);
+}
+.input:focus,
+.textarea:focus {
+  outline: none;
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 3px rgba(0, 140, 168, 0.15);
+}
+.input::placeholder,
+.textarea::placeholder {
+  color: var(--color-text-muted);
+  font-style: italic;
+  font-weight: 300;
+}
+.input.error,
+.textarea.error {
+  border-color: var(--color-error);
+  box-shadow: 0 0 0 3px var(--color-error-bg);
+}
+
+/* === Badge (Prayer Count) === */
+.badge-prayer {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: 0.25rem 0.65rem;
+  background-color: var(--color-accent-light);
+  border-radius: var(--radius-full);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-accent);
+  transition: all var(--transition-fast);
+}
+
+/* === Prayer Pill === */
+.prayer-pill {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding: var(--space-2) var(--space-3);
+  background-color: var(--color-surface-solid);
+  border: 1px solid var(--color-surface-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+  cursor: pointer;
+  max-width: 220px;
+  transition: all var(--transition-base);
+}
+.prayer-pill:hover {
+  border-color: var(--color-accent);
+  box-shadow: var(--shadow-md);
+}
+.prayer-pill.closed {
+  opacity: 0.55;
+  filter: grayscale(40%);
+}
+.prayer-pill__text {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* === Prayer Card === */
+.prayer-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding: var(--space-6);
+  background-color: var(--color-surface-solid);
+  border: 1px solid var(--color-surface-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+  transition: all var(--transition-base);
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+}
+
+.prayer-card:hover {
+  transform: translateY(-2px);
+  border-color: var(--color-accent);
+  box-shadow: var(--shadow-md);
+}
+
+.prayer-card__text {
+  font-family: var(--font-body);
+  font-size: var(--font-size-base);
+  font-weight: 300;
+  line-height: 1.7;
+  color: var(--color-text-primary);
+  display: -webkit-box;
+  -webkit-line-clamp: 5;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.prayer-card__meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: auto;
+  border-top: 1px solid rgba(18, 44, 38, 0.04);
+  padding-top: var(--space-3);
+}
+
+.prayer-card__date {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+}
+
+/* === Toast Notification === */
+.toast {
+  position: fixed;
+  bottom: var(--space-6);
+  right: var(--space-6);
+  z-index: var(--z-toast);
+  padding: var(--space-3) var(--space-5);
+  background-color: var(--color-surface-solid);
+  color: var(--color-text-primary);
+  border: 1px solid var(--color-surface-border);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-lg);
+  max-width: 360px;
+  font-size: var(--font-size-sm);
+  animation: toast-slide-in var(--transition-base) forwards;
+}
+.toast.success {
+  border-left: 3px solid var(--color-success);
+}
+.toast.error {
+  border-left: 3px solid var(--color-error);
+}
+.toast.info {
+  border-left: 3px solid var(--color-accent);
+}
+
+@keyframes toast-slide-in {
+  from {
+    transform: translateY(30px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes toast-slide-out {
+  from {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateY(30px);
+    opacity: 0;
+  }
+}
+
+/* === Modal === */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background-color: var(--color-backdrop);
+  z-index: var(--z-modal-backdrop);
+  animation: fade-in var(--transition-base);
+}
+.modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: var(--z-modal);
+  width: min(90vw, 480px);
+  background-color: var(--color-surface-solid);
+  border: 1px solid var(--color-surface-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-8);
+  box-shadow: var(--shadow-xl);
+  animation: modal-pop var(--transition-slow);
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes modal-pop {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -46%) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+/* === Loading Spinner === */
+.spinner {
+  width: 20px;
+  height: 20px;
+  border: 2px solid var(--color-accent-light);
+  border-top-color: var(--color-accent);
+  border-radius: 50%;
+  animation: spin 0.8s cubic-bezier(0.5, 0.1, 0.4, 0.9) infinite;
+}
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* === Status Badges === */
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: 0.2rem 0.5rem;
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+}
+.status-badge.open {
+  background-color: var(--color-success-bg);
+  color: var(--color-success);
+}
+.status-badge.closed {
+  background-color: #f3f3f8;
+  color: var(--color-text-muted);
+}
+
+/* === Closed Prayer Card === */
+.prayer-card.closed {
+  opacity: 0.6;
+  filter: grayscale(30%);
+}
+.prayer-card.closed:hover {
+  transform: none;
+  border-color: var(--color-surface-border);
+  box-shadow: var(--shadow-sm);
+}
+.prayer-card.closed .prayer-card__text {
+  font-style: italic;
+}
+
+/* === Close Button Focus Outlines === */
+#btn-modal-close-x:focus-visible,
+.btn-modal-close-x:focus-visible {
+  outline: 2px solid var(--color-accent);
+  border-radius: var(--radius-sm);
+}
+
+/* === Keyboard Focus States for Cards === */
+.prayer-card:focus-visible {
+  outline: 3px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+/* === Mobile Slide-in Modal Layout === */
+@media (max-width: 768px) {
+  .modal {
+    top: 0;
+    left: unset;
+    right: 0;
+    transform: none;
+    width: 100vw;
+    height: 100vh;
+    border-radius: 0;
+    box-shadow: none;
+    animation: modal-slide-in-right 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    overflow-y: auto;
+  }
+  @keyframes modal-slide-in-right {
+    from {
+      transform: translateX(100%);
+    }
+    to {
+      transform: translateX(0);
+    }
+  }
+}
+
+/* === Accessibility Screen Reader Utility === */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}

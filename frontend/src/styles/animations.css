@@ -1,0 +1,206 @@
+/* === Background Container with Noise & Light Theme === */
+.background-blobs {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-background);
+  overflow: hidden;
+  pointer-events: none;
+  background-color: #f5f8f6; /* Soft mint off-white */
+}
+
+/* Film grain/noise overlay to create a tactile texture, exactly like the reference image but for light theme */
+.background-blobs::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 3; /* Above waves and text */
+  opacity: 0.035; /* Subtle noise */
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+}
+
+.blob-wrapper {
+  position: absolute;
+  bottom: -30vh; /* Raised up so waves are clearly visible above the bottom edge */
+  left: -20vw;
+  width: 140vw;
+  height: 80vh;
+  pointer-events: none;
+  transition: transform 2.5s cubic-bezier(0.1, 0.8, 0.2, 1); /* Extremely fluid movement */
+  will-change: transform;
+}
+
+/* === Glowing Aurora Waves (at the bottom) === */
+.blob {
+  position: absolute;
+  bottom: 0;
+  border-radius: 50%;
+  filter: blur(
+    80px
+  ); /* Slightly lower blur to make shape boundaries and motion visible */
+  opacity: 0.85; /* Increased opacity for rich colors on light background */
+  will-change: transform;
+}
+
+/* Wave 1: Soft Cyan/Blue glow */
+.blob-1 {
+  width: 80vw;
+  height: 50vh;
+  left: 0%;
+  background: radial-gradient(
+    circle at center,
+    rgba(0, 180, 216, 0.45) 0%,
+    rgba(0, 180, 216, 0) 70%
+  );
+  animation: wave-drift-1 16s ease-in-out infinite alternate;
+}
+
+/* Wave 2: Soft Mint Green glow */
+.blob-2 {
+  width: 90vw;
+  height: 55vh;
+  right: 5%;
+  background: radial-gradient(
+    circle at center,
+    rgba(82, 183, 136, 0.4) 0%,
+    rgba(82, 183, 136, 0) 70%
+  );
+  animation: wave-drift-2 20s ease-in-out infinite alternate;
+}
+
+/* Wave 3: Soft Teal/Seafoam glow */
+.blob-3 {
+  width: 75vw;
+  height: 45vh;
+  left: 20%;
+  background: radial-gradient(
+    circle at center,
+    rgba(72, 191, 227, 0.45) 0%,
+    rgba(72, 191, 227, 0) 70%
+  );
+  animation: wave-drift-3 14s ease-in-out infinite alternate;
+}
+
+/* Wave 4: Soft Ocean Blue glow */
+.blob-4 {
+  width: 100vw;
+  height: 60vh;
+  left: -10%;
+  background: radial-gradient(
+    circle at center,
+    rgba(0, 140, 168, 0.35) 0%,
+    rgba(0, 140, 168, 0) 70%
+  );
+  animation: wave-drift-4 22s ease-in-out infinite alternate;
+}
+
+/* Wave 5: Soft Lime/Mint green */
+.blob-5 {
+  width: 65vw;
+  height: 40vh;
+  right: 25%;
+  background: radial-gradient(
+    circle at center,
+    rgba(116, 198, 157, 0.35) 0%,
+    rgba(116, 198, 157, 0) 70%
+  );
+  animation: wave-drift-5 18s ease-in-out infinite alternate;
+}
+
+/* === Giant Background Typography === */
+.background-giant-text {
+  position: absolute;
+  bottom: 8vh;
+  left: 0;
+  right: 0;
+  text-align: center;
+  font-family: var(--font-body);
+  font-size: 17vw;
+  font-weight: 900;
+  letter-spacing: -0.05em;
+  color: transparent;
+  -webkit-text-stroke: 1px rgba(18, 44, 38, 0.035); /* Sage tinted outline, extremely subtle for light theme */
+  pointer-events: none;
+  z-index: 1; /* Behind the glow waves and noise, creating depth */
+  text-transform: uppercase;
+  user-select: none;
+}
+
+/* === Wave Drift Keyframes (Simulating organic ocean wave motion) === */
+@keyframes wave-drift-1 {
+  0% {
+    transform: translate3d(0, 0, 0) scale(1) rotate(0deg);
+  }
+  100% {
+    transform: translate3d(12%, -8vh, 0) scale(1.15) rotate(15deg);
+  }
+}
+
+@keyframes wave-drift-2 {
+  0% {
+    transform: translate3d(0, 0, 0) scale(1) rotate(0deg);
+  }
+  100% {
+    transform: translate3d(-10%, -6vh, 0) scale(0.9) rotate(-10deg);
+  }
+}
+
+@keyframes wave-drift-3 {
+  0% {
+    transform: translate3d(0, 0, 0) scale(0.95) rotate(0deg);
+  }
+  100% {
+    transform: translate3d(8%, -12vh, 0) scale(1.1) rotate(20deg);
+  }
+}
+
+@keyframes wave-drift-4 {
+  0% {
+    transform: translate3d(0, 0, 0) scale(1) rotate(0deg);
+  }
+  100% {
+    transform: translate3d(-15%, -5vh, 0) scale(1.05) rotate(-15deg);
+  }
+}
+
+@keyframes wave-drift-5 {
+  0% {
+    transform: translate3d(0, 0, 0) scale(1.05) rotate(0deg);
+  }
+  100% {
+    transform: translate3d(10%, -10vh, 0) scale(0.95) rotate(12deg);
+  }
+}
+
+/* === Reduced Motion Support === */
+@media (prefers-reduced-motion: reduce) {
+  .background-blobs .blob {
+    animation-play-state: paused !important;
+  }
+}
+
+/* === Micro-interactions: Floating Reaction Emojis === */
+@keyframes float-emoji {
+  0% {
+    transform: translateY(0) translateX(0) scale(0.6) rotate(0deg);
+    opacity: 0;
+  }
+  15% {
+    opacity: 1;
+    transform: translateY(-15px) translateX(var(--drift-x, 10px)) scale(1.2)
+      rotate(var(--rotate, 10deg));
+  }
+  100% {
+    transform: translateY(-100px) translateX(var(--drift-x-end, -10px)) scale(1)
+      rotate(var(--rotate-end, -20deg));
+    opacity: 0;
+  }
+}
+
+.floating-emoji {
+  position: absolute;
+  pointer-events: none;
+  font-size: 1.6rem;
+  z-index: 1000;
+  animation: float-emoji 0.9s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
