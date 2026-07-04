@@ -60,5 +60,12 @@ export default defineConfig({
         intercessor: resolve(__dirname, 'intercessor.html'),
       }
     }
+  },
+  test: {
+    coverage: {
+      provider: 'v8',
+      reporter: ['text', 'cobertura'],
+      reportsDirectory: './coverage'
+    }
   }
 });

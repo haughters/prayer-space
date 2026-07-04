@@ -38,6 +38,7 @@ dist/
 .eslintcache
 *.local
 frontend/dist/
+coverage/
 
 ### AWS CDK ###
 infra/cdk/**/*.js
