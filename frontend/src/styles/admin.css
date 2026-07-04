@@ -37,14 +37,30 @@
   --font-display: 'Clash Display', Georgia, serif;
 }
 
-body {
+html {
   background: radial-gradient(120% 120% at 70% 20%, #232429 0%, var(--charcoal) 45%, var(--charcoal-deep) 100%) !important;
-  background-attachment: fixed !important;
+  background-color: #141416 !important; /* Deep charcoal matching page theme */
+}
+
+body {
+  background: transparent !important;
+  background-color: transparent !important;
   color: var(--offwhite) !important;
   font-family: "Hanken Grotesk", sans-serif !important;
   min-height: 100vh;
   position: relative;
   overflow: auto !important; /* Enable scrolling */
+}
+
+@media (max-width: 768px) {
+  html {
+    background: radial-gradient(100% 100% at 50% 50%, var(--charcoal) 0%, var(--charcoal-deep) 100%) !important;
+    background-color: #141416 !important;
+  }
+  body {
+    background: transparent !important;
+    background-color: transparent !important;
+  }
 }
 
 /* === Layout & Containers === */
@@ -269,13 +285,22 @@ h1, h2, h3, h4, h5, h6 {
 
 /* Toggle password style positioning */
 .btn-toggle-password {
-  position: absolute;
-  right: 1rem;
-  background: none;
-  border: none;
-  cursor: pointer;
-  color: var(--muted);
-  font-size: 1.1rem;
+  position: absolute !important;
+  right: 1rem !important; /* Position left of the Apple/browser autofill key icon */
+  background: none !important;
+  border: none !important;
+  cursor: pointer !important;
+  color: var(--muted) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 0 !important;
+  z-index: 2 !important;
+}
+
+/* Ensure password fields with toggles have extra right-padding to clear both icons */
+div:has(> .btn-toggle-password) > .input {
+  padding-right: 2.5rem !important;
 }
 
 /* === Buttons === */

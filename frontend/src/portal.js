@@ -880,12 +880,17 @@ function setupGlobalListeners() {
   document.querySelectorAll('.btn-toggle-password').forEach((btn) => {
     btn.addEventListener('click', () => {
       const input = btn.previousElementSibling;
+      const eyeOpen = btn.querySelector('.icon-eye');
+      const eyeClosed = btn.querySelector('.icon-eye-off');
+
       if (input.type === 'password') {
         input.type = 'text';
-        btn.textContent = '🙈';
+        if (eyeOpen) eyeOpen.style.display = 'none';
+        if (eyeClosed) eyeClosed.style.display = 'block';
       } else {
         input.type = 'password';
-        btn.textContent = '👁️';
+        if (eyeOpen) eyeOpen.style.display = 'block';
+        if (eyeClosed) eyeClosed.style.display = 'none';
       }
     });
   });
@@ -981,6 +986,7 @@ function setupGlobalListeners() {
       const email = document.getElementById('register-email').value;
       const password = document.getElementById('register-password').value;
       const confirmPassword = document.getElementById('register-confirm-password').value;
+      const inviteCode = document.getElementById('register-invite-code').value;
 
       if (password.length < 8) {
         showToast('Password must be at least 8 characters long', 'error');
@@ -995,16 +1001,21 @@ function setupGlobalListeners() {
       fetch('/api/identity/intercessor/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, email, password }),
+        body: JSON.stringify({ name, email, password, inviteCode }),
       })
-        .then((res) => {
+        .then(async (res) => {
           if (res.status === 409) {
             throw new Error('An account already exists for this email address.');
           }
-          if (res.status === 400) {
-            throw new Error('Email is not pre-authorized. Please contact your group administrator.');
-          }
           if (!res.ok) {
+            try {
+              const errData = await res.json();
+              if (errData && errData.error) {
+                throw new Error(errData.error);
+              }
+            } catch (e) {
+              // ignore json parse error and throw general error
+            }
             throw new Error('Registration failed. Please try again.');
           }
           return res.json();
