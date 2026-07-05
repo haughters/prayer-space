@@ -75,7 +75,7 @@ async function checkAuthStatus() {
       showAuthCard('setup');
     } else if (!currentUser.authenticated) {
       // Not logged in, route to auth forms
-      showAuthCard(window.location.hash === '#register' ? 'register' : 'login');
+      showAuthCard(window.location.hash.startsWith('#register') ? 'register' : 'login');
     } else {
       // Authenticated! Render appropriate dashboard
       hideAuthView();
@@ -872,7 +872,7 @@ function setupGlobalListeners() {
         handleAdminHashRouting();
       }
     } else {
-      showAuthCard(window.location.hash === '#register' ? 'register' : 'login');
+      showAuthCard(window.location.hash.startsWith('#register') ? 'register' : 'login');
     }
   });
 

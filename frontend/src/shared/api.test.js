@@ -24,6 +24,16 @@ describe('API Client tests', () => {
     expect(result).toEqual(mockResponse);
   });
 
+  it('registerDevice throws error if no deviceId', async () => {
+    await expect(registerDevice(null)).rejects.toThrow('deviceId is required');
+  });
+
+  it('registerDevice throws error on !res.ok', async () => {
+    const fetchMock = vi.fn().mockResolvedValue({ ok: false, status: 500 });
+    vi.stubGlobal('fetch', fetchMock);
+    await expect(registerDevice('d123')).rejects.toThrow('Registration failed with status 500');
+  });
+
   it('fetchPrayersPassesDeviceId', async () => {
     const mockPrayers = [{ prayerId: 'p-1', text: 'Test' }];
     const fetchMock = vi.fn().mockResolvedValue({
@@ -36,6 +46,12 @@ describe('API Client tests', () => {
 
     expect(fetchMock).toHaveBeenCalledWith('/api/prayers?deviceId=device-123');
     expect(result).toEqual(mockPrayers);
+  });
+
+  it('fetchPrayers throws error on !res.ok', async () => {
+    const fetchMock = vi.fn().mockResolvedValue({ ok: false, status: 500 });
+    vi.stubGlobal('fetch', fetchMock);
+    await expect(fetchPrayers('d123')).rejects.toThrow('Failed to fetch prayers: 500');
   });
 
   it('submitPrayerSendsCorrectPayload', async () => {
@@ -58,6 +74,16 @@ describe('API Client tests', () => {
       }),
     });
     expect(result).toEqual(mockResponse);
+  });
+
+  it('submitPrayer throws error if text is too short', async () => {
+    await expect(submitPrayer('short', 'd123')).rejects.toThrow('Prayer text must be at least 10 characters long');
+  });
+
+  it('submitPrayer throws error on !res.ok', async () => {
+    const fetchMock = vi.fn().mockResolvedValue({ ok: false, status: 500 });
+    vi.stubGlobal('fetch', fetchMock);
+    await expect(submitPrayer('This is a long prayer text of 10+ chars', 'd123')).rejects.toThrow('Submission failed with status 500');
   });
 
   it('validatePasscodeReturnsGroupOnSuccess', async () => {
@@ -86,5 +112,15 @@ describe('API Client tests', () => {
 
     expect(fetchMock).toHaveBeenCalledWith('/api/groups/validate?passcode=AAABBB');
     expect(result).toBeNull();
+  });
+
+  it('validatePasscode throws error if passcode length is invalid', async () => {
+    await expect(validatePasscode('123')).rejects.toThrow('Passcode must be exactly 6 characters');
+  });
+
+  it('validatePasscode throws error on !res.ok', async () => {
+    const fetchMock = vi.fn().mockResolvedValue({ ok: false, status: 500 });
+    vi.stubGlobal('fetch', fetchMock);
+    await expect(validatePasscode('AAABBB')).rejects.toThrow('Passcode validation failed: 500');
   });
 });
