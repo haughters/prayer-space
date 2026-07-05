@@ -1,0 +1,41 @@
+server:
+  port: 8085
+
+spring:
+  application:
+    name: notification-service
+  profiles:
+    active: local
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,prometheus
+  endpoint:
+    health:
+      show-details: always
+---
+spring:
+  config:
+    activate:
+      on-profile: local
+
+aws:
+  sqs:
+    endpoint: http://localhost:4566
+    region: us-east-1
+  ses:
+    endpoint: http://localhost:4566
+    region: us-east-1
+
+services:
+  group-service:
+    url: http://localhost:8083
+
+app:
+  domain: localhost:5173  # frontend local dev server
+  # In production, this would be the actual domain name
+
+hmac:
+  secret-key: default-secret-key-change-me-in-production
