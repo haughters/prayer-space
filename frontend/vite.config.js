@@ -65,7 +65,8 @@ export default defineConfig({
     coverage: {
       provider: 'v8',
       reporter: ['text', 'cobertura'],
-      reportsDirectory: './coverage'
+      reportsDirectory: './coverage',
+      exclude: ['**/*.css', '**/*.html', 'dist/**', 'node_modules/**', 'vite.config.js', 'src/styles/**']
     }
   }
 });

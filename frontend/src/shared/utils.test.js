@@ -12,6 +12,13 @@ describe('formatDate', () => {
     expect(formatDate(undefined)).toBe('');
     expect(formatDate('invalid-date')).toBe('');
   });
+
+  it('handles exceptions gracefully', () => {
+    const throwingObj = {
+      toString: () => { throw new Error('stub'); }
+    };
+    expect(formatDate(throwingObj)).toBe('');
+  });
 });
 
 describe('validatePrayerText', () => {
