@@ -41,5 +41,6 @@ jobs:
           paths: services/${{ inputs.service }}/target/site/jacoco/jacoco.xml
           token: ${{ secrets.GITHUB_TOKEN }}
           min-coverage-overall: 80
+          min-coverage-changed-lines: 90
           title: Coverage Report (${{ inputs.service }})
           update-comment: true
