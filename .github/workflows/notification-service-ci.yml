@@ -1,21 +1,27 @@
-name: Identity Service CI
+name: Notification Service CI
 
 on:
   push:
     branches: [ main ]
     paths:
-      - '.github/workflows/identity-service-ci.yml'
+      - '.github/workflows/notification-service-ci.yml'
       - 'services/common/**'
-      - 'services/identity-service/**'
+      - 'services/notification-service/**'
   pull_request:
+    types: [opened, synchronize]
     branches: [ main ]
     paths:
-      - '.github/workflows/identity-service-ci.yml'
+      - '.github/workflows/notification-service-ci.yml'
       - 'services/common/**'
-      - 'services/identity-service/**'
+      - 'services/notification-service/**'
+
+permissions:
+  contents: read
+  code-quality: write
+  pull-requests: write
 
 jobs:
   run:
     uses: ./.github/workflows/service-workflow.yml
     with:
-      service: identity-service
+      service: notification-service

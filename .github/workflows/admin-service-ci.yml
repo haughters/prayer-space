@@ -8,11 +8,17 @@ on:
       - 'services/common/**'
       - 'services/admin-service/**'
   pull_request:
+    types: [opened, synchronize]
     branches: [ main ]
     paths:
       - '.github/workflows/admin-service-ci.yml'
       - 'services/common/**'
       - 'services/admin-service/**'
+
+permissions:
+  contents: read
+  code-quality: write
+  pull-requests: write
 
 jobs:
   run:
