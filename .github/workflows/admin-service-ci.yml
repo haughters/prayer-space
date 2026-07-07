@@ -1,0 +1,27 @@
+name: Admin Service CI
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - '.github/workflows/admin-service-ci.yml'
+      - 'services/common/**'
+      - 'services/admin-service/**'
+  pull_request:
+    types: [opened, synchronize]
+    branches: [ main ]
+    paths:
+      - '.github/workflows/admin-service-ci.yml'
+      - 'services/common/**'
+      - 'services/admin-service/**'
+
+permissions:
+  contents: read
+  code-quality: write
+  pull-requests: write
+
+jobs:
+  run:
+    uses: ./.github/workflows/service-workflow.yml
+    with:
+      service: admin-service

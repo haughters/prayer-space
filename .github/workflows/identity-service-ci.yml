@@ -1,0 +1,27 @@
+name: Identity Service CI
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - '.github/workflows/identity-service-ci.yml'
+      - 'services/common/**'
+      - 'services/identity-service/**'
+  pull_request:
+    types: [opened, synchronize]
+    branches: [ main ]
+    paths:
+      - '.github/workflows/identity-service-ci.yml'
+      - 'services/common/**'
+      - 'services/identity-service/**'
+
+permissions:
+  contents: read
+  code-quality: write
+  pull-requests: write
+
+jobs:
+  run:
+    uses: ./.github/workflows/service-workflow.yml
+    with:
+      service: identity-service

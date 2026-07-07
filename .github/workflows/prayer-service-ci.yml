@@ -1,0 +1,29 @@
+name: Prayer Service CI
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - '.github/workflows/prayer-service-ci.yml'
+      - 'services/common/**'
+      - 'services/prayer-service/**'
+  pull_request:
+    types:
+      - opened
+      - synchronize
+    branches: [ main ]
+    paths:
+      - '.github/workflows/prayer-service-ci.yml'
+      - 'services/common/**'
+      - 'services/prayer-service/**'
+
+permissions:
+  contents: read
+  code-quality: write
+  pull-requests: write
+
+jobs:
+  run:
+    uses: ./.github/workflows/service-workflow.yml
+    with:
+      service: prayer-service

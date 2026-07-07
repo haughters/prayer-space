@@ -1,0 +1,33 @@
+server:
+  port: 8084
+
+spring:
+  application:
+    name: admin-service
+  profiles:
+    active: local
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,prometheus
+  endpoint:
+    health:
+      show-details: always
+
+cookie:
+  secure: false
+---
+spring:
+  config:
+    activate:
+      on-profile: local
+
+aws:
+  dynamodb:
+    endpoint: http://localhost:8000
+    region: us-east-1
+
+cookie:
+  secure: false

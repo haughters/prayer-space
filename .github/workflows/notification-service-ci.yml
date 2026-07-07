@@ -1,0 +1,27 @@
+name: Notification Service CI
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - '.github/workflows/notification-service-ci.yml'
+      - 'services/common/**'
+      - 'services/notification-service/**'
+  pull_request:
+    types: [opened, synchronize]
+    branches: [ main ]
+    paths:
+      - '.github/workflows/notification-service-ci.yml'
+      - 'services/common/**'
+      - 'services/notification-service/**'
+
+permissions:
+  contents: read
+  code-quality: write
+  pull-requests: write
+
+jobs:
+  run:
+    uses: ./.github/workflows/service-workflow.yml
+    with:
+      service: notification-service

@@ -1,0 +1,27 @@
+name: Group Service CI
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - '.github/workflows/group-service-ci.yml'
+      - 'services/common/**'
+      - 'services/group-service/**'
+  pull_request:
+    types: [opened, synchronize]
+    branches: [ main ]
+    paths:
+      - '.github/workflows/group-service-ci.yml'
+      - 'services/common/**'
+      - 'services/group-service/**'
+
+permissions:
+  contents: read
+  code-quality: write
+  pull-requests: write
+
+jobs:
+  run:
+    uses: ./.github/workflows/service-workflow.yml
+    with:
+      service: group-service
