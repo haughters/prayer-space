@@ -20,16 +20,26 @@ jobs:
         with:
           java-version: '21'
           distribution: 'temurin'
-          cache: maven
+
+      - name: Cache Maven packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-m2-${{ inputs.service }}-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-m2-${{ inputs.service }}-
+            ${{ runner.os }}-m2-
 
       - name: Backend Test
         run: mvn clean test --projects :${{ inputs.service }} --also-make --batch-mode
         working-directory: services
 
       - name: PR Coverage Comment (${{ inputs.service }})
-        uses: orgoro/coverage@v3.2
+        uses: madrapps/jacoco-report@v1.8.0
         if: github.event_name == 'pull_request'
         with:
-          coverageFile: services/${{ inputs.service }}/target/site/jacoco/jacoco.xml
+          paths: services/${{ inputs.service }}/target/site/jacoco/jacoco.xml
           token: ${{ secrets.GITHUB_TOKEN }}
-          thresholdAll: 0.8
+          min-coverage-overall: 80
+          title: Coverage Report (${{ inputs.service }})
+          update-comment: true
