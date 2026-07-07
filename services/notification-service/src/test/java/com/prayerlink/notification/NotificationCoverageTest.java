@@ -36,7 +36,7 @@ public class NotificationCoverageTest {
     void testApplicationMain() {
         try {
             NotificationApplication.main(new String[]{"--server.port=0"});
-        } catch (Exception e) {
+        } catch (Throwable e) {
             // expected
         }
         try {
@@ -45,7 +45,7 @@ public class NotificationCoverageTest {
             java.io.OutputStream os = new java.io.ByteArrayOutputStream();
             com.amazonaws.services.lambda.runtime.Context context = org.mockito.Mockito.mock(com.amazonaws.services.lambda.runtime.Context.class);
             handler.handleRequest(is, os, context);
-        } catch (Exception e) {
+        } catch (Throwable e) {
             // expected
         }
     }

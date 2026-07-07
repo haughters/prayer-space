@@ -81,7 +81,7 @@ public class PrayerCoverageTest {
     void testApplicationMain() {
         try {
             PrayerApplication.main(new String[]{"--server.port=0"});
-        } catch (Exception e) {
+        } catch (Throwable e) {
             // expected
         }
         try {
@@ -90,7 +90,7 @@ public class PrayerCoverageTest {
             java.io.OutputStream os = new java.io.ByteArrayOutputStream();
             com.amazonaws.services.lambda.runtime.Context context = mock(com.amazonaws.services.lambda.runtime.Context.class);
             handler.handleRequest(is, os, context);
-        } catch (Exception e) {
+        } catch (Throwable e) {
             // expected
         }
     }

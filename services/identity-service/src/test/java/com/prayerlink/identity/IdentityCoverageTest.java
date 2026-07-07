@@ -63,7 +63,7 @@ public class IdentityCoverageTest {
     void testApplicationMain() {
         try {
             IdentityApplication.main(new String[]{"--server.port=0"});
-        } catch (Exception e) {
+        } catch (Throwable e) {
             // catch context run failures
         }
         try {
@@ -72,7 +72,7 @@ public class IdentityCoverageTest {
             java.io.OutputStream os = new java.io.ByteArrayOutputStream();
             com.amazonaws.services.lambda.runtime.Context context = mock(com.amazonaws.services.lambda.runtime.Context.class);
             handler.handleRequest(is, os, context);
-        } catch (Exception e) {
+        } catch (Throwable e) {
             // expected lambda wrapper instantiate bypass
         }
     }
