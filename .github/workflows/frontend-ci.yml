@@ -44,7 +44,7 @@ jobs:
         working-directory: frontend
 
       - name: PR Coverage Comment
-        uses: orgoro/coverage@v3.2
+        uses: orgoro/coverage@v3.3
         if: github.event_name == 'pull_request'
         with:
           coverageFile: frontend/coverage/cobertura-coverage.xml
