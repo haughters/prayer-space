@@ -69,6 +69,7 @@ jobs:
           
           mvn spring-boot:build-image \
             -pl ${{ inputs.service }} \
+            -Dmaven.test.skip \
             -Dspring-boot.build-image.imageName=$IMAGE_NAME \
             -Dspring-boot.build-image.publish=true \
             -Dspring-boot.build-image.environmentVariables.BP_NATIVE_IMAGE=true \
