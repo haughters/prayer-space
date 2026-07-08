@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Prune old PR images (older than 7 days)
-        uses: snok/container-retention-policy@v3.0.0
+        uses: snok/container-retention-policy@v3.1.0
         with:
           account-type: personal 
           image-names: admin-service, group-service, identity-service, notification-service, prayer-service
@@ -29,7 +29,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Prune old main images (older than 30 days)
-        uses: snok/container-retention-policy@v3.0.0
+        uses: snok/container-retention-policy@v3.1.0
         with:
           account-type: personal 
           image-names: admin-service, group-service, identity-service, notification-service, prayer-service
