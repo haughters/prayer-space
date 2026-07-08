@@ -5,6 +5,7 @@ on:
     branches: [ main ]
     paths:
       - '.github/workflows/admin-service-ci.yml'
+      - '.github/workflows/service-workflow.yml'
       - 'services/common/**'
       - 'services/admin-service/**'
   pull_request:
@@ -12,6 +13,7 @@ on:
     branches: [ main ]
     paths:
       - '.github/workflows/admin-service-ci.yml'
+      - '.github/workflows/service-workflow.yml'
       - 'services/common/**'
       - 'services/admin-service/**'
 
@@ -19,6 +21,7 @@ permissions:
   contents: read
   code-quality: write
   pull-requests: write
+  packages: write
 
 jobs:
   run:

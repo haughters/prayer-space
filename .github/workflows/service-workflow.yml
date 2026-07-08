@@ -31,8 +31,8 @@ jobs:
             ${{ runner.os }}-m2-${{ inputs.service }}-
             ${{ runner.os }}-m2-
 
-      - name: Backend Test
-        run: mvn clean test --projects :${{ inputs.service }} --also-make --batch-mode
+      - name: Backend Test & Install
+        run: mvn clean install --projects :${{ inputs.service }} --also-make --batch-mode
         working-directory: services
 
       - name: PR Coverage Comment (${{ inputs.service }})
