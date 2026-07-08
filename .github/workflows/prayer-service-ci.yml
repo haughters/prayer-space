@@ -23,6 +23,7 @@ permissions:
   contents: read
   code-quality: write
   pull-requests: write
+  packages: write
 
 jobs:
   run:
