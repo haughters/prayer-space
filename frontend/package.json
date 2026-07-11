@@ -14,7 +14,7 @@
   "devDependencies": {
     "@testing-library/dom": "^10.4.0",
     "@vitest/coverage-v8": "^4.1.10",
-    "eslint": "^8.57.0",
+    "eslint": "^10.6.0",
     "jsdom": "^24.1.1",
     "prettier": "^3.2.5",
     "vite": "^8.1.3",
