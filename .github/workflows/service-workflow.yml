@@ -49,7 +49,7 @@ jobs:
       - name: Build Native Lambda Zip
         run: |
           # Build the native executable
-          mvn package -Pnative -pl :${{ inputs.service }} -DskipTests --batch-mode
+          mvn package -P lambda -pl :${{ inputs.service }} -DskipTests --batch-mode
           
           # The native executable is usually named after the artifactId
           cd ${{ inputs.service }}/target
