@@ -13,6 +13,10 @@
     <name>identity-service</name>
     <description>Service tracking device identification and registrations</description>
 
+    <properties>
+        <skip.native.build>false</skip.native.build>
+    </properties>
+
     <dependencies>
         <!-- Internal Shared Library -->
         <dependency>
@@ -55,13 +59,6 @@
             <groupId>com.auth0</groupId>
             <artifactId>java-jwt</artifactId>
             <version>4.4.0</version>
-        </dependency>
-
-        <!-- Testing -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-test</artifactId>
-            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>com.amazonaws.serverless</groupId>

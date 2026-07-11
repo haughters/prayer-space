@@ -20,7 +20,7 @@ jobs:
         uses: actions/setup-java@v5
         with:
           java-version: '21'
-          distribution: 'temurin'
+          distribution: 'graalvm'
 
       - name: Cache Maven packages
         uses: actions/cache@v6
@@ -46,32 +46,15 @@ jobs:
           title: Coverage Report (${{ inputs.service }})
           update-comment: true
 
-      - name: Log in to GHCR
-        uses: docker/login-action@v4
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Build and Push GraalVM Docker Images
+      - name: Build Native Lambda Zip
         run: |
-          OWNER=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')
-          SHORT_SHA=$(echo "${{ github.sha }}" | cut -c1-7)
-          
-          if [ "${{ github.event_name }}" == "pull_request" ]; then
-            TAG="pr-${{ github.event.pull_request.number }}-$SHORT_SHA"
-          else
-            TAG="$SHORT_SHA"
-          fi
-          
-          IMAGE_NAME="ghcr.io/$OWNER/${{ inputs.service }}:$TAG"
-          CACHE_NAME="ghcr.io/$OWNER/${{ inputs.service }}-cache:latest"
-          
-          mvn spring-boot:build-image \
-            -pl ${{ inputs.service }} \
-            -Dspring-boot.build-image.imageName=$IMAGE_NAME \
-            -Dspring-boot.build-image.publish=true \
-            -Dspring-boot.build-image.environmentVariables.BP_NATIVE_IMAGE=true \
-            -Dspring-boot.build-image.buildCache.image.name=$CACHE_NAME \
-            --batch-mode
+          # Build the native executable
+          mvn package -P lambda -pl :${{ inputs.service }} -DskipTests --batch-mode
         working-directory: services
+
+      - name: Upload Lambda Zip Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ inputs.service }}-lambda-zip
+          path: services/${{ inputs.service }}/target/${{ inputs.service }}-lambda.zip
+          retention-days: 7
