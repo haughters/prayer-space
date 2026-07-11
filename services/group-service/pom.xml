@@ -13,6 +13,10 @@
     <name>group-service</name>
     <description>Service managing intercessor groups, members, and group passcodes</description>
 
+    <properties>
+        <skip.native.build>false</skip.native.build>
+    </properties>
+
     <dependencies>
         <!-- Internal Shared Library -->
         <dependency>
@@ -48,13 +52,6 @@
         <dependency>
             <groupId>software.amazon.awssdk</groupId>
             <artifactId>eventbridge</artifactId>
-        </dependency>
-
-        <!-- Testing -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-test</artifactId>
-            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>com.amazonaws.serverless</groupId>

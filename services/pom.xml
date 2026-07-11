@@ -36,6 +36,7 @@
         <maven-surefire-plugin.version>3.5.6</maven-surefire-plugin.version>
         <maven-compiler-plugin.version>3.15.0</maven-compiler-plugin.version>
         <jacoco-maven-plugin.version>0.8.15</jacoco-maven-plugin.version>
+        <skip.native.build>true</skip.native.build>
     </properties>
 
     <dependencyManagement>
@@ -185,24 +186,21 @@
                         </execution>
                     </executions>
                 </plugin>
-
-                <!-- GraalVM Native Image Plugin -->
-                <plugin>
-                    <groupId>org.graalvm.buildtools</groupId>
-                    <artifactId>native-maven-plugin</artifactId>
-                </plugin>
             </plugins>
         </pluginManagement>
     </build>
 
     <profiles>
         <profile>
-            <id>native</id>
+            <id>lambda</id>
             <build>
                 <plugins>
                     <plugin>
                         <groupId>org.springframework.boot</groupId>
                         <artifactId>spring-boot-maven-plugin</artifactId>
+                        <configuration>
+                            <skip>${skip.native.build}</skip>
+                        </configuration>
                         <executions>
                             <execution>
                                 <id>process-aot</id>
@@ -210,16 +208,67 @@
                                     <goal>process-aot</goal>
                                 </goals>
                             </execution>
+                            <execution>
+                                <id>default</id>
+                                <goals>
+                                    <goal>repackage</goal>
+                                </goals>
+                                <configuration>
+                                    <classifier>exec</classifier>
+                                </configuration>
+                            </execution>
                         </executions>
                     </plugin>
                     <plugin>
                         <groupId>org.graalvm.buildtools</groupId>
                         <artifactId>native-maven-plugin</artifactId>
+                        <version>1.1.3</version>
+                        <configuration>
+                            <imageName>bootstrap</imageName>
+                            <skip>${skip.native.build}</skip>
+                        </configuration>
                         <executions>
                             <execution>
                                 <id>build-native</id>
                                 <goals>
                                     <goal>compile-no-fork</goal>
+                                </goals>
+                                <phase>package</phase>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-assembly-plugin</artifactId>
+                        <configuration>
+                            <skipAssembly>${skip.native.build}</skipAssembly>
+                            <inlineDescriptors>
+                                <inlineDescriptor>
+                                    <id>lambda-zip</id>
+                                    <formats>
+                                        <format>zip</format>
+                                    </formats>
+                                    <includeBaseDirectory>false</includeBaseDirectory>
+                                    <fileSets>
+                                        <fileSet>
+                                            <directory>${project.build.directory}</directory>
+                                            <outputDirectory>/</outputDirectory>
+                                            <includes>
+                                                <include>bootstrap</include>
+                                            </includes>
+                                            <fileMode>0755</fileMode>
+                                        </fileSet>
+                                    </fileSets>
+                                </inlineDescriptor>
+                            </inlineDescriptors>
+                            <appendAssemblyId>false</appendAssemblyId>
+                            <finalName>${project.artifactId}-lambda</finalName>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <id>zip-native-lambda</id>
+                                <goals>
+                                    <goal>single</goal>
                                 </goals>
                                 <phase>package</phase>
                             </execution>

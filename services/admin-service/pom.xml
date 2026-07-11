@@ -13,6 +13,10 @@
     <name>admin-service</name>
     <description>Service managing platform configuration and administrative control panels</description>
 
+    <properties>
+        <skip.native.build>false</skip.native.build>
+    </properties>
+
     <dependencies>
         <!-- Internal Shared Library -->
         <dependency>

@@ -31,5 +31,11 @@
             <groupId>org.springframework</groupId>
             <artifactId>spring-web</artifactId>
         </dependency>
+
+        <!-- AspectJ Weaver for GraalVM Native Image Reflection/AOP support -->
+        <dependency>
+            <groupId>org.aspectj</groupId>
+            <artifactId>aspectjweaver</artifactId>
+        </dependency>
     </dependencies>
 </project>
