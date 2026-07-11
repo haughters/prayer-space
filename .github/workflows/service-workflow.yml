@@ -50,25 +50,11 @@ jobs:
         run: |
           # Build the native executable
           mvn package -P lambda -pl :${{ inputs.service }} -DskipTests --batch-mode
-          
-          # The native executable is usually named after the artifactId
-          cd ${{ inputs.service }}/target
-          
-          EXEC_NAME=${{ inputs.service }}
-          
-          # Ensure it's executable
-          chmod +x $EXEC_NAME
-          
-          # Rename to bootstrap for AWS Lambda Custom Runtime
-          mv $EXEC_NAME bootstrap
-          
-          # Create the zip
-          zip function.zip bootstrap
         working-directory: services
 
       - name: Upload Lambda Zip Artifact
         uses: actions/upload-artifact@v4
         with:
           name: ${{ inputs.service }}-lambda-zip
-          path: services/${{ inputs.service }}/target/function.zip
+          path: services/${{ inputs.service }}/target/${{ inputs.service }}-lambda.zip
           retention-days: 7
