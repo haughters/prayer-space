@@ -83,7 +83,7 @@ jobs:
       - name: Deploy Lambda
         run: |
           SVC="${{ inputs.service }}"
-          SHORT_SHA=$(echo "${{ github.sha }}" | cut -c1-7)
+          AWS_ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
           
           if [ "${{ github.event_name }}" = "pull_request" ]; then
             ENV_PREFIX="pr-${{ github.event.pull_request.number }}"
@@ -98,22 +98,24 @@ jobs:
           fi
           
           FUNC_NAME="${ENV_PREFIX}-${SVC}"
-          ZIP_KEY="deploys/${FUNC_NAME}/${SHORT_SHA}.zip"
-          
-          aws s3 cp "artifact-dir/${SVC}-lambda.zip" "s3://${{ secrets.DEPLOY_BUCKET }}/$ZIP_KEY"
           
           if aws lambda get-function --function-name "$FUNC_NAME" 2>/dev/null; then
             aws lambda update-function-code \
               --function-name "$FUNC_NAME" \
-              --s3-bucket "${{ secrets.DEPLOY_BUCKET }}" \
-              --s3-key "$ZIP_KEY"
+              --zip-file "fileb://artifact-dir/${SVC}-lambda.zip"
           else
+            LAMBDA_ROLE=$(aws lambda get-function --function-name "test-${SVC}" --query 'Configuration.Role' --output text 2>/dev/null || echo "")
+            if [ -z "$LAMBDA_ROLE" ]; then
+              echo "Error: Could not find IAM role from test-${SVC} to create PR lambda."
+              exit 1
+            fi
+            
             aws lambda create-function \
               --function-name "$FUNC_NAME" \
               --runtime provided.al2023 \
               --handler bootstrap \
-              --role "${{ secrets.LAMBDA_EXECUTION_ROLE }}" \
-              --code S3Bucket=${{ secrets.DEPLOY_BUCKET }},S3Key=$ZIP_KEY \
+              --role "$LAMBDA_ROLE" \
+              --zip-file "fileb://artifact-dir/${SVC}-lambda.zip" \
               --memory-size 512 \
               --timeout 30 \
               --environment "Variables={SPRING_PROFILES_ACTIVE=default}"
@@ -164,8 +166,8 @@ jobs:
             ENV_VARS="${ENV_VARS},SERVICES_GROUP_SERVICE_URL=${URL_GROUP_SERVICE}"
             ENV_VARS="${ENV_VARS},SERVICES_PRAYER_SERVICE_URL=${URL_PRAYER_SERVICE}"
           elif [ "$SVC" = "notification-service" ]; then
-            ENV_VARS="${ENV_VARS},AWS_SQS_QUEUE_URL=https://sqs.eu-west-1.amazonaws.com/${{ secrets.AWS_ACCOUNT_ID }}/test-notification-queue"
-            ENV_VARS="${ENV_VARS},AWS_SQS_BOUNCE_QUEUE_URL=https://sqs.eu-west-1.amazonaws.com/${{ secrets.AWS_ACCOUNT_ID }}/test-bounce-queue"
+            ENV_VARS="${ENV_VARS},AWS_SQS_QUEUE_URL=https://sqs.eu-west-1.amazonaws.com/${AWS_ACCOUNT_ID}/test-notification-queue"
+            ENV_VARS="${ENV_VARS},AWS_SQS_BOUNCE_QUEUE_URL=https://sqs.eu-west-1.amazonaws.com/${AWS_ACCOUNT_ID}/test-bounce-queue"
             ENV_VARS="${ENV_VARS},AWS_SQS_NOTIFICATION_QUEUE=test-notification-queue"
             ENV_VARS="${ENV_VARS},AWS_SQS_BOUNCE_QUEUE=test-bounce-queue"
             ENV_VARS="${ENV_VARS},SERVICES_GROUP_SERVICE_URL=${URL_GROUP_SERVICE}"
