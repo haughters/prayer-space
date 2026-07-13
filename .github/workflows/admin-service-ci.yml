@@ -26,5 +26,7 @@ permissions:
 jobs:
   run:
     uses: ./.github/workflows/service-workflow.yml
+    secrets: inherit
+
     with:
       service: admin-service
