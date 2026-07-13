@@ -1,0 +1,38 @@
+name: PR Cleanup
+
+on:
+  pull_request:
+    types: [closed]
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
+          aws-region: eu-west-1
+
+      - name: Delete PR Lambdas
+        run: |
+          PR_NUM=${{ github.event.pull_request.number }}
+
+          for svc in prayer-service group-service notification-service identity-service admin-service; do
+            FUNC_NAME="pr-${PR_NUM}-${svc}"
+            if aws lambda get-function --function-name "$FUNC_NAME" 2>/dev/null; then
+              echo "Deleting $FUNC_NAME..."
+
+              # Delete Function URL config first
+              aws lambda delete-function-url-config --function-name "$FUNC_NAME" 2>/dev/null || true
+
+              # Delete the function
+              aws lambda delete-function --function-name "$FUNC_NAME"
+              echo "✅ Deleted $FUNC_NAME"
+            fi
+          done
+
+          # Clean up S3 deploy artifacts
+          aws s3 rm "s3://${{ secrets.DEPLOY_BUCKET }}/pr-deploys/pr-${PR_NUM}-" --recursive

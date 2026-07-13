@@ -12,13 +12,15 @@ import software.amazon.awssdk.enhanced.dynamodb.TableSchema;
 import software.amazon.awssdk.enhanced.dynamodb.model.Page;
 import software.amazon.awssdk.enhanced.dynamodb.model.QueryConditional;
 
+import com.prayerlink.common.config.TableNameResolver;
+
 @Repository
 public class GroupMemberRepository {
   private final DynamoDbTable<GroupMember> table;
   private final DynamoDbIndex<GroupMember> emailIndex;
 
-  public GroupMemberRepository(DynamoDbEnhancedClient enhancedClient) {
-    this.table = enhancedClient.table("GroupMembers", TableSchema.fromBean(GroupMember.class));
+  public GroupMemberRepository(DynamoDbEnhancedClient enhancedClient, TableNameResolver tableNameResolver) {
+    this.table = enhancedClient.table(tableNameResolver.resolve("GroupMembers"), TableSchema.fromBean(GroupMember.class));
     this.emailIndex = this.table.index("EmailIndex");
   }
 

@@ -1,0 +1,25 @@
+{
+  "name": "prayer-link-infra",
+  "version": "1.0.0",
+  "private": true,
+  "bin": {
+    "infra": "bin/app.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc -w",
+    "test": "jest",
+    "cdk": "cdk"
+  },
+  "devDependencies": {
+    "@types/node": "20.11.0",
+    "aws-cdk": "^2.138.0",
+    "ts-node": "^10.9.2",
+    "typescript": "~5.3.3"
+  },
+  "dependencies": {
+    "@aws-cdk/lambda-layer-kubectl-v29": "^2.1.1",
+    "aws-cdk-lib": "^2.138.0",
+    "constructs": "^10.3.0"
+  }
+}

@@ -7,12 +7,14 @@ import software.amazon.awssdk.enhanced.dynamodb.DynamoDbEnhancedClient;
 import software.amazon.awssdk.enhanced.dynamodb.DynamoDbTable;
 import software.amazon.awssdk.enhanced.dynamodb.TableSchema;
 
+import com.prayerlink.common.config.TableNameResolver;
+
 @Repository
 public class IntercessorAccountRepository {
   private final DynamoDbTable<IntercessorAccount> table;
 
-  public IntercessorAccountRepository(DynamoDbEnhancedClient enhancedClient) {
-    this.table = enhancedClient.table("IntercessorAccounts", TableSchema.fromBean(IntercessorAccount.class));
+  public IntercessorAccountRepository(DynamoDbEnhancedClient enhancedClient, TableNameResolver tableNameResolver) {
+    this.table = enhancedClient.table(tableNameResolver.resolve("IntercessorAccounts"), TableSchema.fromBean(IntercessorAccount.class));
   }
 
   public void save(IntercessorAccount account) {

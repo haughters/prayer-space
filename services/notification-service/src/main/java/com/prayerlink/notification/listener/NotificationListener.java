@@ -52,7 +52,7 @@ public class NotificationListener {
     this.objectMapper = objectMapper;
   }
 
-  @SqsListener("notification-queue")
+  @SqsListener("${aws.sqs.notification-queue:notification-queue}")
   public void listenToNotifications(String messageBody) {
     log.info("Received message from notification-queue: {}", messageBody);
     try {
@@ -78,7 +78,7 @@ public class NotificationListener {
     }
   }
 
-  @SqsListener("bounce-queue")
+  @SqsListener("${aws.sqs.bounce-queue:bounce-queue}")
   public void listenToBounces(String messageBody) {
     log.info("Received message from bounce-queue: {}", messageBody);
     try {

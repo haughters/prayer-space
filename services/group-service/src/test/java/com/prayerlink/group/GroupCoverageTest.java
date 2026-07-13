@@ -71,11 +71,17 @@ public class GroupCoverageTest {
 
     @Test
     void testApplicationMain() {
-        // Run main method in try-catch to cover entrypoint execution
+        System.setProperty("aws.accessKeyId", "dummy");
+        System.setProperty("aws.secretAccessKey", "dummy");
+        System.setProperty("aws.region", "eu-west-1");
         try {
-            GroupApplication.main(new String[]{"--server.port=0"});
+            GroupApplication.main(new String[]{"--server.port=0", "--spring.profiles.active=local"});
         } catch (Throwable e) {
             // expected to fail during full Spring context run under some test environments or run cleanly
+        } finally {
+            System.clearProperty("aws.accessKeyId");
+            System.clearProperty("aws.secretAccessKey");
+            System.clearProperty("aws.region");
         }
         
         // Instantiate StreamLambdaHandler to cover its constructor

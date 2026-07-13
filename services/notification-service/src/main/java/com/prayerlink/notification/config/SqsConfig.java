@@ -16,7 +16,7 @@ public class SqsConfig {
   @Value("${aws.sqs.endpoint:#{null}}")
   private String endpoint;
 
-  @Value("${aws.sqs.region:us-east-1}")
+  @Value("${aws.sqs.region:eu-west-1}")
   private String region;
 
   @Bean

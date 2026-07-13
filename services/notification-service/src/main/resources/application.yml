@@ -24,14 +24,17 @@ spring:
 aws:
   sqs:
     endpoint: http://localhost:4566
-    region: us-east-1
+    region: eu-west-1
   ses:
     endpoint: http://localhost:4566
-    region: us-east-1
+    region: eu-west-1
 
 services:
   group-service:
     url: http://localhost:8083
+  prayer-service:
+    url: http://localhost:8082
+
 
 app:
   domain: localhost:5173  # frontend local dev server

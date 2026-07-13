@@ -17,18 +17,22 @@ import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
 import software.amazon.awssdk.services.dynamodb.model.AttributeValue;
 import software.amazon.awssdk.services.dynamodb.model.UpdateItemRequest;
 
+import com.prayerlink.common.config.TableNameResolver;
+
 @Repository
 public class PrayerRepository {
   private final DynamoDbTable<Prayer> table;
   private final DynamoDbIndex<Prayer> deviceIdIndex;
   private final DynamoDbIndex<Prayer> groupIdIndex;
   private final DynamoDbClient rawClient;
+  private final TableNameResolver tableNameResolver;
 
-  public PrayerRepository(DynamoDbEnhancedClient enhancedClient, DynamoDbClient rawClient) {
-    this.table = enhancedClient.table("Prayers", TableSchema.fromBean(Prayer.class));
+  public PrayerRepository(DynamoDbEnhancedClient enhancedClient, DynamoDbClient rawClient, TableNameResolver tableNameResolver) {
+    this.table = enhancedClient.table(tableNameResolver.resolve("Prayers"), TableSchema.fromBean(Prayer.class));
     this.deviceIdIndex = this.table.index("DeviceIdIndex");
     this.groupIdIndex = this.table.index("GroupIdIndex");
     this.rawClient = rawClient;
+    this.tableNameResolver = tableNameResolver;
   }
 
   public void save(Prayer prayer) {
@@ -49,7 +53,7 @@ public class PrayerRepository {
     );
 
     UpdateItemRequest request = UpdateItemRequest.builder()
-        .tableName("Prayers")
+        .tableName(tableNameResolver.resolve("Prayers"))
         .key(key)
         .updateExpression("SET prayedForCount = if_not_exists(prayedForCount, :zero) + :one, updatedAt = :now ADD prayedByEmails :emailSet")
         .conditionExpression("attribute_not_exists(prayedByEmails) OR NOT contains(prayedByEmails, :emailSingle)")

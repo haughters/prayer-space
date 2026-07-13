@@ -3,7 +3,7 @@ package com.prayerlink.prayer;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-@SpringBootApplication
+@SpringBootApplication(scanBasePackages = "com.prayerlink")
 public class PrayerApplication {
   public static void main(String[] args) {
     SpringApplication.run(PrayerApplication.class, args);

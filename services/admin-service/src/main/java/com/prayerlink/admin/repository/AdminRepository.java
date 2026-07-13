@@ -12,13 +12,15 @@ import software.amazon.awssdk.enhanced.dynamodb.TableSchema;
 import software.amazon.awssdk.enhanced.dynamodb.model.Page;
 import software.amazon.awssdk.enhanced.dynamodb.model.QueryConditional;
 
+import com.prayerlink.common.config.TableNameResolver;
+
 @Repository
 public class AdminRepository {
   private final DynamoDbTable<Admin> table;
   private final DynamoDbIndex<Admin> usernameIndex;
 
-  public AdminRepository(DynamoDbEnhancedClient enhancedClient) {
-    this.table = enhancedClient.table("Admins", TableSchema.fromBean(Admin.class));
+  public AdminRepository(DynamoDbEnhancedClient enhancedClient, TableNameResolver tableNameResolver) {
+    this.table = enhancedClient.table(tableNameResolver.resolve("Admins"), TableSchema.fromBean(Admin.class));
     this.usernameIndex = this.table.index("UsernameIndex");
   }
 

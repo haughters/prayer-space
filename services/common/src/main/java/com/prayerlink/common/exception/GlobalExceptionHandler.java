@@ -7,8 +7,39 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 
+import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.http.converter.HttpMessageNotReadableException;
+import jakarta.validation.ConstraintViolationException;
+import org.springframework.web.method.annotation.HandlerMethodValidationException;
+import org.springframework.web.server.ResponseStatusException;
+
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+
+  @ExceptionHandler(MethodArgumentNotValidException.class)
+  public ResponseEntity<ErrorResponse> handleValidation(
+      MethodArgumentNotValidException ex, WebRequest request) {
+    String detail = ex.getBindingResult().getFieldError() != null ? ex.getBindingResult().getFieldError().getDefaultMessage() : ex.getMessage();
+    return buildErrorResponse(HttpStatus.BAD_REQUEST, "Validation failed: " + detail, request);
+  }
+
+  @ExceptionHandler(HttpMessageNotReadableException.class)
+  public ResponseEntity<ErrorResponse> handleMessageNotReadable(
+      HttpMessageNotReadableException ex, WebRequest request) {
+    return buildErrorResponse(HttpStatus.BAD_REQUEST, "Malformed request body", request);
+  }
+
+  @ExceptionHandler(ConstraintViolationException.class)
+  public ResponseEntity<ErrorResponse> handleConstraintViolation(
+      ConstraintViolationException ex, WebRequest request) {
+    return buildErrorResponse(HttpStatus.BAD_REQUEST, ex.getMessage(), request);
+  }
+
+  @ExceptionHandler(HandlerMethodValidationException.class)
+  public ResponseEntity<ErrorResponse> handleMethodValidation(
+      HandlerMethodValidationException ex, WebRequest request) {
+    return buildErrorResponse(HttpStatus.BAD_REQUEST, "Validation failed", request);
+  }
 
   @ExceptionHandler(ResourceNotFoundException.class)
   public ResponseEntity<ErrorResponse> handleResourceNotFound(
@@ -26,6 +57,11 @@ public class GlobalExceptionHandler {
   public ResponseEntity<ErrorResponse> handleBadRequest(
       BadRequestException ex, WebRequest request) {
     return buildErrorResponse(HttpStatus.BAD_REQUEST, ex.getMessage(), request);
+  }
+
+  @ExceptionHandler(ResponseStatusException.class)
+  public ResponseEntity<ErrorResponse> handleResponseStatus(ResponseStatusException ex, WebRequest request) {
+    return buildErrorResponse(HttpStatus.valueOf(ex.getStatusCode().value()), ex.getReason(), request);
   }
 
   @ExceptionHandler(Exception.class)

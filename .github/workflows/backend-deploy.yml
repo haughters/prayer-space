@@ -1,0 +1,232 @@
+name: Backend Deploy
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'services/**'
+      - 'infra/**'
+      - '.github/workflows/backend-deploy.yml'
+
+concurrency:
+  group: backend-deploy-main
+  cancel-in-progress: false     # queue, don't cancel
+
+jobs:
+  detect-changes:
+    runs-on: ubuntu-latest
+    outputs:
+      services: ${{ steps.filter.outputs.changes }}
+      has-changes: ${{ steps.check.outputs.has-changes }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            prayer-service:
+              - 'services/prayer-service/**'
+              - 'services/common/**'
+              - 'services/pom.xml'
+            group-service:
+              - 'services/group-service/**'
+              - 'services/common/**'
+              - 'services/pom.xml'
+            notification-service:
+              - 'services/notification-service/**'
+              - 'services/common/**'
+              - 'services/pom.xml'
+            identity-service:
+              - 'services/identity-service/**'
+              - 'services/common/**'
+              - 'services/pom.xml'
+            admin-service:
+              - 'services/admin-service/**'
+              - 'services/common/**'
+              - 'services/pom.xml'
+            infra:
+              - 'infra/**'
+      - id: check
+        run: |
+          CHANGES='${{ steps.filter.outputs.changes }}'
+          if [ "$CHANGES" = "[]" ]; then
+            echo "has-changes=false" >> $GITHUB_OUTPUT
+          else
+            echo "has-changes=true" >> $GITHUB_OUTPUT
+          fi
+
+  build:
+    needs: detect-changes
+    if: needs.detect-changes.outputs.has-changes == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Set up GraalVM
+        uses: actions/setup-java@v5
+        with:
+          java-version: '21'
+          distribution: 'graalvm'
+
+      - name: Cache Maven packages
+        uses: actions/cache@v6
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-m2-deploy-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-m2-deploy-
+            ${{ runner.os }}-m2-
+
+      - name: Build Changed Services
+        run: |
+          CHANGED='${{ needs.detect-changes.outputs.services }}'
+          for svc in prayer-service group-service notification-service identity-service admin-service; do
+            if echo "$CHANGED" | grep -q "$svc"; then
+              echo "::group::Building $svc"
+              mvn package -P lambda -pl :$svc -am -DskipTests --batch-mode
+              echo "::endgroup::"
+            fi
+          done
+        working-directory: services
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: lambda-zips-${{ github.sha }}
+          path: services/*/target/*-lambda.zip
+          retention-days: 3
+
+  deploy-test:
+    needs: [detect-changes, build]
+    runs-on: ubuntu-latest
+    environment: test
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
+          aws-region: eu-west-1
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: lambda-zips-${{ github.sha }}
+          path: services/
+
+      - uses: actions/setup-node@v6
+        with: { node-version: '20' }
+
+      - run: npm ci
+        working-directory: infra/cdk
+
+      - name: Deploy to Test
+        run: |
+          npx cdk deploy --all \
+            --require-approval never \
+            -c deployEnv=test \
+            -c gitSha=${{ github.sha }}
+        working-directory: infra/cdk
+
+  smoke-test:
+    needs: deploy-test
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
+          aws-region: eu-west-1
+
+      - name: Smoke Test (Test Env)
+        run: |
+          FAILED=0
+          # Hit each Lambda's Function URL directly for /actuator/health
+          for svc in identity-service prayer-service group-service admin-service; do
+            FUNC_NAME="test-${svc}"
+            URL=$(aws lambda get-function-url-config --function-name "$FUNC_NAME" \
+              --query 'FunctionUrl' --output text 2>/dev/null || echo "")
+
+            if [ -z "$URL" ]; then
+              echo "⚠️  $svc — no Function URL found, skipping"
+              continue
+            fi
+
+            STATUS=$(curl -s -o /dev/null -w "%{http_code}" --retry 3 --max-time 30 "${URL}actuator/health")
+            if [ "$STATUS" = "200" ]; then
+              echo "✅ $svc → $STATUS"
+            else
+              echo "❌ $svc → $STATUS"
+              FAILED=1
+            fi
+          done
+
+          if [ "$FAILED" = "1" ]; then
+            echo "::error::Smoke tests failed on test environment"
+            exit 1
+          fi
+
+  deploy-live:
+    needs: [detect-changes, build, smoke-test]
+    runs-on: ubuntu-latest
+    environment: production      # requires manual approval in GitHub
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
+          aws-region: eu-west-1
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: lambda-zips-${{ github.sha }}
+          path: services/
+
+      - uses: actions/setup-node@v6
+        with: { node-version: '20' }
+
+      - run: npm ci
+        working-directory: infra/cdk
+
+      - name: Deploy to Live
+        run: |
+          npx cdk deploy --all \
+            --require-approval never \
+            -c deployEnv=live \
+            -c gitSha=${{ github.sha }}
+        working-directory: infra/cdk
+
+  smoke-live:
+    needs: deploy-live
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
+          aws-region: eu-west-1
+
+      - name: Smoke Test (Live)
+        run: |
+          for svc in identity-service prayer-service group-service admin-service; do
+            FUNC_NAME="live-${svc}"
+            URL=$(aws lambda get-function-url-config --function-name "$FUNC_NAME" \
+              --query 'FunctionUrl' --output text 2>/dev/null || echo "")
+
+            if [ -z "$URL" ]; then
+              echo "⚠️  $svc — no Function URL found"
+              continue
+            fi
+
+            STATUS=$(curl -s -o /dev/null -w "%{http_code}" --retry 5 --max-time 30 "${URL}actuator/health")
+            echo "$svc → $STATUS"
+          done

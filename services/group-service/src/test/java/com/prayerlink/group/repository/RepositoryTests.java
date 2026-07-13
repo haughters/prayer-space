@@ -17,6 +17,8 @@ import software.amazon.awssdk.enhanced.dynamodb.DynamoDbTable;
 import software.amazon.awssdk.enhanced.dynamodb.TableSchema;
 import software.amazon.awssdk.enhanced.dynamodb.model.Page;
 
+import com.prayerlink.common.config.TableNameResolver;
+
 public class RepositoryTests {
 
     private DynamoDbEnhancedClient enhancedClient;
@@ -31,18 +33,19 @@ public class RepositoryTests {
     @BeforeEach
     void setUp() {
         enhancedClient = mock(DynamoDbEnhancedClient.class);
+        TableNameResolver tableNameResolver = new TableNameResolver("");
         
         groupTable = mock(DynamoDbTable.class);
         passcodeIndex = mock(DynamoDbIndex.class);
         when(enhancedClient.table(eq("Groups"), any(TableSchema.class))).thenReturn(groupTable);
         when(groupTable.index(eq("PasscodeIndex"))).thenReturn(passcodeIndex);
-        groupRepository = new GroupRepository(enhancedClient);
+        groupRepository = new GroupRepository(enhancedClient, tableNameResolver);
 
         memberTable = mock(DynamoDbTable.class);
         emailIndex = mock(DynamoDbIndex.class);
         when(enhancedClient.table(eq("GroupMembers"), any(TableSchema.class))).thenReturn(memberTable);
         when(memberTable.index(eq("EmailIndex"))).thenReturn(emailIndex);
-        memberRepository = new GroupMemberRepository(enhancedClient);
+        memberRepository = new GroupMemberRepository(enhancedClient, tableNameResolver);
     }
 
     @Test

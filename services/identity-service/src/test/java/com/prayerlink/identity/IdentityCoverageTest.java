@@ -61,10 +61,17 @@ public class IdentityCoverageTest {
 
     @Test
     void testApplicationMain() {
+        System.setProperty("aws.accessKeyId", "dummy");
+        System.setProperty("aws.secretAccessKey", "dummy");
+        System.setProperty("aws.region", "eu-west-1");
         try {
-            IdentityApplication.main(new String[]{"--server.port=0"});
+            IdentityApplication.main(new String[]{"--server.port=0", "--spring.profiles.active=local"});
         } catch (Throwable e) {
             // catch context run failures
+        } finally {
+            System.clearProperty("aws.accessKeyId");
+            System.clearProperty("aws.secretAccessKey");
+            System.clearProperty("aws.region");
         }
         try {
             StreamLambdaHandler handler = new StreamLambdaHandler();

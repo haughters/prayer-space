@@ -7,6 +7,13 @@ spring:
   profiles:
     active: local
 
+services:
+  group-service:
+    url: http://localhost:8083
+  prayer-service:
+    url: http://localhost:8082
+
+
 management:
   endpoints:
     web:
@@ -27,7 +34,7 @@ spring:
 aws:
   dynamodb:
     endpoint: http://localhost:8000
-    region: us-east-1
+    region: eu-west-1
 
 cookie:
   secure: false

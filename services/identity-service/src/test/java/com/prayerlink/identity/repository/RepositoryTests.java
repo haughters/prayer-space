@@ -13,6 +13,8 @@ import software.amazon.awssdk.enhanced.dynamodb.DynamoDbEnhancedClient;
 import software.amazon.awssdk.enhanced.dynamodb.DynamoDbTable;
 import software.amazon.awssdk.enhanced.dynamodb.TableSchema;
 
+import com.prayerlink.common.config.TableNameResolver;
+
 public class RepositoryTests {
 
     private DynamoDbEnhancedClient enhancedClient;
@@ -25,14 +27,15 @@ public class RepositoryTests {
     @BeforeEach
     void setUp() {
         enhancedClient = mock(DynamoDbEnhancedClient.class);
+        TableNameResolver tableNameResolver = new TableNameResolver("");
         
         deviceTable = mock(DynamoDbTable.class);
         when(enhancedClient.table(eq("Devices"), any(TableSchema.class))).thenReturn(deviceTable);
-        deviceRepository = new DeviceRepository(enhancedClient);
+        deviceRepository = new DeviceRepository(enhancedClient, tableNameResolver);
 
         accountTable = mock(DynamoDbTable.class);
         when(enhancedClient.table(eq("IntercessorAccounts"), any(TableSchema.class))).thenReturn(accountTable);
-        accountRepository = new IntercessorAccountRepository(enhancedClient);
+        accountRepository = new IntercessorAccountRepository(enhancedClient, tableNameResolver);
     }
 
     @Test

@@ -20,6 +20,8 @@ import software.amazon.awssdk.enhanced.dynamodb.model.QueryEnhancedRequest;
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
 import software.amazon.awssdk.services.dynamodb.model.UpdateItemRequest;
 
+import com.prayerlink.common.config.TableNameResolver;
+
 public class RepositoryTests {
 
     private DynamoDbEnhancedClient enhancedClient;
@@ -37,6 +39,7 @@ public class RepositoryTests {
     void setUp() {
         enhancedClient = mock(DynamoDbEnhancedClient.class);
         rawClient = mock(DynamoDbClient.class);
+        TableNameResolver tableNameResolver = new TableNameResolver("");
 
         prayerTable = mock(DynamoDbTable.class);
         deviceIdIndex = mock(DynamoDbIndex.class);
@@ -44,11 +47,11 @@ public class RepositoryTests {
         when(enhancedClient.table(eq("Prayers"), any(TableSchema.class))).thenReturn(prayerTable);
         when(prayerTable.index(eq("DeviceIdIndex"))).thenReturn(deviceIdIndex);
         when(prayerTable.index(eq("GroupIdIndex"))).thenReturn(groupIdIndex);
-        prayerRepository = new PrayerRepository(enhancedClient, rawClient);
+        prayerRepository = new PrayerRepository(enhancedClient, rawClient, tableNameResolver);
 
         updateTable = mock(DynamoDbTable.class);
         when(enhancedClient.table(eq("PrayerUpdates"), any(TableSchema.class))).thenReturn(updateTable);
-        updateRepository = new PrayerUpdateRepository(enhancedClient);
+        updateRepository = new PrayerUpdateRepository(enhancedClient, tableNameResolver);
     }
 
     @Test

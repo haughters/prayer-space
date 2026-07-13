@@ -32,6 +32,18 @@
             <artifactId>spring-web</artifactId>
         </dependency>
 
+        <!-- Spring Context for @Component and @Value -->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-context</artifactId>
+        </dependency>
+
+        <!-- Spring Boot for BuildProperties -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot</artifactId>
+        </dependency>
+
         <!-- AspectJ Weaver for GraalVM Native Image Reflection/AOP support -->
         <dependency>
             <groupId>org.aspectj</groupId>

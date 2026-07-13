@@ -16,7 +16,7 @@ public class SesConfig {
   @Value("${aws.ses.endpoint:#{null}}")
   private String endpoint;
 
-  @Value("${aws.ses.region:us-east-1}")
+  @Value("${aws.ses.region:eu-west-1}")
   private String region;
 
   @Bean

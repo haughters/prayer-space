@@ -11,12 +11,14 @@ import software.amazon.awssdk.enhanced.dynamodb.model.Page;
 import software.amazon.awssdk.enhanced.dynamodb.model.QueryConditional;
 import software.amazon.awssdk.enhanced.dynamodb.model.QueryEnhancedRequest;
 
+import com.prayerlink.common.config.TableNameResolver;
+
 @Repository
 public class PrayerUpdateRepository {
   private final DynamoDbTable<PrayerUpdate> table;
 
-  public PrayerUpdateRepository(DynamoDbEnhancedClient enhancedClient) {
-    this.table = enhancedClient.table("PrayerUpdates", TableSchema.fromBean(PrayerUpdate.class));
+  public PrayerUpdateRepository(DynamoDbEnhancedClient enhancedClient, TableNameResolver tableNameResolver) {
+    this.table = enhancedClient.table(tableNameResolver.resolve("PrayerUpdates"), TableSchema.fromBean(PrayerUpdate.class));
   }
 
   public void save(PrayerUpdate update) {
