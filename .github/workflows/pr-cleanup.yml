@@ -3,6 +3,8 @@ name: PR Cleanup
 on:
   pull_request:
     types: [closed]
+    paths:
+      - 'services/**'
 
 jobs:
   cleanup:
@@ -11,6 +13,8 @@ jobs:
       id-token: write
       contents: read
     steps:
+      - uses: actions/checkout@v7
+
       - uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
@@ -19,20 +23,16 @@ jobs:
       - name: Delete PR Lambdas
         run: |
           PR_NUM=${{ github.event.pull_request.number }}
-
-          for svc in prayer-service group-service notification-service identity-service admin-service; do
-            FUNC_NAME="pr-${PR_NUM}-${svc}"
-            if aws lambda get-function --function-name "$FUNC_NAME" 2>/dev/null; then
-              echo "Deleting $FUNC_NAME..."
-
-              # Delete Function URL config first
-              aws lambda delete-function-url-config --function-name "$FUNC_NAME" 2>/dev/null || true
-
-              # Delete the function
-              aws lambda delete-function --function-name "$FUNC_NAME"
-              echo "✅ Deleted $FUNC_NAME"
-            fi
-          done
-
-          # Clean up S3 deploy artifacts
-          aws s3 rm "s3://${{ secrets.DEPLOY_BUCKET }}/pr-deploys/pr-${PR_NUM}-" --recursive
+          PREFIX="pr-${PR_NUM}-"
+          
+          # List all functions matching the prefix
+          FUNCTIONS=$(aws lambda list-functions --query "Functions[?starts_with(FunctionName, '${PREFIX}')].FunctionName" --output text)
+          
+          if [ -z "$FUNCTIONS" ]; then
+            echo "No functions found for PR $PR_NUM"
+          else
+            for func in $FUNCTIONS; do
+              echo "Deleting $func..."
+              aws lambda delete-function --function-name "$func"
+            done
+          fi

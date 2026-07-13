@@ -58,3 +58,134 @@ jobs:
           name: ${{ inputs.service }}-lambda-zip
           path: services/${{ inputs.service }}/target/${{ inputs.service }}-lambda.zip
           retention-days: 7
+
+  deploy:
+    needs: build-and-test
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Download Lambda Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ inputs.service }}-lambda-zip
+          path: artifact-dir
+
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
+          aws-region: eu-west-1
+
+      - name: Deploy Lambda
+        run: |
+          SVC="${{ inputs.service }}"
+          SHORT_SHA=$(echo "${{ github.sha }}" | cut -c1-7)
+          
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            ENV_PREFIX="pr-${{ github.event.pull_request.number }}"
+            TABLE_PREFIX="test-"
+            DEPLOY_ENV="test"
+            PR_NUMBER="${{ github.event.pull_request.number }}"
+          else
+            ENV_PREFIX="test"
+            TABLE_PREFIX="test-"
+            DEPLOY_ENV="test"
+            PR_NUMBER=""
+          fi
+          
+          FUNC_NAME="${ENV_PREFIX}-${SVC}"
+          ZIP_KEY="deploys/${FUNC_NAME}/${SHORT_SHA}.zip"
+          
+          aws s3 cp "artifact-dir/${SVC}-lambda.zip" "s3://${{ secrets.DEPLOY_BUCKET }}/$ZIP_KEY"
+          
+          if aws lambda get-function --function-name "$FUNC_NAME" 2>/dev/null; then
+            aws lambda update-function-code \
+              --function-name "$FUNC_NAME" \
+              --s3-bucket "${{ secrets.DEPLOY_BUCKET }}" \
+              --s3-key "$ZIP_KEY"
+          else
+            aws lambda create-function \
+              --function-name "$FUNC_NAME" \
+              --runtime provided.al2023 \
+              --handler bootstrap \
+              --role "${{ secrets.LAMBDA_EXECUTION_ROLE }}" \
+              --code S3Bucket=${{ secrets.DEPLOY_BUCKET }},S3Key=$ZIP_KEY \
+              --memory-size 512 \
+              --timeout 30 \
+              --environment "Variables={SPRING_PROFILES_ACTIVE=default}"
+              
+            aws lambda add-permission \
+              --function-name "$FUNC_NAME" \
+              --statement-id FunctionURLAllowPublicAccess \
+              --action lambda:InvokeFunctionUrl \
+              --principal '*' \
+              --function-url-auth-type NONE
+              
+            aws lambda create-function-url-config \
+              --function-name "$FUNC_NAME" \
+              --auth-type NONE
+          fi
+          
+          aws lambda wait function-updated --function-name "$FUNC_NAME"
+          
+          # Resolve active URL for each service dependency
+          get_url() {
+            local dep=$1
+            local url=""
+            if [ -n "$PR_NUMBER" ]; then
+              url=$(aws lambda get-function-url-config --function-name "pr-${PR_NUMBER}-${dep}" --query 'FunctionUrl' --output text 2>/dev/null || echo "")
+            fi
+            if [ -z "$url" ]; then
+              url=$(aws lambda get-function-url-config --function-name "test-${dep}" --query 'FunctionUrl' --output text 2>/dev/null || echo "")
+            fi
+            echo "$url"
+          }
+          
+          URL_GROUP_SERVICE=$(get_url "group-service")
+          URL_PRAYER_SERVICE=$(get_url "prayer-service")
+          
+          ENV_VARS="SPRING_PROFILES_ACTIVE=default"
+          ENV_VARS="${ENV_VARS},DEPLOY_ENV=${DEPLOY_ENV}"
+          ENV_VARS="${ENV_VARS},APP_TABLE_PREFIX=${TABLE_PREFIX}"
+          if [ -n "$PR_NUMBER" ]; then
+            ENV_VARS="${ENV_VARS},PR_NUMBER=${PR_NUMBER}"
+          fi
+          
+          if [ "$SVC" = "prayer-service" ]; then
+            ENV_VARS="${ENV_VARS},AWS_EVENTBRIDGE_BUS_NAME=test-prayer-link-bus"
+            ENV_VARS="${ENV_VARS},SERVICES_GROUP_SERVICE_URL=${URL_GROUP_SERVICE}"
+          elif [ "$SVC" = "identity-service" ]; then
+            ENV_VARS="${ENV_VARS},SERVICES_GROUP_SERVICE_URL=${URL_GROUP_SERVICE}"
+          elif [ "$SVC" = "admin-service" ]; then
+            ENV_VARS="${ENV_VARS},SERVICES_GROUP_SERVICE_URL=${URL_GROUP_SERVICE}"
+            ENV_VARS="${ENV_VARS},SERVICES_PRAYER_SERVICE_URL=${URL_PRAYER_SERVICE}"
+          elif [ "$SVC" = "notification-service" ]; then
+            ENV_VARS="${ENV_VARS},AWS_SQS_QUEUE_URL=https://sqs.eu-west-1.amazonaws.com/${{ secrets.AWS_ACCOUNT_ID }}/test-notification-queue"
+            ENV_VARS="${ENV_VARS},AWS_SQS_BOUNCE_QUEUE_URL=https://sqs.eu-west-1.amazonaws.com/${{ secrets.AWS_ACCOUNT_ID }}/test-bounce-queue"
+            ENV_VARS="${ENV_VARS},AWS_SQS_NOTIFICATION_QUEUE=test-notification-queue"
+            ENV_VARS="${ENV_VARS},AWS_SQS_BOUNCE_QUEUE=test-bounce-queue"
+            ENV_VARS="${ENV_VARS},SERVICES_GROUP_SERVICE_URL=${URL_GROUP_SERVICE}"
+            ENV_VARS="${ENV_VARS},SERVICES_PRAYER_SERVICE_URL=${URL_PRAYER_SERVICE}"
+          fi
+          
+          aws lambda update-function-configuration \
+            --function-name "$FUNC_NAME" \
+            --environment "Variables={${ENV_VARS}}"
+            
+          aws lambda wait function-updated --function-name "$FUNC_NAME"
+          FINAL_URL=$(aws lambda get-function-url-config --function-name "$FUNC_NAME" --query 'FunctionUrl' --output text)
+          
+          echo "SERVICE_URL=$FINAL_URL" >> $GITHUB_ENV
+
+      - name: Comment PR
+        if: github.event_name == 'pull_request'
+        uses: peter-evans/create-or-update-comment@v4
+        with:
+          issue-number: ${{ github.event.pull_request.number }}
+          body: |
+            ✅ Deployed **${{ inputs.service }}** to PR environment!
+            URL: ${{ env.SERVICE_URL }}
