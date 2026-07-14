@@ -6,9 +6,15 @@ on:
     paths:
       - 'frontend/**'
       - '.github/workflows/frontend-deploy.yml'
+  pull_request:
+    types: [opened, synchronize]
+    branches: [main]
+    paths:
+      - 'frontend/**'
+      - '.github/workflows/frontend-deploy.yml'
 
 concurrency:
-  group: frontend-deploy
+  group: frontend-deploy-${{ github.ref }}
   cancel-in-progress: false
 
 jobs:
@@ -17,12 +23,13 @@ jobs:
     permissions:
       id-token: write
       contents: read
+      pull-requests: write
     steps:
       - uses: actions/checkout@v7
 
       - uses: actions/setup-node@v6
         with:
-          node-version: '20'
+          node-version: '24'
           cache: 'npm'
           cache-dependency-path: frontend/package-lock.json
 
@@ -45,7 +52,11 @@ jobs:
       - name: Build
         run: |
           npm ci
-          npm run build
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            npm run build -- --base=/pr-${{ github.event.pull_request.number }}/
+          else
+            npm run build
+          fi
         env:
           VITE_APP_VERSION: ${{ steps.version.outputs.version }}
         working-directory: frontend
@@ -60,21 +71,46 @@ jobs:
             exit 1
           fi
 
-          aws s3 sync dist/ s3://${FRONTEND_BUCKET} \
-            --delete \
-            --metadata version=${{ steps.version.outputs.version }}
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            aws s3 sync dist/ s3://${FRONTEND_BUCKET}/pr-${{ github.event.pull_request.number }} \
+              --delete \
+              --metadata version=${{ steps.version.outputs.version }}
+          else
+            aws s3 sync dist/ s3://${FRONTEND_BUCKET} \
+              --delete \
+              --metadata version=${{ steps.version.outputs.version }}
 
-          aws cloudfront create-invalidation \
-            --distribution-id ${CLOUDFRONT_ID} \
-            --paths "/*"
+            aws cloudfront create-invalidation \
+              --distribution-id ${CLOUDFRONT_ID} \
+              --paths "/*"
+          fi
         working-directory: frontend
 
       - name: Smoke Test
         run: |
           sleep 10  # wait for CDN propagation
-          STATUS=$(curl -s -o /dev/null -w "%{http_code}" https://prayer-link.com)
+          
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            URL="https://prayer-link.com/pr-${{ github.event.pull_request.number }}/index.html"
+          else
+            URL="https://prayer-link.com"
+          fi
+          
+          STATUS=$(curl -s -o /dev/null -w "%{http_code}" "$URL")
           if [ "$STATUS" != "200" ]; then
-            echo "❌ Frontend smoke test failed (HTTP $STATUS)"
+            echo "❌ Frontend smoke test failed (HTTP $STATUS) on $URL"
             exit 1
           fi
           echo "✅ Frontend responding (HTTP $STATUS) — version ${{ steps.version.outputs.version }}"
+          echo "URL=$URL" >> $GITHUB_ENV
+
+      - name: Comment PR
+        if: github.event_name == 'pull_request'
+        uses: peter-evans/create-or-update-comment@v4
+        with:
+          issue-number: ${{ github.event.pull_request.number }}
+          body: |
+            🎨 **Frontend PR Preview Deployed!**
+            URL: ${{ env.URL }}
+            
+            *(Note: This preview uses the `test` backend APIs)*

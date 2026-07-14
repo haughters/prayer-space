@@ -5,6 +5,7 @@ on:
     types: [closed]
     paths:
       - 'services/**'
+      - 'frontend/**'
 
 jobs:
   cleanup:
@@ -35,4 +36,14 @@ jobs:
               echo "Deleting $func..."
               aws lambda delete-function --function-name "$func"
             done
+          fi
+
+      - name: Delete PR Frontend
+        run: |
+          PR_NUM=${{ github.event.pull_request.number }}
+          FRONTEND_BUCKET=$(aws cloudformation list-exports --query "Exports[?Name=='test-PrayerLinkFrontendBucketName'].Value" --output text 2>/dev/null || echo "")
+          
+          if [ -n "$FRONTEND_BUCKET" ]; then
+            echo "Cleaning up S3 frontend folder: s3://${FRONTEND_BUCKET}/pr-${PR_NUM}"
+            aws s3 rm "s3://${FRONTEND_BUCKET}/pr-${PR_NUM}" --recursive
           fi

@@ -1,3 +1,4 @@
+name: Common Service Workflow
 on:
   workflow_call:
     inputs:
@@ -201,15 +202,23 @@ jobs:
             --environment "Variables={${ENV_VARS}}"
             
           aws lambda wait function-updated --function-name "$FUNC_NAME"
-          FINAL_URL=$(aws lambda get-function-url-config --function-name "$FUNC_NAME" --query 'FunctionUrl' --output text)
+          FINAL_URL=$(aws lambda get-function-url-config --function-name "$FUNC_NAME" --query 'FunctionUrl' --output text 2>/dev/null || echo "")
           
           echo "SERVICE_URL=$FINAL_URL" >> $GITHUB_ENV
 
-      - name: Comment PR
-        if: github.event_name == 'pull_request'
-        uses: peter-evans/create-or-update-comment@v4
-        with:
-          issue-number: ${{ github.event.pull_request.number }}
-          body: |
-            ✅ Deployed **${{ inputs.service }}** to PR environment!
-            URL: ${{ env.SERVICE_URL }}
+      - name: Smoke Test
+        run: |
+          if [ -z "${{ env.SERVICE_URL }}" ] || [ "${{ env.SERVICE_URL }}" = "None" ]; then
+            echo "No Function URL exposed for ${{ inputs.service }}, skipping smoke test."
+            exit 0
+          fi
+          
+          echo "Testing ${{ env.SERVICE_URL }}actuator/health"
+          STATUS=$(curl -s -o /dev/null -w "%{http_code}" --retry 5 --retry-delay 5 --max-time 30 "${{ env.SERVICE_URL }}actuator/health")
+          
+          if [ "$STATUS" = "200" ]; then
+            echo "✅ Smoke test passed (HTTP $STATUS)"
+          else
+            echo "❌ Smoke test failed (HTTP $STATUS)"
+            exit 1
+          fi
