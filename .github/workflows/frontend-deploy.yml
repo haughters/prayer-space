@@ -65,11 +65,14 @@ jobs:
         run: |
           FRONTEND_BUCKET=$(aws cloudformation list-exports --query "Exports[?Name=='test-PrayerLinkFrontendBucketName'].Value" --output text)
           CLOUDFRONT_ID=$(aws cloudformation list-exports --query "Exports[?Name=='test-PrayerLinkCloudFrontDistributionId'].Value" --output text)
+          CLOUDFRONT_DOMAIN=$(aws cloudformation list-exports --query "Exports[?Name=='test-PrayerLinkCloudFrontDomainName'].Value" --output text)
           
-          if [ -z "$FRONTEND_BUCKET" ] || [ -z "$CLOUDFRONT_ID" ]; then
-            echo "Error: Could not resolve Frontend Bucket or CloudFront ID from CloudFormation exports."
+          if [ -z "$FRONTEND_BUCKET" ] || [ -z "$CLOUDFRONT_ID" ] || [ -z "$CLOUDFRONT_DOMAIN" ]; then
+            echo "Error: Could not resolve Frontend Bucket, CloudFront ID, or Domain Name from CloudFormation exports."
             exit 1
           fi
+          
+          echo "CLOUDFRONT_DOMAIN=$CLOUDFRONT_DOMAIN" >> $GITHUB_ENV
 
           if [ "${{ github.event_name }}" = "pull_request" ]; then
             aws s3 sync dist/ s3://${FRONTEND_BUCKET}/pr-${{ github.event.pull_request.number }} \
@@ -90,10 +93,11 @@ jobs:
         run: |
           sleep 10  # wait for CDN propagation
           
+          BASE_URL="https://${{ env.CLOUDFRONT_DOMAIN }}"
           if [ "${{ github.event_name }}" = "pull_request" ]; then
-            URL="https://prayer-link.com/pr-${{ github.event.pull_request.number }}/index.html"
+            URL="${BASE_URL}/pr-${{ github.event.pull_request.number }}/index.html"
           else
-            URL="https://prayer-link.com"
+            URL="${BASE_URL}/index.html"
           fi
           
           STATUS=$(curl -s -o /dev/null -w "%{http_code}" "$URL")
