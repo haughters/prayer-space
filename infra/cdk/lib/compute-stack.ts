@@ -156,6 +156,42 @@ export class ComputeStack extends cdk.Stack {
     // Pass Queue Names to Notification Listener SpEL
     notificationSvc.fn.addEnvironment('AWS_SQS_NOTIFICATION_QUEUE', props.notificationQueue.queueName);
     notificationSvc.fn.addEnvironment('AWS_SQS_BOUNCE_QUEUE', props.bounceQueue.queueName);
+
+    // Grant GitHub Actions Role permission to manage PR Lambdas
+    const githubActionsRole = iam.Role.fromRoleName(this, 'GitHubActionsRole', 'GitHubActionsWorkflowDeployRole');
+    
+    const lambdaDeployPolicy = new iam.Policy(this, 'GitHubActionsLambdaDeployPolicy', {
+      policyName: 'GitHubActionsLambdaDeployPolicy',
+      statements: [
+        new iam.PolicyStatement({
+          actions: [
+            'lambda:GetFunction',
+            'lambda:CreateFunction',
+            'lambda:UpdateFunctionCode',
+            'lambda:UpdateFunctionConfiguration',
+            'lambda:DeleteFunction',
+            'lambda:AddPermission',
+            'lambda:CreateFunctionUrlConfig',
+            'lambda:GetFunctionUrlConfig',
+            'lambda:DeleteFunctionUrlConfig'
+          ],
+          resources: [
+            `arn:aws:lambda:${this.region}:${this.account}:function:pr-*`,
+            `arn:aws:lambda:${this.region}:${this.account}:function:test-*`
+          ]
+        }),
+        new iam.PolicyStatement({
+          actions: ['iam:PassRole'],
+          resources: [`arn:aws:iam::${this.account}:role/*`],
+          conditions: {
+            StringEquals: {
+              'iam:PassedToService': 'lambda.amazonaws.com'
+            }
+          }
+        })
+      ]
+    });
+    lambdaDeployPolicy.attachToRole(githubActionsRole);
   }
 }
 
