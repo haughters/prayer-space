@@ -61,6 +61,9 @@ jobs:
   deploy:
     needs: build-and-test
     runs-on: ubuntu-latest
+    environment:
+      name: ${{ github.event_name == 'pull_request' && format('pr-{0}', github.event.pull_request.number) || 'test' }}
+      url: ${{ env.SERVICE_URL }}
     permissions:
       id-token: write
       contents: read
@@ -147,7 +150,10 @@ jobs:
           }
           
           URL_GROUP_SERVICE=$(get_url "group-service")
+          [ -z "$URL_GROUP_SERVICE" ] && URL_GROUP_SERVICE="http://localhost"
+          
           URL_PRAYER_SERVICE=$(get_url "prayer-service")
+          [ -z "$URL_PRAYER_SERVICE" ] && URL_PRAYER_SERVICE="http://localhost"
           
           ENV_VARS="SPRING_PROFILES_ACTIVE=default"
           ENV_VARS="${ENV_VARS},DEPLOY_ENV=${DEPLOY_ENV}"
