@@ -20,7 +20,6 @@ on:
 permissions:
   id-token: write
   contents: read
-  code-quality: write
   pull-requests: write
   packages: write
 
