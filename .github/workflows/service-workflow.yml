@@ -103,7 +103,7 @@ jobs:
               --function-name "$FUNC_NAME" \
               --zip-file "fileb://artifact-dir/${SVC}-lambda.zip"
           else
-            LAMBDA_ROLE=$(aws lambda get-function --function-name "test-${SVC}" --query 'Configuration.Role' --output text 2>/dev/null || echo "")
+            LAMBDA_ROLE=$(aws lambda get-function --function-name "test-${SVC}" --query 'Configuration.Role' --output text || echo "")
             if [ -z "$LAMBDA_ROLE" ]; then
               echo "Error: Could not find IAM role from test-${SVC} to create PR lambda."
               exit 1
