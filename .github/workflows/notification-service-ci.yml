@@ -27,6 +27,12 @@ permissions:
 jobs:
   run:
     uses: ./.github/workflows/service-workflow.yml
+    permissions:
+      id-token: write
+      contents: read
+      pull-requests: write
+      packages: write
+
     secrets: inherit
 
     with:
