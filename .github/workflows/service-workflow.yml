@@ -106,6 +106,24 @@ jobs:
             aws lambda update-function-code \
               --function-name "$FUNC_NAME" \
               --zip-file "fileb://artifact-dir/${SVC}-lambda.zip"
+              
+            if [ -n "$PR_NUMBER" ]; then
+              aws lambda add-permission \
+                --function-name "$FUNC_NAME" \
+                --statement-id FunctionURLAllowPublicAccess \
+                --action lambda:InvokeFunctionUrl \
+                --principal '*' \
+                --function-url-auth-type NONE 2>/dev/null || true
+                
+              aws lambda update-function-url-config \
+                --function-name "$FUNC_NAME" \
+                --auth-type NONE \
+                --cors "AllowOrigins=*,AllowMethods=*,AllowHeaders=*,AllowCredentials=true" 2>/dev/null || \
+              aws lambda create-function-url-config \
+                --function-name "$FUNC_NAME" \
+                --auth-type NONE \
+                --cors "AllowOrigins=*,AllowMethods=*,AllowHeaders=*,AllowCredentials=true"
+            fi
           else
             LAMBDA_ROLE=$(aws lambda get-function --function-name "test-${SVC}" --query 'Configuration.Role' --output text || echo "")
             if [ -z "$LAMBDA_ROLE" ]; then
@@ -123,16 +141,19 @@ jobs:
               --timeout 30 \
               --environment "Variables={SPRING_PROFILES_ACTIVE=default}"
               
-            aws lambda add-permission \
-              --function-name "$FUNC_NAME" \
-              --statement-id FunctionURLAllowPublicAccess \
-              --action lambda:InvokeFunctionUrl \
-              --principal '*' \
-              --function-url-auth-type NONE
-              
-            aws lambda create-function-url-config \
-              --function-name "$FUNC_NAME" \
-              --auth-type NONE
+            if [ -n "$PR_NUMBER" ]; then
+              aws lambda add-permission \
+                --function-name "$FUNC_NAME" \
+                --statement-id FunctionURLAllowPublicAccess \
+                --action lambda:InvokeFunctionUrl \
+                --principal '*' \
+                --function-url-auth-type NONE
+                
+              aws lambda create-function-url-config \
+                --function-name "$FUNC_NAME" \
+                --auth-type NONE \
+                --cors "AllowOrigins=*,AllowMethods=*,AllowHeaders=*,AllowCredentials=true"
+            fi
           fi
           
           aws lambda wait function-updated --function-name "$FUNC_NAME"
