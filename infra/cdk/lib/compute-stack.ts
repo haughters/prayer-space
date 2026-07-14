@@ -6,7 +6,7 @@ import * as dynamodb from 'aws-cdk-lib/aws-dynamodb';
 import * as events from 'aws-cdk-lib/aws-events';
 import * as sqs from 'aws-cdk-lib/aws-sqs';
 import * as iam from 'aws-cdk-lib/aws-iam';
-import * as codedeploy from 'aws-cdk-lib/aws-codedeploy';
+
 import * as cloudwatch from 'aws-cdk-lib/aws-cloudwatch';
 import { Construct } from 'constructs';
 
@@ -80,16 +80,7 @@ export class ComputeStack extends cdk.Stack {
         treatMissingData: cloudwatch.TreatMissingData.NOT_BREACHING,
       });
 
-      new codedeploy.LambdaDeploymentGroup(this, `${name}DeployGroup`, {
-        alias,
-        deploymentConfig: codedeploy.LambdaDeploymentConfig.LINEAR_10PERCENT_EVERY_1MINUTE,
-        alarms: [errorAlarm],
-        autoRollback: {
-          failedDeployment: true,
-          stoppedDeployment: true,
-          deploymentInAlarm: true,
-        },
-      });
+
 
       let functionUrl: lambda.FunctionUrl | undefined = undefined;
       if (hasUrl) {
