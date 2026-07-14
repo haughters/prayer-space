@@ -136,12 +136,29 @@ jobs:
           
           aws lambda wait function-updated --function-name "$FUNC_NAME"
           
+          # Fetch PR changed files if it's a pull request to check for parallel deployments
+          if [ -n "$PR_NUMBER" ]; then
+            CHANGED_FILES=$(curl -s -H "Authorization: Bearer ${{ github.token }}" \
+              "https://api.github.com/repos/${{ github.repository }}/pulls/${PR_NUMBER}/files?per_page=100" | jq -r '.[].filename' || echo "")
+          fi
+
           # Resolve active URL for each service dependency
           get_url() {
             local dep=$1
             local url=""
             if [ -n "$PR_NUMBER" ]; then
-              url=$(aws lambda get-function-url-config --function-name "pr-${PR_NUMBER}-${dep}" --query 'FunctionUrl' --output text 2>/dev/null || echo "")
+              if echo "$CHANGED_FILES" | grep -q "^services/${dep}/"; then
+                echo "Waiting up to 10 minutes for parallel PR deployment of ${dep}..." >&2
+                for i in {1..40}; do
+                  url=$(aws lambda get-function-url-config --function-name "pr-${PR_NUMBER}-${dep}" --query 'FunctionUrl' --output text 2>/dev/null || echo "")
+                  if [ -n "$url" ]; then
+                    break
+                  fi
+                  sleep 15
+                done
+              else
+                url=$(aws lambda get-function-url-config --function-name "pr-${PR_NUMBER}-${dep}" --query 'FunctionUrl' --output text 2>/dev/null || echo "")
+              fi
             fi
             if [ -z "$url" ]; then
               url=$(aws lambda get-function-url-config --function-name "test-${dep}" --query 'FunctionUrl' --output text 2>/dev/null || echo "")
