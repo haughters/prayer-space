@@ -160,8 +160,8 @@ export class ComputeStack extends cdk.Stack {
     // Grant GitHub Actions Role permission to manage PR Lambdas
     const githubActionsRole = iam.Role.fromRoleName(this, 'GitHubActionsRole', 'GitHubActionsWorkflowDeployRole');
     
-    const lambdaDeployPolicy = new iam.Policy(this, 'GitHubActionsLambdaDeployPolicy', {
-      policyName: 'GitHubActionsLambdaDeployPolicy',
+    const lambdaDeployPolicy = new iam.Policy(this, 'GitHubActionsDeployPolicy', {
+      policyName: 'GitHubActionsDeployPolicy',
       statements: [
         new iam.PolicyStatement({
           actions: [
@@ -169,6 +169,7 @@ export class ComputeStack extends cdk.Stack {
             'lambda:CreateFunction',
             'lambda:UpdateFunctionCode',
             'lambda:UpdateFunctionConfiguration',
+            'lambda:GetFunctionConfiguration',
             'lambda:DeleteFunction',
             'lambda:AddPermission',
             'lambda:CreateFunctionUrlConfig',
@@ -179,6 +180,29 @@ export class ComputeStack extends cdk.Stack {
             `arn:aws:lambda:${this.region}:${this.account}:function:pr-*`,
             `arn:aws:lambda:${this.region}:${this.account}:function:test-*`
           ]
+        }),
+        new iam.PolicyStatement({
+          actions: [
+            'lambda:ListFunctions',
+            'cloudformation:ListExports'
+          ],
+          resources: ['*']
+        }),
+        new iam.PolicyStatement({
+          actions: [
+            's3:ListBucket',
+            's3:GetObject',
+            's3:PutObject',
+            's3:DeleteObject'
+          ],
+          resources: [
+            'arn:aws:s3:::*',
+            'arn:aws:s3:::*/*'
+          ]
+        }),
+        new iam.PolicyStatement({
+          actions: ['cloudfront:CreateInvalidation'],
+          resources: [`arn:aws:cloudfront::${this.account}:distribution/*`]
         }),
         new iam.PolicyStatement({
           actions: ['iam:PassRole'],
