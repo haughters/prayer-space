@@ -115,14 +115,17 @@ jobs:
                 --principal '*' \
                 --function-url-auth-type NONE 2>/dev/null || true
                 
-              aws lambda update-function-url-config \
-                --function-name "$FUNC_NAME" \
-                --auth-type NONE \
-                --cors "AllowOrigins=*,AllowMethods=*,AllowHeaders=*,AllowCredentials=true" 2>/dev/null || \
-              aws lambda create-function-url-config \
-                --function-name "$FUNC_NAME" \
-                --auth-type NONE \
-                --cors "AllowOrigins=*,AllowMethods=*,AllowHeaders=*,AllowCredentials=true"
+              if aws lambda get-function-url-config --function-name "$FUNC_NAME" >/dev/null 2>&1; then
+                aws lambda update-function-url-config \
+                  --function-name "$FUNC_NAME" \
+                  --auth-type NONE \
+                  --cors "AllowOrigins=*,AllowMethods=*,AllowHeaders=*,AllowCredentials=true" || true
+              else
+                aws lambda create-function-url-config \
+                  --function-name "$FUNC_NAME" \
+                  --auth-type NONE \
+                  --cors "AllowOrigins=*,AllowMethods=*,AllowHeaders=*,AllowCredentials=true" || true
+              fi
             fi
           else
             LAMBDA_ROLE=$(aws lambda get-function --function-name "test-${SVC}" --query 'Configuration.Role' --output text || echo "")
