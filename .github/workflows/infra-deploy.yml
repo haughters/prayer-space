@@ -1,0 +1,53 @@
+name: Infrastructure Deploy
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'infra/**'
+      - '.github/workflows/infra-deploy.yml'
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to deploy to'
+        required: true
+        default: 'test'
+        type: choice
+        options:
+          - test
+          - live
+
+concurrency:
+  group: infra-deploy-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment || 'test' }}
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
+          aws-region: eu-west-1
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '20'
+
+      - name: Install CDK dependencies
+        run: npm ci
+        working-directory: infra/cdk
+
+      - name: Deploy Infrastructure
+        run: |
+          npx cdk deploy --all \
+            --require-approval never \
+            -c deployEnv=${{ inputs.environment || 'test' }} \
+            -c gitSha=${{ github.sha }}
+        working-directory: infra/cdk
