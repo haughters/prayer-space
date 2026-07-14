@@ -7,7 +7,7 @@ import * as events from 'aws-cdk-lib/aws-events';
 import * as sqs from 'aws-cdk-lib/aws-sqs';
 import * as iam from 'aws-cdk-lib/aws-iam';
 
-import * as cloudwatch from 'aws-cdk-lib/aws-cloudwatch';
+
 import { Construct } from 'constructs';
 
 export interface ComputeStackProps extends cdk.StackProps {
@@ -69,18 +69,6 @@ export class ComputeStack extends cdk.Stack {
         aliasName: 'live',
         version,
       });
-
-      const errorAlarm = new cloudwatch.Alarm(this, `${name}ErrorAlarm`, {
-        alarmName: `${props.deployEnv}-${name}-errors`,
-        metric: alias.metricErrors({
-          period: cdk.Duration.minutes(1),
-        }),
-        threshold: 5,
-        evaluationPeriods: 1,
-        treatMissingData: cloudwatch.TreatMissingData.NOT_BREACHING,
-      });
-
-
 
       let functionUrl: lambda.FunctionUrl | undefined = undefined;
       if (hasUrl) {
