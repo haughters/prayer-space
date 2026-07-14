@@ -17,6 +17,7 @@ jobs:
   build-and-test:
     runs-on: ubuntu-latest
     permissions:
+      id-token: write
       contents: read
       code-quality: write
       pull-requests: write

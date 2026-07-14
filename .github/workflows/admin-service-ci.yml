@@ -18,6 +18,7 @@ on:
       - 'services/admin-service/**'
 
 permissions:
+  id-token: write
   contents: read
   code-quality: write
   pull-requests: write

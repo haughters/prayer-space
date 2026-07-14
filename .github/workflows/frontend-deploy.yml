@@ -52,12 +52,20 @@ jobs:
 
       - name: Deploy to S3
         run: |
-          aws s3 sync dist/ s3://${{ secrets.FRONTEND_S3_BUCKET }} \
+          FRONTEND_BUCKET=$(aws cloudformation list-exports --query "Exports[?Name=='test-PrayerLinkFrontendBucketName'].Value" --output text)
+          CLOUDFRONT_ID=$(aws cloudformation list-exports --query "Exports[?Name=='test-PrayerLinkCloudFrontDistributionId'].Value" --output text)
+          
+          if [ -z "$FRONTEND_BUCKET" ] || [ -z "$CLOUDFRONT_ID" ]; then
+            echo "Error: Could not resolve Frontend Bucket or CloudFront ID from CloudFormation exports."
+            exit 1
+          fi
+
+          aws s3 sync dist/ s3://${FRONTEND_BUCKET} \
             --delete \
             --metadata version=${{ steps.version.outputs.version }}
 
           aws cloudfront create-invalidation \
-            --distribution-id ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }} \
+            --distribution-id ${CLOUDFRONT_ID} \
             --paths "/*"
         working-directory: frontend
 
