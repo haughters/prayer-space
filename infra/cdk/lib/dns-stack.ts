@@ -43,19 +43,21 @@ export class DnsStack extends cdk.Stack {
     // 3. Define Origins
     const s3Origin = origins.S3BucketOrigin.withOriginAccessIdentity(this.frontendBucket, { originAccessIdentity });
 
-    const parseDomain = (url: string) => cdk.Fn.select(2, cdk.Fn.split('/', url));
+    const lambdaOac = new cloudfront.FunctionUrlOriginAccessControl(this, 'LambdaOAC', {
+      originAccessControlName: `${props.deployEnv}-LambdaOAC`,
+    });
 
-    const identityOrigin = new origins.HttpOrigin(parseDomain(props.computeStack.identityFunctionUrl.url), {
-      protocolPolicy: cloudfront.OriginProtocolPolicy.HTTPS_ONLY,
+    const identityOrigin = new origins.FunctionUrlOrigin(props.computeStack.identityFunctionUrl, {
+      originAccessControlId: lambdaOac.originAccessControlId,
     });
-    const prayerOrigin = new origins.HttpOrigin(parseDomain(props.computeStack.prayerFunctionUrl.url), {
-      protocolPolicy: cloudfront.OriginProtocolPolicy.HTTPS_ONLY,
+    const prayerOrigin = new origins.FunctionUrlOrigin(props.computeStack.prayerFunctionUrl, {
+      originAccessControlId: lambdaOac.originAccessControlId,
     });
-    const groupOrigin = new origins.HttpOrigin(parseDomain(props.computeStack.groupFunctionUrl.url), {
-      protocolPolicy: cloudfront.OriginProtocolPolicy.HTTPS_ONLY,
+    const groupOrigin = new origins.FunctionUrlOrigin(props.computeStack.groupFunctionUrl, {
+      originAccessControlId: lambdaOac.originAccessControlId,
     });
-    const adminOrigin = new origins.HttpOrigin(parseDomain(props.computeStack.adminFunctionUrl.url), {
-      protocolPolicy: cloudfront.OriginProtocolPolicy.HTTPS_ONLY,
+    const adminOrigin = new origins.FunctionUrlOrigin(props.computeStack.adminFunctionUrl, {
+      originAccessControlId: lambdaOac.originAccessControlId,
     });
 
     // 4. CloudFront Distribution

@@ -73,13 +73,7 @@ export class ComputeStack extends cdk.Stack {
       let functionUrl: lambda.FunctionUrl | undefined = undefined;
       if (hasUrl) {
         functionUrl = alias.addFunctionUrl({
-          authType: lambda.FunctionUrlAuthType.NONE,
-          cors: {
-            allowedOrigins: ['*'],
-            allowedMethods: [lambda.HttpMethod.ALL],
-            allowedHeaders: ['*'],
-            allowCredentials: true,
-          },
+          authType: lambda.FunctionUrlAuthType.AWS_IAM,
         });
 
         new cdk.CfnOutput(this, `${name}FunctionUrlOut`, {
@@ -172,9 +166,12 @@ export class ComputeStack extends cdk.Stack {
             'lambda:GetFunctionConfiguration',
             'lambda:DeleteFunction',
             'lambda:AddPermission',
+            'lambda:RemovePermission',
             'lambda:CreateFunctionUrlConfig',
             'lambda:GetFunctionUrlConfig',
-            'lambda:DeleteFunctionUrlConfig'
+            'lambda:UpdateFunctionUrlConfig',
+            'lambda:DeleteFunctionUrlConfig',
+            'lambda:InvokeFunctionUrl'
           ],
           resources: [
             `arn:aws:lambda:${this.region}:${this.account}:function:pr-*`,

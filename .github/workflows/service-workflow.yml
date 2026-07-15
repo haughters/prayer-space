@@ -108,23 +108,16 @@ jobs:
               --zip-file "fileb://artifact-dir/${SVC}-lambda.zip"
               
             if [ -n "$PR_NUMBER" ]; then
-              aws lambda add-permission \
-                --function-name "$FUNC_NAME" \
-                --statement-id FunctionURLAllowPublicAccess \
-                --action lambda:InvokeFunctionUrl \
-                --principal '*' \
-                --function-url-auth-type NONE 2>/dev/null || true
-                
               if aws lambda get-function-url-config --function-name "$FUNC_NAME" >/dev/null 2>&1; then
                 aws lambda update-function-url-config \
                   --function-name "$FUNC_NAME" \
-                  --auth-type NONE \
-                  --cors "AllowOrigins=*,AllowMethods=*,AllowHeaders=*,AllowCredentials=true" || true
+                  --auth-type AWS_IAM \
+                  --cors '{"AllowOrigins":["*"],"AllowMethods":["*"],"AllowHeaders":["*"],"AllowCredentials":true}' >/dev/null 2>&1 || true
               else
                 aws lambda create-function-url-config \
                   --function-name "$FUNC_NAME" \
-                  --auth-type NONE \
-                  --cors "AllowOrigins=*,AllowMethods=*,AllowHeaders=*,AllowCredentials=true" || true
+                  --auth-type AWS_IAM \
+                  --cors '{"AllowOrigins":["*"],"AllowMethods":["*"],"AllowHeaders":["*"],"AllowCredentials":true}' >/dev/null 2>&1 || true
               fi
             fi
           else
@@ -150,12 +143,12 @@ jobs:
                 --statement-id FunctionURLAllowPublicAccess \
                 --action lambda:InvokeFunctionUrl \
                 --principal '*' \
-                --function-url-auth-type NONE
+                --function-url-auth-type NONE >/dev/null 2>&1 || true
                 
               aws lambda create-function-url-config \
                 --function-name "$FUNC_NAME" \
                 --auth-type NONE \
-                --cors "AllowOrigins=*,AllowMethods=*,AllowHeaders=*,AllowCredentials=true"
+                --cors '{"AllowOrigins":["*"],"AllowMethods":["*"],"AllowHeaders":["*"],"AllowCredentials":true}' >/dev/null 2>&1 || true
             fi
           fi
           
@@ -229,16 +222,21 @@ jobs:
           FINAL_URL=$(aws lambda get-function-url-config --function-name "$FUNC_NAME" --query 'FunctionUrl' --output text 2>/dev/null || echo "")
           
           echo "SERVICE_URL=$FINAL_URL" >> $GITHUB_ENV
+          echo "AWS_REGION=eu-west-1" >> $GITHUB_ENV
 
       - name: Smoke Test
         run: |
-          if [ -z "${{ env.SERVICE_URL }}" ] || [ "${{ env.SERVICE_URL }}" = "None" ]; then
-            echo "No Function URL exposed for ${{ inputs.service }}, skipping smoke test."
+          LAMBDA_URL="${{ env.SERVICE_URL }}"
+          SVC="${{ inputs.service }}"
+          
+          if [ -z "$LAMBDA_URL" ] || [ "$LAMBDA_URL" = "None" ]; then
+            echo "No Function URL exposed for ${SVC}, skipping smoke test."
             exit 0
           fi
           
-          echo "Testing ${{ env.SERVICE_URL }}actuator/health"
-          STATUS=$(curl -s -o /dev/null -w "%{http_code}" --retry 5 --retry-delay 5 --max-time 30 "${{ env.SERVICE_URL }}actuator/health")
+          echo "Testing $LAMBDA_URL"
+          python -m pip install awscurl
+          STATUS=$(awscurl -s -o /dev/null -w "%{http_code}" --service lambda --region ${{ env.AWS_REGION }} "https://${LAMBDA_URL#https://}actuator/health")
           
           if [ "$STATUS" = "200" ]; then
             echo "✅ Smoke test passed (HTTP $STATUS)"
