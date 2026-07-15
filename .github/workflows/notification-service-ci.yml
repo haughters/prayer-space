@@ -36,3 +36,4 @@ jobs:
 
     with:
       service: notification-service
+      has-url: false

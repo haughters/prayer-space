@@ -5,6 +5,10 @@ on:
       service:
         required: true
         type: string
+      has-url:
+        required: false
+        type: boolean
+        default: true
 
 jobs:
   build-and-test:
@@ -83,61 +87,45 @@ jobs:
           role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
           aws-region: eu-west-1
 
-      - name: Deploy Lambda
+      - name: Resolve Environment
+        id: env
         run: |
           SVC="${{ inputs.service }}"
           AWS_ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
-          
+
           if [ "${{ github.event_name }}" = "pull_request" ]; then
             ENV_PREFIX="pr-${{ github.event.pull_request.number }}"
-            TABLE_PREFIX="test-"
-            DEPLOY_ENV="test"
             PR_NUMBER="${{ github.event.pull_request.number }}"
           else
             ENV_PREFIX="test"
-            TABLE_PREFIX="test-"
-            DEPLOY_ENV="test"
             PR_NUMBER=""
           fi
-          
+
           FUNC_NAME="${ENV_PREFIX}-${SVC}"
-          
+
+          echo "SVC=$SVC" >> $GITHUB_ENV
+          echo "AWS_ACCOUNT_ID=$AWS_ACCOUNT_ID" >> $GITHUB_ENV
+          echo "ENV_PREFIX=$ENV_PREFIX" >> $GITHUB_ENV
+          echo "PR_NUMBER=$PR_NUMBER" >> $GITHUB_ENV
+          echo "FUNC_NAME=$FUNC_NAME" >> $GITHUB_ENV
+          echo "TABLE_PREFIX=test-" >> $GITHUB_ENV
+          echo "DEPLOY_ENV=test" >> $GITHUB_ENV
+
+      - name: Create or Update Lambda
+        run: |
           if aws lambda get-function --function-name "$FUNC_NAME" 2>/dev/null; then
+            echo "Updating existing function: $FUNC_NAME"
             aws lambda update-function-code \
               --function-name "$FUNC_NAME" \
               --zip-file "fileb://artifact-dir/${SVC}-lambda.zip"
-              
-            if [ -n "$PR_NUMBER" ]; then
-              aws lambda remove-permission \
-                --function-name "$FUNC_NAME" \
-                --statement-id GithubActionsInvoke >/dev/null 2>&1 || true
-
-              aws lambda add-permission \
-                --function-name "$FUNC_NAME" \
-                --statement-id GithubActionsInvoke \
-                --action lambda:InvokeFunctionUrl \
-                --principal "arn:aws:iam::${AWS_ACCOUNT_ID}:role/GitHubActionsWorkflowDeployRole" \
-                --function-url-auth-type AWS_IAM >/dev/null 2>&1 || true
-
-              if aws lambda get-function-url-config --function-name "$FUNC_NAME" >/dev/null 2>&1; then
-                aws lambda update-function-url-config \
-                  --function-name "$FUNC_NAME" \
-                  --auth-type AWS_IAM \
-                  --cors '{"AllowOrigins":["*"],"AllowMethods":["*"],"AllowHeaders":["*"],"AllowCredentials":true}' >/dev/null 2>&1 || true
-              else
-                aws lambda create-function-url-config \
-                  --function-name "$FUNC_NAME" \
-                  --auth-type AWS_IAM \
-                  --cors '{"AllowOrigins":["*"],"AllowMethods":["*"],"AllowHeaders":["*"],"AllowCredentials":true}' >/dev/null 2>&1 || true
-              fi
-            fi
           else
-            LAMBDA_ROLE=$(aws lambda get-function --function-name "test-${SVC}" --query 'Configuration.Role' --output text || echo "")
+            echo "Creating new function: $FUNC_NAME"
+            LAMBDA_ROLE=$(aws lambda get-function --function-name "test-${SVC}" --query 'Configuration.Role' --output text)
             if [ -z "$LAMBDA_ROLE" ]; then
-              echo "Error: Could not find IAM role from test-${SVC} to create PR lambda."
+              echo "::error::Could not find IAM role from test-${SVC}"
               exit 1
             fi
-            
+
             aws lambda create-function \
               --function-name "$FUNC_NAME" \
               --runtime provided.al2023 \
@@ -147,115 +135,131 @@ jobs:
               --memory-size 512 \
               --timeout 30 \
               --environment "Variables={SPRING_PROFILES_ACTIVE=default}"
-              
-            if [ -n "$PR_NUMBER" ]; then
-              aws lambda remove-permission \
-                --function-name "$FUNC_NAME" \
-                --statement-id GithubActionsInvoke >/dev/null 2>&1 || true
-
-              aws lambda add-permission \
-                --function-name "$FUNC_NAME" \
-                --statement-id GithubActionsInvoke \
-                --action lambda:InvokeFunctionUrl \
-                --principal "arn:aws:iam::${AWS_ACCOUNT_ID}:role/GitHubActionsWorkflowDeployRole" \
-                --function-url-auth-type AWS_IAM >/dev/null 2>&1 || true
-                
-              aws lambda create-function-url-config \
-                --function-name "$FUNC_NAME" \
-                --auth-type AWS_IAM \
-                --cors '{"AllowOrigins":["*"],"AllowMethods":["*"],"AllowHeaders":["*"],"AllowCredentials":true}' >/dev/null 2>&1 || true
-            fi
           fi
-          
+
           aws lambda wait function-updated --function-name "$FUNC_NAME"
-          
-          # Fetch PR changed files if it's a pull request to check for parallel deployments
-          if [ -n "$PR_NUMBER" ]; then
-            CHANGED_FILES=$(curl -s -H "Authorization: Bearer ${{ github.token }}" \
-              "https://api.github.com/repos/${{ github.repository }}/pulls/${PR_NUMBER}/files?per_page=100" | jq -r '.[].filename' || echo "")
+
+      - name: Configure Function URL
+        if: inputs.has-url && env.PR_NUMBER != ''
+        run: |
+          # Remove stale permission (may not exist — OK to fail)
+          aws lambda remove-permission \
+            --function-name "$FUNC_NAME" \
+            --statement-id GithubActionsInvoke 2>/dev/null || true
+
+          # Grant the GitHub Actions role permission to invoke this Function URL
+          aws lambda add-permission \
+            --function-name "$FUNC_NAME" \
+            --statement-id GithubActionsInvoke \
+            --action lambda:InvokeFunctionUrl \
+            --principal "arn:aws:iam::${AWS_ACCOUNT_ID}:role/GitHubActionsWorkflowDeployRole" \
+            --function-url-auth-type AWS_IAM
+
+          # Create or update the Function URL config
+          if aws lambda get-function-url-config --function-name "$FUNC_NAME" >/dev/null 2>&1; then
+            aws lambda update-function-url-config \
+              --function-name "$FUNC_NAME" \
+              --auth-type AWS_IAM
+          else
+            aws lambda create-function-url-config \
+              --function-name "$FUNC_NAME" \
+              --auth-type AWS_IAM
           fi
 
-          # Resolve active URL for each service dependency
+      - name: Resolve Service Dependencies
+        run: |
           get_url() {
             local dep=$1
             local url=""
+
             if [ -n "$PR_NUMBER" ]; then
+              CHANGED_FILES=$(curl -s -H "Authorization: Bearer ${{ github.token }}" \
+                "https://api.github.com/repos/${{ github.repository }}/pulls/${PR_NUMBER}/files?per_page=100" \
+                | jq -r '.[].filename' || echo "")
+
               if echo "$CHANGED_FILES" | grep -q "^services/${dep}/"; then
-                echo "Waiting up to 10 minutes for parallel PR deployment of ${dep}..." >&2
-                for i in {1..40}; do
+                echo "Waiting for parallel PR deployment of ${dep}..." >&2
+                for i in $(seq 1 40); do
                   url=$(aws lambda get-function-url-config --function-name "pr-${PR_NUMBER}-${dep}" --query 'FunctionUrl' --output text 2>/dev/null || echo "")
-                  if [ -n "$url" ]; then
-                    break
-                  fi
+                  [ -n "$url" ] && break
                   sleep 15
                 done
               else
                 url=$(aws lambda get-function-url-config --function-name "pr-${PR_NUMBER}-${dep}" --query 'FunctionUrl' --output text 2>/dev/null || echo "")
               fi
             fi
+
             if [ -z "$url" ]; then
               url=$(aws lambda get-function-url-config --function-name "test-${dep}" --query 'FunctionUrl' --output text 2>/dev/null || echo "")
             fi
             echo "$url"
           }
-          
+
           URL_GROUP_SERVICE=$(get_url "group-service")
           [ -z "$URL_GROUP_SERVICE" ] && URL_GROUP_SERVICE="http://localhost"
-          
+
           URL_PRAYER_SERVICE=$(get_url "prayer-service")
           [ -z "$URL_PRAYER_SERVICE" ] && URL_PRAYER_SERVICE="http://localhost"
-          
+
+          echo "URL_GROUP_SERVICE=$URL_GROUP_SERVICE" >> $GITHUB_ENV
+          echo "URL_PRAYER_SERVICE=$URL_PRAYER_SERVICE" >> $GITHUB_ENV
+
+      - name: Configure Environment Variables
+        run: |
           ENV_VARS="SPRING_PROFILES_ACTIVE=default"
           ENV_VARS="${ENV_VARS},DEPLOY_ENV=${DEPLOY_ENV}"
           ENV_VARS="${ENV_VARS},APP_TABLE_PREFIX=${TABLE_PREFIX}"
-          if [ -n "$PR_NUMBER" ]; then
-            ENV_VARS="${ENV_VARS},PR_NUMBER=${PR_NUMBER}"
-          fi
-          
-          if [ "$SVC" = "prayer-service" ]; then
-            ENV_VARS="${ENV_VARS},AWS_EVENTBRIDGE_BUS_NAME=test-prayer-link-bus"
-            ENV_VARS="${ENV_VARS},SERVICES_GROUP_SERVICE_URL=${URL_GROUP_SERVICE}"
-          elif [ "$SVC" = "identity-service" ]; then
-            ENV_VARS="${ENV_VARS},SERVICES_GROUP_SERVICE_URL=${URL_GROUP_SERVICE}"
-          elif [ "$SVC" = "admin-service" ]; then
-            ENV_VARS="${ENV_VARS},SERVICES_GROUP_SERVICE_URL=${URL_GROUP_SERVICE}"
-            ENV_VARS="${ENV_VARS},SERVICES_PRAYER_SERVICE_URL=${URL_PRAYER_SERVICE}"
-          elif [ "$SVC" = "notification-service" ]; then
-            ENV_VARS="${ENV_VARS},AWS_SQS_QUEUE_URL=https://sqs.eu-west-1.amazonaws.com/${AWS_ACCOUNT_ID}/test-notification-queue"
-            ENV_VARS="${ENV_VARS},AWS_SQS_BOUNCE_QUEUE_URL=https://sqs.eu-west-1.amazonaws.com/${AWS_ACCOUNT_ID}/test-bounce-queue"
-            ENV_VARS="${ENV_VARS},AWS_SQS_NOTIFICATION_QUEUE=test-notification-queue"
-            ENV_VARS="${ENV_VARS},AWS_SQS_BOUNCE_QUEUE=test-bounce-queue"
-            ENV_VARS="${ENV_VARS},SERVICES_GROUP_SERVICE_URL=${URL_GROUP_SERVICE}"
-            ENV_VARS="${ENV_VARS},SERVICES_PRAYER_SERVICE_URL=${URL_PRAYER_SERVICE}"
-          fi
-          
+          [ -n "$PR_NUMBER" ] && ENV_VARS="${ENV_VARS},PR_NUMBER=${PR_NUMBER}"
+
+          case "$SVC" in
+            prayer-service)
+              ENV_VARS="${ENV_VARS},AWS_EVENTBRIDGE_BUS_NAME=test-prayer-link-bus"
+              ENV_VARS="${ENV_VARS},SERVICES_GROUP_SERVICE_URL=${URL_GROUP_SERVICE}"
+              ;;
+            identity-service)
+              ENV_VARS="${ENV_VARS},SERVICES_GROUP_SERVICE_URL=${URL_GROUP_SERVICE}"
+              ;;
+            admin-service)
+              ENV_VARS="${ENV_VARS},SERVICES_GROUP_SERVICE_URL=${URL_GROUP_SERVICE}"
+              ENV_VARS="${ENV_VARS},SERVICES_PRAYER_SERVICE_URL=${URL_PRAYER_SERVICE}"
+              ;;
+            notification-service)
+              ENV_VARS="${ENV_VARS},AWS_SQS_QUEUE_URL=https://sqs.eu-west-1.amazonaws.com/${AWS_ACCOUNT_ID}/test-notification-queue"
+              ENV_VARS="${ENV_VARS},AWS_SQS_BOUNCE_QUEUE_URL=https://sqs.eu-west-1.amazonaws.com/${AWS_ACCOUNT_ID}/test-bounce-queue"
+              ENV_VARS="${ENV_VARS},AWS_SQS_NOTIFICATION_QUEUE=test-notification-queue"
+              ENV_VARS="${ENV_VARS},AWS_SQS_BOUNCE_QUEUE=test-bounce-queue"
+              ENV_VARS="${ENV_VARS},SERVICES_GROUP_SERVICE_URL=${URL_GROUP_SERVICE}"
+              ENV_VARS="${ENV_VARS},SERVICES_PRAYER_SERVICE_URL=${URL_PRAYER_SERVICE}"
+              ;;
+          esac
+
           aws lambda update-function-configuration \
             --function-name "$FUNC_NAME" \
             --environment "Variables={${ENV_VARS}}"
-            
+
           aws lambda wait function-updated --function-name "$FUNC_NAME"
+
+      - name: Resolve Service URL
+        if: inputs.has-url
+        run: |
           FINAL_URL=$(aws lambda get-function-url-config --function-name "$FUNC_NAME" --query 'FunctionUrl' --output text 2>/dev/null || echo "")
-          
           echo "SERVICE_URL=$FINAL_URL" >> $GITHUB_ENV
-          echo "AWS_REGION=eu-west-1" >> $GITHUB_ENV
 
       - name: Smoke Test
+        if: inputs.has-url
         run: |
-          LAMBDA_URL="${{ env.SERVICE_URL }}"
-          SVC="${{ inputs.service }}"
-          
-          if [ -z "$LAMBDA_URL" ] || [ "$LAMBDA_URL" = "None" ]; then
+          if [ -z "$SERVICE_URL" ] || [ "$SERVICE_URL" = "None" ]; then
             echo "No Function URL exposed for ${SVC}, skipping smoke test."
             exit 0
           fi
-          
-          echo "Testing $LAMBDA_URL"
+
+          echo "Testing ${SERVICE_URL}actuator/health"
           STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
-            --aws-sigv4 "aws:amz:${{ env.AWS_REGION }}:lambda" \
+            --aws-sigv4 "aws:amz:${AWS_REGION}:lambda" \
             --user "$AWS_ACCESS_KEY_ID:$AWS_SECRET_ACCESS_KEY" \
             -H "x-amz-security-token:$AWS_SESSION_TOKEN" \
-            "https://${LAMBDA_URL#https://}actuator/health")
-          
+            "${SERVICE_URL}actuator/health")
+
           if [ "$STATUS" = "200" ]; then
             echo "✅ Smoke test passed (HTTP $STATUS)"
           else
