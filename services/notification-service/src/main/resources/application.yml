@@ -8,6 +8,9 @@ spring:
     active: local
 
 management:
+  health:
+    diskspace:
+      enabled: false
   endpoints:
     web:
       exposure:
