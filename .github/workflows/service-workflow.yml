@@ -108,6 +108,17 @@ jobs:
               --zip-file "fileb://artifact-dir/${SVC}-lambda.zip"
               
             if [ -n "$PR_NUMBER" ]; then
+              aws lambda remove-permission \
+                --function-name "$FUNC_NAME" \
+                --statement-id GithubActionsInvoke >/dev/null 2>&1 || true
+
+              aws lambda add-permission \
+                --function-name "$FUNC_NAME" \
+                --statement-id GithubActionsInvoke \
+                --action lambda:InvokeFunctionUrl \
+                --principal "arn:aws:iam::${AWS_ACCOUNT_ID}:role/GitHubActionsWorkflowDeployRole" \
+                --function-url-auth-type AWS_IAM >/dev/null 2>&1 || true
+
               if aws lambda get-function-url-config --function-name "$FUNC_NAME" >/dev/null 2>&1; then
                 aws lambda update-function-url-config \
                   --function-name "$FUNC_NAME" \
@@ -138,16 +149,20 @@ jobs:
               --environment "Variables={SPRING_PROFILES_ACTIVE=default}"
               
             if [ -n "$PR_NUMBER" ]; then
+              aws lambda remove-permission \
+                --function-name "$FUNC_NAME" \
+                --statement-id GithubActionsInvoke >/dev/null 2>&1 || true
+
               aws lambda add-permission \
                 --function-name "$FUNC_NAME" \
-                --statement-id FunctionURLAllowPublicAccess \
+                --statement-id GithubActionsInvoke \
                 --action lambda:InvokeFunctionUrl \
-                --principal '*' \
-                --function-url-auth-type NONE >/dev/null 2>&1 || true
+                --principal "arn:aws:iam::${AWS_ACCOUNT_ID}:role/GitHubActionsWorkflowDeployRole" \
+                --function-url-auth-type AWS_IAM >/dev/null 2>&1 || true
                 
               aws lambda create-function-url-config \
                 --function-name "$FUNC_NAME" \
-                --auth-type NONE \
+                --auth-type AWS_IAM \
                 --cors '{"AllowOrigins":["*"],"AllowMethods":["*"],"AllowHeaders":["*"],"AllowCredentials":true}' >/dev/null 2>&1 || true
             fi
           fi
