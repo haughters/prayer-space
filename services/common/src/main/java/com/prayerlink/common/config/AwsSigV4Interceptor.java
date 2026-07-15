@@ -29,8 +29,8 @@ import software.amazon.awssdk.regions.Region;
  */
 public class AwsSigV4Interceptor implements ClientHttpRequestInterceptor {
 
-    private final Aws4Signer signer = Aws4Signer.create();
-    private final AwsCredentialsProvider credentialsProvider = DefaultCredentialsProvider.create();
+    private Aws4Signer signer;
+    private AwsCredentialsProvider credentialsProvider;
     private final Region region;
 
     public AwsSigV4Interceptor(String region) {
@@ -47,6 +47,12 @@ public class AwsSigV4Interceptor implements ClientHttpRequestInterceptor {
         // Only sign requests to Lambda Function URLs
         if (host == null || !host.contains(".lambda-url.") || !host.endsWith(".on.aws")) {
             return execution.execute(request, body);
+        }
+
+        // Lazy initialization to avoid GraalVM startup reflection crashes
+        if (this.signer == null) {
+            this.signer = Aws4Signer.create();
+            this.credentialsProvider = software.amazon.awssdk.auth.credentials.EnvironmentVariableCredentialsProvider.create();
         }
 
         // Convert Spring HttpRequest → AWS SDK SdkHttpFullRequest
