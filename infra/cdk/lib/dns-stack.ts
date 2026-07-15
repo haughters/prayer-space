@@ -158,6 +158,7 @@ export class DnsStack extends cdk.Stack {
             'lambda:UpdateFunctionUrlConfig',
             'lambda:DeleteFunctionUrlConfig',
             'lambda:InvokeFunctionUrl',
+            'lambda:InvokeFunction',
           ],
           resources: [
             `arn:aws:lambda:${this.region}:${this.account}:function:pr-*`,
