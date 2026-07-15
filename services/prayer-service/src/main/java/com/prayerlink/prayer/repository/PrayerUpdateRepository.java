@@ -4,6 +4,7 @@ import com.prayerlink.prayer.model.PrayerUpdate;
 import java.util.ArrayList;
 import java.util.List;
 import org.springframework.stereotype.Repository;
+import org.springframework.aot.hint.annotation.RegisterReflectionForBinding;
 import software.amazon.awssdk.enhanced.dynamodb.DynamoDbEnhancedClient;
 import software.amazon.awssdk.enhanced.dynamodb.DynamoDbTable;
 import software.amazon.awssdk.enhanced.dynamodb.TableSchema;
@@ -14,11 +15,12 @@ import software.amazon.awssdk.enhanced.dynamodb.model.QueryEnhancedRequest;
 import com.prayerlink.common.config.TableNameResolver;
 
 @Repository
+@RegisterReflectionForBinding({PrayerUpdate.class})
 public class PrayerUpdateRepository {
   private final DynamoDbTable<PrayerUpdate> table;
 
   public PrayerUpdateRepository(DynamoDbEnhancedClient enhancedClient, TableNameResolver tableNameResolver) {
-    this.table = enhancedClient.table(tableNameResolver.resolve("PrayerUpdates"), TableSchema.fromBean(PrayerUpdate.class));
+    this.table = enhancedClient.table(tableNameResolver.resolve("PrayerUpdates"), PrayerUpdate.SCHEMA);
   }
 
   public void save(PrayerUpdate update) {

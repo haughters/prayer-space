@@ -3,6 +3,7 @@ package com.prayerlink.identity.repository;
 import com.prayerlink.identity.model.Device;
 import java.util.Optional;
 import org.springframework.stereotype.Repository;
+import org.springframework.aot.hint.annotation.RegisterReflectionForBinding;
 import software.amazon.awssdk.enhanced.dynamodb.DynamoDbEnhancedClient;
 import software.amazon.awssdk.enhanced.dynamodb.DynamoDbTable;
 import software.amazon.awssdk.enhanced.dynamodb.TableSchema;
@@ -10,11 +11,12 @@ import software.amazon.awssdk.enhanced.dynamodb.TableSchema;
 import com.prayerlink.common.config.TableNameResolver;
 
 @Repository
+@RegisterReflectionForBinding({Device.class})
 public class DeviceRepository {
   private final DynamoDbTable<Device> table;
 
   public DeviceRepository(DynamoDbEnhancedClient enhancedClient, TableNameResolver tableNameResolver) {
-    this.table = enhancedClient.table(tableNameResolver.resolve("Devices"), TableSchema.fromBean(Device.class));
+    this.table = enhancedClient.table(tableNameResolver.resolve("Devices"), Device.SCHEMA);
   }
 
   public void save(Device device) {
