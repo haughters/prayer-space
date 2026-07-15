@@ -76,6 +76,12 @@ export class ComputeStack extends cdk.Stack {
           authType: lambda.FunctionUrlAuthType.AWS_IAM,
         });
 
+        alias.addPermission('AllowCloudFrontInvoke', {
+          principal: new iam.ServicePrincipal('cloudfront.amazonaws.com'),
+          action: 'lambda:InvokeFunctionUrl',
+          sourceArn: `arn:aws:cloudfront::${cdk.Stack.of(this).account}:distribution/*`,
+        });
+
         new cdk.CfnOutput(this, `${name}FunctionUrlOut`, {
           value: functionUrl.url,
         });
