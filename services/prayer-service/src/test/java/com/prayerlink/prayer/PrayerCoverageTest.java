@@ -3,7 +3,6 @@ package com.prayerlink.prayer;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-import com.prayerlink.prayer.config.RestTemplateConfig;
 import com.prayerlink.prayer.config.EventBridgeConfig;
 import com.prayerlink.prayer.config.DynamoDbConfig;
 import com.prayerlink.prayer.model.Prayer;
@@ -61,9 +60,6 @@ public class PrayerCoverageTest {
 
     @Test
     void testConfigs() {
-        RestTemplateConfig restConfig = new RestTemplateConfig();
-        assertNotNull(restConfig.restTemplate());
-
         EventBridgeConfig ebConfig = new EventBridgeConfig();
         try {
             assertNotNull(ebConfig.eventBridgeClient());

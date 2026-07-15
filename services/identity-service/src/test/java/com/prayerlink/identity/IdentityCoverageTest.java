@@ -49,9 +49,7 @@ public class IdentityCoverageTest {
     @Test
     void testConfigs() {
         AppConfig appConfig = new AppConfig();
-        PasswordEncoder encoder = appConfig.passwordEncoder();
-        assertNotNull(encoder);
-        assertNotNull(appConfig.restTemplate());
+        assertNotNull(appConfig.passwordEncoder());
 
         DynamoDbConfig dbConfig = new DynamoDbConfig();
         DynamoDbClient mockClient = mock(DynamoDbClient.class);

@@ -2,7 +2,6 @@ package com.prayerlink.notification;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import com.prayerlink.notification.config.AppConfig;
 import com.prayerlink.notification.config.SesConfig;
 import com.prayerlink.notification.config.SqsConfig;
 import org.junit.jupiter.api.Test;
@@ -12,9 +11,6 @@ public class NotificationCoverageTest {
 
     @Test
     void testConfigs() {
-        AppConfig appConfig = new AppConfig();
-        assertNotNull(appConfig.restTemplate());
-        
         SesConfig sesConfig = new SesConfig();
         try {
             SesClient sesClient = sesConfig.sesClient();

@@ -84,7 +84,6 @@ public class AdminCoverageTest {
         AppConfig appConfig = new AppConfig();
         PasswordEncoder encoder = appConfig.passwordEncoder();
         assertNotNull(encoder);
-        assertNotNull(appConfig.restTemplate());
 
         DynamoDbConfig dbConfig = new DynamoDbConfig();
         DynamoDbClient mockClient = mock(DynamoDbClient.class);
