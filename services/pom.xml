@@ -225,6 +225,11 @@
                         <configuration>
                             <imageName>bootstrap</imageName>
                             <skip>${skip.native.build}</skip>
+                            <buildArgs>
+                                <buildArg>-Os</buildArg>
+                                <buildArg>-H:-InstallExitHandlers</buildArg>
+                            </buildArgs>
+                        </configuration>
                         <executions>
                             <execution>
                                 <id>build-native</id>
