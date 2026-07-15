@@ -225,7 +225,6 @@
                         <configuration>
                             <imageName>bootstrap</imageName>
                             <skip>${skip.native.build}</skip>
-                        <buildArgs><buildArg>-H:ConfigurationFileDirectories=${project.build.directory}/spring-aot/main/resources/META-INF/native-image/com.prayerspace/${project.artifactId}</buildArg><buildArg>-Os</buildArg><buildArg>-H:-InstallExitHandlers</buildArg></buildArgs></configuration>
                         <executions>
                             <execution>
                                 <id>build-native</id>
