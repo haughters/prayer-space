@@ -1,7 +1,5 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<?xml version='1.0' encoding='UTF-8'?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
         <groupId>com.prayerspace</groupId>
         <artifactId>prayer-space-services</artifactId>
@@ -18,13 +16,13 @@
     </properties>
 
     <dependencies>
-        <!-- Internal Shared Library -->
+        
         <dependency>
             <groupId>com.prayerspace</groupId>
             <artifactId>common</artifactId>
         </dependency>
 
-        <!-- Spring Boot Web & Actuator -->
+        
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
@@ -42,19 +40,19 @@
             <artifactId>micrometer-registry-prometheus</artifactId>
         </dependency>
 
-        <!-- DynamoDB -->
+        
         <dependency>
             <groupId>software.amazon.awssdk</groupId>
             <artifactId>dynamodb-enhanced</artifactId>
-        </dependency>
+        <exclusions><exclusion><groupId>software.amazon.awssdk</groupId><artifactId>apache-client</artifactId></exclusion><exclusion><groupId>software.amazon.awssdk</groupId><artifactId>netty-nio-client</artifactId></exclusion></exclusions></dependency>
 
-        <!-- BCrypt Password Hashing -->
+        
         <dependency>
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-crypto</artifactId>
         </dependency>
 
-        <!-- JWT Generation and Verification -->
+        
         <dependency>
             <groupId>com.auth0</groupId>
             <artifactId>java-jwt</artifactId>
@@ -64,7 +62,7 @@
             <groupId>com.amazonaws.serverless</groupId>
             <artifactId>aws-serverless-java-container-springboot4</artifactId>
         </dependency>
-    </dependencies>
+    <dependency><groupId>software.amazon.awssdk</groupId><artifactId>url-connection-client</artifactId></dependency></dependencies>
 
     <build>
         <plugins>
