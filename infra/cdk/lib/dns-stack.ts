@@ -1,4 +1,5 @@
 import * as cdk from 'aws-cdk-lib';
+import * as iam from 'aws-cdk-lib/aws-iam';
 import * as s3 from 'aws-cdk-lib/aws-s3';
 import * as cloudfront from 'aws-cdk-lib/aws-cloudfront';
 import * as origins from 'aws-cdk-lib/aws-cloudfront-origins';
@@ -135,5 +136,68 @@ export class DnsStack extends cdk.Stack {
       value: this.distribution.distributionDomainName,
       exportName: `${props.deployEnv}-PrayerLinkCloudFrontDomainName`,
     });
+
+    // Grant GitHub Actions Role permission to manage PR Lambdas and deploy frontend
+    const githubActionsRole = iam.Role.fromRoleName(this, 'GitHubActionsRole', 'GitHubActionsWorkflowDeployRole');
+
+    const deployPolicy = new iam.Policy(this, 'GitHubActionsDeployPolicy', {
+      policyName: 'GitHubActionsDeployPolicy',
+      statements: [
+        new iam.PolicyStatement({
+          actions: [
+            'lambda:GetFunction',
+            'lambda:CreateFunction',
+            'lambda:UpdateFunctionCode',
+            'lambda:UpdateFunctionConfiguration',
+            'lambda:GetFunctionConfiguration',
+            'lambda:DeleteFunction',
+            'lambda:AddPermission',
+            'lambda:RemovePermission',
+            'lambda:CreateFunctionUrlConfig',
+            'lambda:GetFunctionUrlConfig',
+            'lambda:UpdateFunctionUrlConfig',
+            'lambda:DeleteFunctionUrlConfig',
+            'lambda:InvokeFunctionUrl',
+          ],
+          resources: [
+            `arn:aws:lambda:${this.region}:${this.account}:function:pr-*`,
+            `arn:aws:lambda:${this.region}:${this.account}:function:test-*`,
+          ],
+        }),
+        new iam.PolicyStatement({
+          actions: ['lambda:ListFunctions', 'cloudformation:ListExports'],
+          resources: ['*'],
+        }),
+        new iam.PolicyStatement({
+          actions: ['s3:ListBucket', 's3:GetObject', 's3:PutObject', 's3:DeleteObject'],
+          resources: [
+            this.frontendBucket.bucketArn,
+            `${this.frontendBucket.bucketArn}/*`,
+            this.deployBucket.bucketArn,
+            `${this.deployBucket.bucketArn}/*`,
+          ],
+        }),
+        new iam.PolicyStatement({
+          actions: ['cloudfront:CreateInvalidation'],
+          resources: [
+            `arn:aws:cloudfront::${this.account}:distribution/${this.distribution.distributionId}`,
+          ],
+        }),
+        new iam.PolicyStatement({
+          actions: ['iam:PassRole'],
+          resources: [
+            props.computeStack.identityServiceAlias.role!.roleArn,
+            props.computeStack.groupServiceAlias.role!.roleArn,
+            props.computeStack.prayerServiceAlias.role!.roleArn,
+            props.computeStack.adminServiceAlias.role!.roleArn,
+            props.computeStack.notificationServiceAlias.role!.roleArn,
+          ],
+          conditions: {
+            StringEquals: { 'iam:PassedToService': 'lambda.amazonaws.com' },
+          },
+        }),
+      ],
+    });
+    deployPolicy.attachToRole(githubActionsRole);
   }
 }

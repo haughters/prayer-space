@@ -151,68 +151,25 @@ export class ComputeStack extends cdk.Stack {
     notificationSvc.fn.addEnvironment('AWS_SQS_NOTIFICATION_QUEUE', props.notificationQueue.queueName);
     notificationSvc.fn.addEnvironment('AWS_SQS_BOUNCE_QUEUE', props.bounceQueue.queueName);
 
-    // Grant GitHub Actions Role permission to manage PR Lambdas
-    const githubActionsRole = iam.Role.fromRoleName(this, 'GitHubActionsRole', 'GitHubActionsWorkflowDeployRole');
-    
-    const lambdaDeployPolicy = new iam.Policy(this, 'GitHubActionsDeployPolicy', {
-      policyName: 'GitHubActionsDeployPolicy',
-      statements: [
-        new iam.PolicyStatement({
-          actions: [
-            'lambda:GetFunction',
-            'lambda:CreateFunction',
-            'lambda:UpdateFunctionCode',
-            'lambda:UpdateFunctionConfiguration',
-            'lambda:GetFunctionConfiguration',
-            'lambda:DeleteFunction',
-            'lambda:AddPermission',
-            'lambda:RemovePermission',
-            'lambda:CreateFunctionUrlConfig',
-            'lambda:GetFunctionUrlConfig',
-            'lambda:UpdateFunctionUrlConfig',
-            'lambda:DeleteFunctionUrlConfig',
-            'lambda:InvokeFunctionUrl'
-          ],
-          resources: [
-            `arn:aws:lambda:${this.region}:${this.account}:function:pr-*`,
-            `arn:aws:lambda:${this.region}:${this.account}:function:test-*`
-          ]
-        }),
-        new iam.PolicyStatement({
-          actions: [
-            'lambda:ListFunctions',
-            'cloudformation:ListExports'
-          ],
-          resources: ['*']
-        }),
-        new iam.PolicyStatement({
-          actions: [
-            's3:ListBucket',
-            's3:GetObject',
-            's3:PutObject',
-            's3:DeleteObject'
-          ],
-          resources: [
-            'arn:aws:s3:::*',
-            'arn:aws:s3:::*/*'
-          ]
-        }),
-        new iam.PolicyStatement({
-          actions: ['cloudfront:CreateInvalidation'],
-          resources: [`arn:aws:cloudfront::${this.account}:distribution/*`]
-        }),
-        new iam.PolicyStatement({
-          actions: ['iam:PassRole'],
-          resources: [`arn:aws:iam::${this.account}:role/*`],
-          conditions: {
-            StringEquals: {
-              'iam:PassedToService': 'lambda.amazonaws.com'
-            }
-          }
-        })
-      ]
+    // Grant inter-service Lambda invocation permissions
+    // Each service needs both InvokeFunctionUrl and InvokeFunction on the services it calls.
+    // group-service is called by: identity, prayer, admin, notification
+    [identitySvc, prayerSvc, adminSvc, notificationSvc].forEach(svc => {
+      svc.fn.addToRolePolicy(new iam.PolicyStatement({
+        actions: ['lambda:InvokeFunctionUrl', 'lambda:InvokeFunction'],
+        resources: [groupSvc.fn.functionArn],
+      }));
     });
-    lambdaDeployPolicy.attachToRole(githubActionsRole);
+
+    // prayer-service is called by: admin, notification
+    [adminSvc, notificationSvc].forEach(svc => {
+      svc.fn.addToRolePolicy(new iam.PolicyStatement({
+        actions: ['lambda:InvokeFunctionUrl', 'lambda:InvokeFunction'],
+        resources: [prayerSvc.fn.functionArn],
+      }));
+    });
+
+
   }
 }
 
