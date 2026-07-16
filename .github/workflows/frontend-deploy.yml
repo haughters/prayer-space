@@ -18,7 +18,7 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  deploy:
+  deploy-test:
     if: github.actor != 'dependabot[bot]'
     runs-on: ubuntu-latest
     environment:
@@ -72,6 +72,132 @@ jobs:
             PRAYER_URL=$(aws cloudformation list-exports --query "Exports[?Name=='test-PrayerLinkprayer-serviceFunctionUrlOut'].Value" --output text)
             GROUP_URL=$(aws cloudformation list-exports --query "Exports[?Name=='test-PrayerLinkgroup-serviceFunctionUrlOut'].Value" --output text)
             ADMIN_URL=$(aws cloudformation list-exports --query "Exports[?Name=='test-PrayerLinkadmin-serviceFunctionUrlOut'].Value" --output text)
+          fi
+
+          if [ -z "$FRONTEND_BUCKET" ] || [ -z "$CLOUDFRONT_ID" ]; then
+            echo "Error: Could not resolve required CloudFormation exports."
+            exit 1
+          fi
+
+          echo "FRONTEND_BUCKET=$FRONTEND_BUCKET" >> $GITHUB_ENV
+          echo "CLOUDFRONT_ID=$CLOUDFRONT_ID" >> $GITHUB_ENV
+          echo "CLOUDFRONT_DOMAIN=$CLOUDFRONT_DOMAIN" >> $GITHUB_ENV
+          echo "VITE_COGNITO_IDENTITY_POOL_ID=$IDENTITY_POOL_ID" >> $GITHUB_ENV
+          echo "VITE_AWS_REGION=$REGION" >> $GITHUB_ENV
+          echo "VITE_IDENTITY_LAMBDA_URL=$IDENTITY_URL" >> $GITHUB_ENV
+          echo "VITE_PRAYER_LAMBDA_URL=$PRAYER_URL" >> $GITHUB_ENV
+          echo "VITE_GROUP_LAMBDA_URL=$GROUP_URL" >> $GITHUB_ENV
+          echo "VITE_ADMIN_LAMBDA_URL=$ADMIN_URL" >> $GITHUB_ENV
+
+      - name: Build
+        run: |
+          npm ci
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            npm run build -- --base=/pr-${{ github.event.pull_request.number }}/
+          else
+            npm run build
+          fi
+        env:
+          VITE_APP_VERSION: ${{ steps.version.outputs.version }}
+          VITE_AWS_REGION: ${{ env.VITE_AWS_REGION }}
+          VITE_COGNITO_IDENTITY_POOL_ID: ${{ env.VITE_COGNITO_IDENTITY_POOL_ID }}
+          VITE_IDENTITY_LAMBDA_URL: ${{ env.VITE_IDENTITY_LAMBDA_URL }}
+          VITE_PRAYER_LAMBDA_URL: ${{ env.VITE_PRAYER_LAMBDA_URL }}
+          VITE_GROUP_LAMBDA_URL: ${{ env.VITE_GROUP_LAMBDA_URL }}
+          VITE_ADMIN_LAMBDA_URL: ${{ env.VITE_ADMIN_LAMBDA_URL }}
+        working-directory: frontend
+
+      - name: Deploy to S3
+        run: |
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            aws s3 sync dist/ s3://${FRONTEND_BUCKET}/pr-${{ github.event.pull_request.number }} \
+              --delete \
+              --metadata version=${{ steps.version.outputs.version }}
+          else
+            aws s3 sync dist/ s3://${FRONTEND_BUCKET} \
+              --delete \
+              --metadata version=${{ steps.version.outputs.version }}
+
+            aws cloudfront create-invalidation \
+              --distribution-id ${CLOUDFRONT_ID} \
+              --paths "/*"
+          fi
+        working-directory: frontend
+
+      - name: Smoke Test
+        run: |
+          sleep 10  # wait for CDN propagation
+          
+          BASE_URL="https://${{ env.CLOUDFRONT_DOMAIN }}"
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            URL="${BASE_URL}/pr-${{ github.event.pull_request.number }}/index.html"
+          else
+            URL="${BASE_URL}/index.html"
+          fi
+          
+          STATUS=$(curl -s -o /dev/null -w "%{http_code}" "$URL")
+          if [ "$STATUS" != "200" ]; then
+            echo "❌ Frontend smoke test failed (HTTP $STATUS) on $URL"
+            exit 1
+          fi
+          echo "✅ Frontend responding (HTTP $STATUS) — version ${{ steps.version.outputs.version }}"
+          echo "URL=$URL" >> $GITHUB_ENV
+
+
+  deploy-live:
+    if: github.actor != 'dependabot[bot]' && github.event_name == 'push'
+    runs-on: ubuntu-latest
+    environment:
+      name: 'live-frontend'
+      url: ${{ env.URL }}
+    permissions:
+      id-token: write
+      contents: read
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
+          aws-region: eu-west-1
+
+      - name: Generate version
+        id: version
+        run: |
+          BASE=$(node -p "require('./package.json').version.split('.').slice(0,2).join('.')")
+          VERSION="${BASE}.${{ github.run_number }}"
+          npm version $VERSION --no-git-tag-version
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "📦 Frontend version: $VERSION"
+        working-directory: frontend
+
+      - name: Fetch Environment Variables
+        run: |
+          FRONTEND_BUCKET=$(aws cloudformation list-exports --query "Exports[?Name=='live-PrayerLinkFrontendBucketName'].Value" --output text)
+          CLOUDFRONT_ID=$(aws cloudformation list-exports --query "Exports[?Name=='live-PrayerLinkCloudFrontDistributionId'].Value" --output text)
+          CLOUDFRONT_DOMAIN=$(aws cloudformation list-exports --query "Exports[?Name=='live-PrayerLinkCloudFrontDomainName'].Value" --output text)
+          IDENTITY_POOL_ID=$(aws cloudformation list-exports --query "Exports[?Name=='live-PrayerLinkViteIdentityPoolId'].Value" --output text)
+          REGION=$(aws cloudformation list-exports --query "Exports[?Name=='live-PrayerLinkViteRegion'].Value" --output text)
+          
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            PREFIX="pr-${{ github.event.pull_request.number }}-"
+            IDENTITY_URL=$(aws lambda get-function-url-config --function-name "${PREFIX}identity-service" --query "FunctionUrl" --output text 2>/dev/null || echo "")
+            PRAYER_URL=$(aws lambda get-function-url-config --function-name "${PREFIX}prayer-service" --query "FunctionUrl" --output text 2>/dev/null || echo "")
+            GROUP_URL=$(aws lambda get-function-url-config --function-name "${PREFIX}group-service" --query "FunctionUrl" --output text 2>/dev/null || echo "")
+            ADMIN_URL=$(aws lambda get-function-url-config --function-name "${PREFIX}admin-service" --query "FunctionUrl" --output text 2>/dev/null || echo "")
+          else
+            IDENTITY_URL=$(aws cloudformation list-exports --query "Exports[?Name=='live-PrayerLinkidentity-serviceFunctionUrlOut'].Value" --output text)
+            PRAYER_URL=$(aws cloudformation list-exports --query "Exports[?Name=='live-PrayerLinkprayer-serviceFunctionUrlOut'].Value" --output text)
+            GROUP_URL=$(aws cloudformation list-exports --query "Exports[?Name=='live-PrayerLinkgroup-serviceFunctionUrlOut'].Value" --output text)
+            ADMIN_URL=$(aws cloudformation list-exports --query "Exports[?Name=='live-PrayerLinkadmin-serviceFunctionUrlOut'].Value" --output text)
           fi
 
           if [ -z "$FRONTEND_BUCKET" ] || [ -z "$CLOUDFRONT_ID" ]; then
