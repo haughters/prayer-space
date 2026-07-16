@@ -91,42 +91,42 @@ export async function fetchSecureData(path, options = {}) {
 }
 
 // Globally intercept fetch to automatically upgrade /api/ requests to SigV4
-const originalFetch = window.fetch;
-window.fetch = async (input, init = {}) => {
-  let path = '';
-  if (typeof input === 'string') {
-    path = input;
-  } else if (input instanceof URL) {
-    path = input.pathname;
-  } else if (input instanceof Request) {
-    path = input.url;
-    // We should extract the actual path from the Request object's url
-    try {
-      path = new URL(input.url).pathname;
-    } catch(e) {
-      path = input.url;
-    }
-  }
+if (typeof window !== 'undefined' && typeof window.vitest === 'undefined' && !window.__vitest_environment__) {
+  const isVitest = typeof process !== 'undefined' && process.env && process.env.NODE_ENV === 'test';
+  
+  if (!isVitest) {
+    const originalFetch = window.fetch;
+    window.fetch = async (input, init = {}) => {
+      let path = '';
+      if (typeof input === 'string') {
+        path = input;
+      } else if (input instanceof URL) {
+        path = input.pathname;
+      } else if (input instanceof Request) {
+        path = input.url;
+        try {
+          path = new URL(input.url).pathname;
+        } catch(e) {
+          path = input.url;
+        }
+      }
 
-  // Only intercept relative /api/ calls
-  if (typeof path === 'string' && path.startsWith('/api/')) {
-    // Bypass in test mode so Vitest fetch mocks work without Cognito
-    if (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.MODE === 'test') {
+      // Only intercept relative /api/ calls
+      if (typeof path === 'string' && path.startsWith('/api/')) {
+        // If the input was a Request object, extract its properties
+        if (input instanceof Request) {
+          init = {
+            method: input.method,
+            headers: Object.fromEntries(input.headers.entries()),
+            body: input.body,
+            credentials: input.credentials,
+            ...init
+          };
+        }
+        return fetchSecureData(path, init);
+      }
+
       return originalFetch(input, init);
-    }
-
-    // If the input was a Request object, extract its properties
-    if (input instanceof Request) {
-      init = {
-        method: input.method,
-        headers: Object.fromEntries(input.headers.entries()),
-        body: input.body,
-        credentials: input.credentials,
-        ...init
-      };
-    }
-    return fetchSecureData(path, init);
+    };
   }
-
-  return originalFetch(input, init);
-};
+}
