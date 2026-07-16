@@ -101,11 +101,12 @@ if (typeof window !== 'undefined' && typeof window.vitest === 'undefined' && !wi
       if (typeof input === 'string') {
         path = input;
       } else if (input instanceof URL) {
-        path = input.pathname;
+        path = input.pathname + input.search;
       } else if (input instanceof Request) {
         path = input.url;
         try {
-          path = new URL(input.url).pathname;
+          const u = new URL(input.url);
+          path = u.pathname + u.search;
         } catch(e) {
           path = input.url;
         }

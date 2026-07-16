@@ -58,7 +58,7 @@ jobs:
       - name: Build Native Lambda Zip
         run: |
           # Build the native executable
-          mvn package -P lambda -pl :${{ inputs.service }} -DskipTests --batch-mode
+          mvn package -P lambda -pl :${{ inputs.service }} -DskipTests -Dspring.profiles.active=default --batch-mode
         working-directory: services
 
       - name: Upload Lambda Zip Artifact
@@ -158,7 +158,18 @@ jobs:
             --statement-id GithubActionsInvoke \
             --action lambda:InvokeFunctionUrl \
             --principal "arn:aws:iam::${AWS_ACCOUNT_ID}:role/GitHubActionsWorkflowDeployRole" \
-            --function-url-auth-type AWS_IAM
+            --function-url-auth-type AWS_IAM || true
+
+          # Grant the Unauthenticated Cognito role permission to invoke this Function URL
+          UNAUTH_ROLE=$(aws iam list-roles --query "Roles[?contains(RoleName, 'GuestAccessPoolUnauthenti')].Arn" --output text | awk '{print $1}')
+          if [ -n "$UNAUTH_ROLE" ]; then
+            aws lambda add-permission \
+              --function-name "$FUNC_NAME" \
+              --statement-id CognitoInvoke \
+              --action lambda:InvokeFunctionUrl \
+              --principal "$UNAUTH_ROLE" \
+              --function-url-auth-type AWS_IAM || true
+          fi
 
           # Create or update the Function URL config
           if aws lambda get-function-url-config --function-name "$FUNC_NAME" >/dev/null 2>&1; then
