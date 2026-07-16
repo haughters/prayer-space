@@ -110,6 +110,11 @@ window.fetch = async (input, init = {}) => {
 
   // Only intercept relative /api/ calls
   if (typeof path === 'string' && path.startsWith('/api/')) {
+    // Bypass in test mode so Vitest fetch mocks work without Cognito
+    if (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.MODE === 'test') {
+      return originalFetch(input, init);
+    }
+
     // If the input was a Request object, extract its properties
     if (input instanceof Request) {
       init = {

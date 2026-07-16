@@ -132,14 +132,3 @@ jobs:
           fi
           echo "✅ Frontend responding (HTTP $STATUS) — version ${{ steps.version.outputs.version }}"
           echo "URL=$URL" >> $GITHUB_ENV
-
-      - name: Comment PR
-        if: github.event_name == 'pull_request'
-        uses: peter-evans/create-or-update-comment@v4
-        with:
-          issue-number: ${{ github.event.pull_request.number }}
-          body: |
-            🎨 **Frontend PR Preview Deployed!**
-            URL: ${{ env.URL }}
-            
-            *(Note: This preview uses the `test` backend APIs)*
