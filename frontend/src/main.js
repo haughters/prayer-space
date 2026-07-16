@@ -1,3 +1,4 @@
+import './shared/apiClient.js';
 import './styles/home.css';
 import { Html5Qrcode } from 'html5-qrcode';
 

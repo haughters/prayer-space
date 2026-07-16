@@ -73,7 +73,7 @@ export async function fetchSecureData(path, options = {}) {
   if (path.startsWith('/api/identity')) baseUrl = URLS.identity;
   else if (path.startsWith('/api/prayers')) baseUrl = URLS.prayers;
   else if (path.startsWith('/api/groups')) baseUrl = URLS.groups;
-  else if (path.startsWith('/api/admin')) baseUrl = URLS.admin;
+  else if (path.startsWith('/api/admin') || path.startsWith('/api/auth')) baseUrl = URLS.admin;
   else throw new Error(`Unknown API path: ${path}`);
 
   // Base URL from CDK already has a trailing slash usually, but URL constructor handles it
@@ -89,3 +89,39 @@ export async function fetchSecureData(path, options = {}) {
 
   return response;
 }
+
+// Globally intercept fetch to automatically upgrade /api/ requests to SigV4
+const originalFetch = window.fetch;
+window.fetch = async (input, init = {}) => {
+  let path = '';
+  if (typeof input === 'string') {
+    path = input;
+  } else if (input instanceof URL) {
+    path = input.pathname;
+  } else if (input instanceof Request) {
+    path = input.url;
+    // We should extract the actual path from the Request object's url
+    try {
+      path = new URL(input.url).pathname;
+    } catch(e) {
+      path = input.url;
+    }
+  }
+
+  // Only intercept relative /api/ calls
+  if (typeof path === 'string' && path.startsWith('/api/')) {
+    // If the input was a Request object, extract its properties
+    if (input instanceof Request) {
+      init = {
+        method: input.method,
+        headers: Object.fromEntries(input.headers.entries()),
+        body: input.body,
+        credentials: input.credentials,
+        ...init
+      };
+    }
+    return fetchSecureData(path, init);
+  }
+
+  return originalFetch(input, init);
+};
