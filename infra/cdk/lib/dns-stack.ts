@@ -129,7 +129,7 @@ export class DnsStack extends cdk.Stack {
     const githubActionsRole = iam.Role.fromRoleName(this, 'GitHubActionsRole', 'GitHubActionsWorkflowDeployRole');
 
     const deployPolicy = new iam.Policy(this, 'GitHubActionsDeployPolicy', {
-      policyName: 'GitHubActionsDeployPolicy',
+      policyName: `${props.deployEnv}-GitHubActionsDeployPolicy`,
       statements: [
         new iam.PolicyStatement({
           actions: [
@@ -147,10 +147,13 @@ export class DnsStack extends cdk.Stack {
             'lambda:DeleteFunctionUrlConfig',
             'lambda:InvokeFunctionUrl',
             'lambda:InvokeFunction',
+            'lambda:GetAlias',
+            'lambda:UpdateAlias',
           ],
           resources: [
             `arn:aws:lambda:${this.region}:${this.account}:function:pr-*`,
             `arn:aws:lambda:${this.region}:${this.account}:function:test-*`,
+            `arn:aws:lambda:${this.region}:${this.account}:function:live-*`,
           ],
         }),
         new iam.PolicyStatement({
