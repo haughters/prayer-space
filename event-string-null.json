@@ -1,0 +1,17 @@
+{
+  "version": "2.0",
+  "routeKey": "$default",
+  "rawPath": "/api/prayers",
+  "rawQueryString": "",
+  "headers": {
+    "content-type": "application/json"
+  },
+  "requestContext": {
+    "http": {
+      "method": "POST",
+      "path": "/api/prayers"
+    }
+  },
+  "body": "{\"deviceId\":\"91af252d-9128-45cf-90a3-e4410bd73556\",\"prayerText\":\"This is a test\",\"groupId\":\"null\"}",
+  "isBase64Encoded": false
+}

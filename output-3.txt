@@ -1,0 +1,677 @@
+{
+    "events": [
+        {
+            "logStreamName": "2026/07/15/[$LATEST]7e2c31c1c132469fa560215d02908962",
+            "timestamp": 1784143499306,
+            "message": "INIT_START Runtime Version: provided:al2023.v144\tRuntime Version ARN: arn:aws:lambda:eu-west-1::runtime:4dfa2bb23d8a14b03e47d57c81d4714d7c15cad5c493c40a126328d6a0b315d1\n",
+            "ingestionTime": 1784143499820,
+            "eventId": "39787729575637903663297176456581210008873363547032387584"
+        },
+        {
+            "logStreamName": "2026/07/15/[$LATEST]7e2c31c1c132469fa560215d02908962",
+            "timestamp": 1784143499710,
+            "message": "Exception in thread \"main\" java.lang.IllegalArgumentException: Unable to instantiate factory class [org.springframework.boot.webmvc.WebMvcWebApplicationTypeDeducer] for factory type [org.springframework.boot.WebApplicationType$Deducer]\n",
+            "ingestionTime": 1784143499820,
+            "eventId": "39787729584647404723503548205761640191023301595448475649"
+        },
+        {
+            "logStreamName": "2026/07/15/[$LATEST]7e2c31c1c132469fa560215d02908962",
+            "timestamp": 1784143499732,
+            "message": "at org.springframework.core.io.support.SpringFactoriesLoader$FailureHandler.lambda$throwing$0(SpringFactoriesLoader.java:632)\n",
+            "ingestionTime": 1784143499820,
+            "eventId": "39787729585138021117871221914875425993021565548580044802"
+        },
+        {
+            "logStreamName": "2026/07/15/[$LATEST]7e2c31c1c132469fa560215d02908962",
+            "timestamp": 1784143499733,
+            "message": "at org.springframework.core.io.support.SpringFactoriesLoader$FailureHandler.lambda$handleMessage$0(SpringFactoriesLoader.java:656)\n",
+            "ingestionTime": 1784143499820,
+            "eventId": "39787729585160321863069752538016961711294213910086025219"
+        },
+        {
+            "logStreamName": "2026/07/15/[$LATEST]7e2c31c1c132469fa560215d02908962",
+            "timestamp": 1784143499733,
+            "message": "at org.springframework.core.io.support.SpringFactoriesLoader.instantiateFactory(SpringFactoriesLoader.java:225)\n",
+            "ingestionTime": 1784143499820,
+            "eventId": "39787729585160321863069752538016961711294213910086025220"
+        },
+        {
+            "logStreamName": "2026/07/15/[$LATEST]7e2c31c1c132469fa560215d02908962",
+            "timestamp": 1784143499733,
+            "message": "at org.springframework.core.io.support.SpringFactoriesLoader.load(SpringFactoriesLoader.java:201)\n",
+            "ingestionTime": 1784143499820,
+            "eventId": "39787729585160321863069752538016961711294213910086025221"
+        },
+        {
+            "logStreamName": "2026/07/15/[$LATEST]7e2c31c1c132469fa560215d02908962",
+            "timestamp": 1784143499733,
+            "message": "at org.springframework.core.io.support.SpringFactoriesLoader.load(SpringFactoriesLoader.java:140)\n",
+            "ingestionTime": 1784143499820,
+            "eventId": "39787729585160321863069752538016961711294213910086025222"
+        },
+        {
+            "logStreamName": "2026/07/15/[$LATEST]7e2c31c1c132469fa560215d02908962",
+            "timestamp": 1784143499733,
+            "message": "at org.springframework.boot.WebApplicationType.deduce(WebApplicationType.java:64)\n",
+            "ingestionTime": 1784143499820,
+            "eventId": "39787729585160321863069752538016961711294213910086025223"
+        },
+        {
+            "logStreamName": "2026/07/15/[$LATEST]7e2c31c1c132469fa560215d02908962",
+            "timestamp": 1784143499733,
+            "message": "at org.springframework.boot.SpringApplication.<init>(SpringApplication.java:278)\n",
+            "ingestionTime": 1784143499820,
+            "eventId": "39787729585160321863069752538016961711294213910086025224"
+        },
+        {
+            "logStreamName": "2026/07/15/[$LATEST]7e2c31c1c132469fa560215d02908962",
+            "timestamp": 1784143499733,
+            "message": "at org.springframework.boot.SpringApplication.<init>(SpringApplication.java:260)\n",
+            "ingestionTime": 1784143499820,
+            "eventId": "39787729585160321863069752538016961711294213910086025225"
+        },
+        {
+            "logStreamName": "2026/07/15/[$LATEST]7e2c31c1c132469fa560215d02908962",
+            "timestamp": 1784143499733,
+            "message": "at org.springframework.boot.SpringApplication.run(SpringApplication.java:1365)\n",
+            "ingestionTime": 1784143499820,
+            "eventId": "39787729585160321863069752538016961711294213910086025226"
+        },
+        {
+            "logStreamName": "2026/07/15/[$LATEST]7e2c31c1c132469fa560215d02908962",
+            "timestamp": 1784143499733,
+            "message": "at org.springframework.boot.SpringApplication.run(SpringApplication.java:1354)\n",
+            "ingestionTime": 1784143499820,
+            "eventId": "39787729585160321863069752538016961711294213910086025227"
+        },
+        {
+            "logStreamName": "2026/07/15/[$LATEST]7e2c31c1c132469fa560215d02908962",
+            "timestamp": 1784143499733,
+            "message": "at com.prayerlink.group.GroupApplication.main(GroupApplication.java:9)\n",
+            "ingestionTime": 1784143499820,
+            "eventId": "39787729585160321863069752538016961711294213910086025228"
+        },
+        {
+            "logStreamName": "2026/07/15/[$LATEST]7e2c31c1c132469fa560215d02908962",
+            "timestamp": 1784143499733,
+            "message": "at java.base@21.0.11/java.lang.invoke.LambdaForm$DMH/sa346b79c.invokeStaticInit(LambdaForm$DMH)\n",
+            "ingestionTime": 1784143499820,
+            "eventId": "39787729585160321863069752538016961711294213910086025229"
+        },
+        {
+            "logStreamName": "2026/07/15/[$LATEST]7e2c31c1c132469fa560215d02908962",
+            "timestamp": 1784143499734,
+            "message": "Caused by: java.lang.ClassNotFoundException: org.springframework.boot.webmvc.WebMvcWebApplicationTypeDeducer\n",
+            "ingestionTime": 1784143499820,
+            "eventId": "39787729585182622608268283161158497429566862271592005646"
+        },
+        {
+            "logStreamName": "2026/07/15/[$LATEST]7e2c31c1c132469fa560215d02908962",
+            "timestamp": 1784143499734,
+            "message": "at org.graalvm.nativeimage.builder/com.oracle.svm.core.hub.ClassForNameSupport.forName(ClassForNameSupport.java:126)\n",
+            "ingestionTime": 1784143499820,
+            "eventId": "39787729585182622608268283161158497429566862271592005647"
+        },
+        {
+            "logStreamName": "2026/07/15/[$LATEST]7e2c31c1c132469fa560215d02908962",
+            "timestamp": 1784143499734,
+            "message": "at org.graalvm.nativeimage.builder/com.oracle.svm.core.hub.ClassForNameSupport.forName(ClassForNameSupport.java:87)\n",
+            "ingestionTime": 1784143499820,
+            "eventId": "39787729585182622608268283161158497429566862271592005648"
+        },
+        {
+            "logStreamName": "2026/07/15/[$LATEST]7e2c31c1c132469fa560215d02908962",
+            "timestamp": 1784143499734,
+            "message": "at java.base@21.0.11/java.lang.Class.forName(DynamicHub.java:1359)\n",
+            "ingestionTime": 1784143499820,
+            "eventId": "39787729585182622608268283161158497429566862271592005649"
+        },
+        {
+            "logStreamName": "2026/07/15/[$LATEST]7e2c31c1c132469fa560215d02908962",
+            "timestamp": 1784143499734,
+            "message": "at java.base@21.0.11/java.lang.Class.forName(DynamicHub.java:1348)\n",
+            "ingestionTime": 1784143499820,
+            "eventId": "39787729585182622608268283161158497429566862271592005650"
+        },
+        {
+            "logStreamName": "2026/07/15/[$LATEST]7e2c31c1c132469fa560215d02908962",
+            "timestamp": 1784143499734,
+            "message": "at org.springframework.util.ClassUtils.forName(ClassUtils.java:308)\n",
+            "ingestionTime": 1784143499820,
+            "eventId": "39787729585182622608268283161158497429566862271592005651"
+        },
+        {
+            "logStreamName": "2026/07/15/[$LATEST]7e2c31c1c132469fa560215d02908962",
+            "timestamp": 1784143499734,
+            "message": "at org.springframework.core.io.support.SpringFactoriesLoader.instantiateFactory(SpringFactoriesLoader.java:218)\n",
+            "ingestionTime": 1784143499820,
+            "eventId": "39787729585182622608268283161158497429566862271592005652"
+        },
+        {
+            "logStreamName": "2026/07/15/[$LATEST]7e2c31c1c132469fa560215d02908962",
+            "timestamp": 1784143499734,
+            "message": "... 9 more\n",
+            "ingestionTime": 1784143499820,
+            "eventId": "39787729585182622608268283161158497429566862271592005653"
+        },
+        {
+            "logStreamName": "2026/07/15/[$LATEST]7e2c31c1c132469fa560215d02908962",
+            "timestamp": 1784143499736,
+            "message": "INIT_REPORT Init Duration: 430.12 ms\tPhase: init\tStatus: error\tError Type: Runtime.ExitError\n",
+            "ingestionTime": 1784143499838,
+            "eventId": "39787729585227224098665344407463652624024270699021729792"
+        },
+        {
+            "logStreamName": "2026/07/15/[$LATEST]7e2c31c1c132469fa560215d02908962",
+            "timestamp": 1784143500157,
+            "message": "Exception in thread \"main\" java.lang.IllegalArgumentException: Unable to instantiate factory class [org.springframework.boot.webmvc.WebMvcWebApplicationTypeDeducer] for factory type [org.springframework.boot.WebApplicationType$Deducer]\n",
+            "ingestionTime": 1784143500184,
+            "eventId": "39787729594615837827246736750468050994783522954237313024"
+        },
+        {
+            "logStreamName": "2026/07/15/[$LATEST]7e2c31c1c132469fa560215d02908962",
+            "timestamp": 1784143500179,
+            "message": "at org.springframework.core.io.support.SpringFactoriesLoader$FailureHandler.lambda$throwing$0(SpringFactoriesLoader.java:632)\n",
+            "ingestionTime": 1784143500184,
+            "eventId": "39787729595106454221614410459581836796781786907368882177"
+        },
+        {
+            "logStreamName": "2026/07/15/[$LATEST]7e2c31c1c132469fa560215d02908962",
+            "timestamp": 1784143500180,
+            "message": "at org.springframework.core.io.support.SpringFactoriesLoader$FailureHandler.lambda$handleMessage$0(SpringFactoriesLoader.java:656)\n",
+            "ingestionTime": 1784143500184,
+            "eventId": "39787729595128754966812941082723372515054435268874862594"
+        },
+        {
+            "logStreamName": "2026/07/15/[$LATEST]7e2c31c1c132469fa560215d02908962",
+            "timestamp": 1784143500180,
+            "message": "at org.springframework.core.io.support.SpringFactoriesLoader.instantiateFactory(SpringFactoriesLoader.java:225)\n",
+            "ingestionTime": 1784143500184,
+            "eventId": "39787729595128754966812941082723372515054435268874862595"
+        },
+        {
+            "logStreamName": "2026/07/15/[$LATEST]7e2c31c1c132469fa560215d02908962",
+            "timestamp": 1784143500180,
+            "message": "at org.springframework.core.io.support.SpringFactoriesLoader.load(SpringFactoriesLoader.java:201)\n",
+            "ingestionTime": 1784143500184,
+            "eventId": "39787729595128754966812941082723372515054435268874862596"
+        },
+        {
+            "logStreamName": "2026/07/15/[$LATEST]7e2c31c1c132469fa560215d02908962",
+            "timestamp": 1784143500180,
+            "message": "at org.springframework.core.io.support.SpringFactoriesLoader.load(SpringFactoriesLoader.java:140)\n",
+            "ingestionTime": 1784143500184,
+            "eventId": "39787729595128754966812941082723372515054435268874862597"
+        },
+        {
+            "logStreamName": "2026/07/15/[$LATEST]7e2c31c1c132469fa560215d02908962",
+            "timestamp": 1784143500180,
+            "message": "at org.springframework.boot.WebApplicationType.deduce(WebApplicationType.java:64)\n",
+            "ingestionTime": 1784143500184,
+            "eventId": "39787729595128754966812941082723372515054435268874862598"
+        },
+        {
+            "logStreamName": "2026/07/15/[$LATEST]7e2c31c1c132469fa560215d02908962",
+            "timestamp": 1784143500180,
+            "message": "at org.springframework.boot.SpringApplication.<init>(SpringApplication.java:278)\n",
+            "ingestionTime": 1784143500184,
+            "eventId": "39787729595128754966812941082723372515054435268874862599"
+        },
+        {
+            "logStreamName": "2026/07/15/[$LATEST]7e2c31c1c132469fa560215d02908962",
+            "timestamp": 1784143500180,
+            "message": "at org.springframework.boot.SpringApplication.<init>(SpringApplication.java:260)\n",
+            "ingestionTime": 1784143500184,
+            "eventId": "39787729595128754966812941082723372515054435268874862600"
+        },
+        {
+            "logStreamName": "2026/07/15/[$LATEST]7e2c31c1c132469fa560215d02908962",
+            "timestamp": 1784143500180,
+            "message": "at org.springframework.boot.SpringApplication.run(SpringApplication.java:1365)\n",
+            "ingestionTime": 1784143500184,
+            "eventId": "39787729595128754966812941082723372515054435268874862601"
+        },
+        {
+            "logStreamName": "2026/07/15/[$LATEST]7e2c31c1c132469fa560215d02908962",
+            "timestamp": 1784143500180,
+            "message": "at org.springframework.boot.SpringApplication.run(SpringApplication.java:1354)\n",
+            "ingestionTime": 1784143500184,
+            "eventId": "39787729595128754966812941082723372515054435268874862602"
+        },
+        {
+            "logStreamName": "2026/07/15/[$LATEST]7e2c31c1c132469fa560215d02908962",
+            "timestamp": 1784143500180,
+            "message": "at com.prayerlink.group.GroupApplication.main(GroupApplication.java:9)\n",
+            "ingestionTime": 1784143500184,
+            "eventId": "39787729595128754966812941082723372515054435268874862603"
+        },
+        {
+            "logStreamName": "2026/07/15/[$LATEST]7e2c31c1c132469fa560215d02908962",
+            "timestamp": 1784143500180,
+            "message": "at java.base@21.0.11/java.lang.invoke.LambdaForm$DMH/sa346b79c.invokeStaticInit(LambdaForm$DMH)\n",
+            "ingestionTime": 1784143500184,
+            "eventId": "39787729595128754966812941082723372515054435268874862604"
+        },
+        {
+            "logStreamName": "2026/07/15/[$LATEST]7e2c31c1c132469fa560215d02908962",
+            "timestamp": 1784143500180,
+            "message": "Caused by: java.lang.ClassNotFoundException: org.springframework.boot.webmvc.WebMvcWebApplicationTypeDeducer\n",
+            "ingestionTime": 1784143500184,
+            "eventId": "39787729595128754966812941082723372515054435268874862605"
+        },
+        {
+            "logStreamName": "2026/07/15/[$LATEST]7e2c31c1c132469fa560215d02908962",
+            "timestamp": 1784143500180,
+            "message": "at org.graalvm.nativeimage.builder/com.oracle.svm.core.hub.ClassForNameSupport.forName(ClassForNameSupport.java:126)\n",
+            "ingestionTime": 1784143500184,
+            "eventId": "39787729595128754966812941082723372515054435268874862606"
+        },
+        {
+            "logStreamName": "2026/07/15/[$LATEST]7e2c31c1c132469fa560215d02908962",
+            "timestamp": 1784143500180,
+            "message": "at org.graalvm.nativeimage.builder/com.oracle.svm.core.hub.ClassForNameSupport.forName(ClassForNameSupport.java:87)\n",
+            "ingestionTime": 1784143500184,
+            "eventId": "39787729595128754966812941082723372515054435268874862607"
+        },
+        {
+            "logStreamName": "2026/07/15/[$LATEST]7e2c31c1c132469fa560215d02908962",
+            "timestamp": 1784143500180,
+            "message": "at java.base@21.0.11/java.lang.Class.forName(DynamicHub.java:1359)\n",
+            "ingestionTime": 1784143500184,
+            "eventId": "39787729595128754966812941082723372515054435268874862608"
+        },
+        {
+            "logStreamName": "2026/07/15/[$LATEST]7e2c31c1c132469fa560215d02908962",
+            "timestamp": 1784143500180,
+            "message": "at java.base@21.0.11/java.lang.Class.forName(DynamicHub.java:1348)\n",
+            "ingestionTime": 1784143500184,
+            "eventId": "39787729595128754966812941082723372515054435268874862609"
+        },
+        {
+            "logStreamName": "2026/07/15/[$LATEST]7e2c31c1c132469fa560215d02908962",
+            "timestamp": 1784143500180,
+            "message": "at org.springframework.util.ClassUtils.forName(ClassUtils.java:308)\n",
+            "ingestionTime": 1784143500184,
+            "eventId": "39787729595128754966812941082723372515054435268874862610"
+        },
+        {
+            "logStreamName": "2026/07/15/[$LATEST]7e2c31c1c132469fa560215d02908962",
+            "timestamp": 1784143500180,
+            "message": "at org.springframework.core.io.support.SpringFactoriesLoader.instantiateFactory(SpringFactoriesLoader.java:218)\n",
+            "ingestionTime": 1784143500184,
+            "eventId": "39787729595128754966812941082723372515054435268874862611"
+        },
+        {
+            "logStreamName": "2026/07/15/[$LATEST]7e2c31c1c132469fa560215d02908962",
+            "timestamp": 1784143500180,
+            "message": "... 9 more\n",
+            "ingestionTime": 1784143500184,
+            "eventId": "39787729595128754966812941082723372515054435268874862612"
+        },
+        {
+            "logStreamName": "2026/07/15/[$LATEST]7e2c31c1c132469fa560215d02908962",
+            "timestamp": 1784143500182,
+            "message": "INIT_REPORT Init Duration: 424.74 ms\tPhase: invoke\tStatus: error\tError Type: Runtime.ExitError\n",
+            "ingestionTime": 1784143500197,
+            "eventId": "39787729595173356457210002329022245391015492794085539840"
+        },
+        {
+            "logStreamName": "2026/07/15/[$LATEST]7e2c31c1c132469fa560215d02908962",
+            "timestamp": 1784143500182,
+            "message": "START RequestId: d59e387d-51db-47a9-a965-14fd92e6db57 Version: $LATEST\n",
+            "ingestionTime": 1784143500197,
+            "eventId": "39787729595173356457210002329022245391015492794085539841"
+        },
+        {
+            "logStreamName": "2026/07/15/[$LATEST]7e2c31c1c132469fa560215d02908962",
+            "timestamp": 1784143500188,
+            "message": "END RequestId: d59e387d-51db-47a9-a965-14fd92e6db57\n",
+            "ingestionTime": 1784143500197,
+            "eventId": "39787729595307160928401186067871459700651382963121422338"
+        },
+        {
+            "logStreamName": "2026/07/15/[$LATEST]7e2c31c1c132469fa560215d02908962",
+            "timestamp": 1784143500188,
+            "message": "REPORT RequestId: d59e387d-51db-47a9-a965-14fd92e6db57\tDuration: 439.20 ms\tBilled Duration: 440 ms\tMemory Size: 512 MB\tMax Memory Used: 65 MB\tStatus: error\tError Type: Runtime.ExitError\n",
+            "ingestionTime": 1784143500197,
+            "eventId": "39787729595307160928401186067871459700651382963121422339"
+        },
+        {
+            "logStreamName": "2026/07/15/[$LATEST]92f0c57c4218480882f0289d89a7611d",
+            "timestamp": 1784144669506,
+            "message": "INIT_START Runtime Version: provided:al2023.v144\tRuntime Version ARN: arn:aws:lambda:eu-west-1::runtime:4dfa2bb23d8a14b03e47d57c81d4714d7c15cad5c493c40a126328d6a0b315d1\n",
+            "ingestionTime": 1784144669968,
+            "eventId": "39787755671969934983832378096301069770084561835441061888"
+        },
+        {
+            "logStreamName": "2026/07/15/[$LATEST]92f0c57c4218480882f0289d89a7611d",
+            "timestamp": 1784144669886,
+            "message": "Exception in thread \"main\" java.lang.IllegalArgumentException: Unable to instantiate factory class [org.springframework.boot.webmvc.WebMvcWebApplicationTypeDeducer] for factory type [org.springframework.boot.WebApplicationType$Deducer]\n",
+            "ingestionTime": 1784144669968,
+            "eventId": "39787755680444218159274014890084642713690939207713619969"
+        },
+        {
+            "logStreamName": "2026/07/15/[$LATEST]92f0c57c4218480882f0289d89a7611d",
+            "timestamp": 1784144669908,
+            "message": "at org.springframework.core.io.support.SpringFactoriesLoader$FailureHandler.lambda$throwing$0(SpringFactoriesLoader.java:632)\n",
+            "ingestionTime": 1784144669968,
+            "eventId": "39787755680934834553641688599198428515689203160845189122"
+        },
+        {
+            "logStreamName": "2026/07/15/[$LATEST]92f0c57c4218480882f0289d89a7611d",
+            "timestamp": 1784144669910,
+            "message": "at org.springframework.core.io.support.SpringFactoriesLoader$FailureHandler.lambda$handleMessage$0(SpringFactoriesLoader.java:656)\n",
+            "ingestionTime": 1784144669968,
+            "eventId": "39787755680979436044038749845481499952234499883857149955"
+        },
+        {
+            "logStreamName": "2026/07/15/[$LATEST]92f0c57c4218480882f0289d89a7611d",
+            "timestamp": 1784144669910,
+            "message": "at org.springframework.core.io.support.SpringFactoriesLoader.instantiateFactory(SpringFactoriesLoader.java:225)\n",
+            "ingestionTime": 1784144669968,
+            "eventId": "39787755680979436044038749845481499952234499883857149956"
+        },
+        {
+            "logStreamName": "2026/07/15/[$LATEST]92f0c57c4218480882f0289d89a7611d",
+            "timestamp": 1784144669910,
+            "message": "at org.springframework.core.io.support.SpringFactoriesLoader.load(SpringFactoriesLoader.java:201)\n",
+            "ingestionTime": 1784144669968,
+            "eventId": "39787755680979436044038749845481499952234499883857149957"
+        },
+        {
+            "logStreamName": "2026/07/15/[$LATEST]92f0c57c4218480882f0289d89a7611d",
+            "timestamp": 1784144669910,
+            "message": "at org.springframework.core.io.support.SpringFactoriesLoader.load(SpringFactoriesLoader.java:140)\n",
+            "ingestionTime": 1784144669968,
+            "eventId": "39787755680979436044038749845481499952234499883857149958"
+        },
+        {
+            "logStreamName": "2026/07/15/[$LATEST]92f0c57c4218480882f0289d89a7611d",
+            "timestamp": 1784144669911,
+            "message": "at org.springframework.boot.WebApplicationType.deduce(WebApplicationType.java:64)\n",
+            "ingestionTime": 1784144669968,
+            "eventId": "39787755681001736789237280468623035670507148245363130375"
+        },
+        {
+            "logStreamName": "2026/07/15/[$LATEST]92f0c57c4218480882f0289d89a7611d",
+            "timestamp": 1784144669911,
+            "message": "at org.springframework.boot.SpringApplication.<init>(SpringApplication.java:278)\n",
+            "ingestionTime": 1784144669968,
+            "eventId": "39787755681001736789237280468623035670507148245363130376"
+        },
+        {
+            "logStreamName": "2026/07/15/[$LATEST]92f0c57c4218480882f0289d89a7611d",
+            "timestamp": 1784144669911,
+            "message": "at org.springframework.boot.SpringApplication.<init>(SpringApplication.java:260)\n",
+            "ingestionTime": 1784144669968,
+            "eventId": "39787755681001736789237280468623035670507148245363130377"
+        },
+        {
+            "logStreamName": "2026/07/15/[$LATEST]92f0c57c4218480882f0289d89a7611d",
+            "timestamp": 1784144669911,
+            "message": "at org.springframework.boot.SpringApplication.run(SpringApplication.java:1365)\n",
+            "ingestionTime": 1784144669968,
+            "eventId": "39787755681001736789237280468623035670507148245363130378"
+        },
+        {
+            "logStreamName": "2026/07/15/[$LATEST]92f0c57c4218480882f0289d89a7611d",
+            "timestamp": 1784144669911,
+            "message": "at org.springframework.boot.SpringApplication.run(SpringApplication.java:1354)\n",
+            "ingestionTime": 1784144669968,
+            "eventId": "39787755681001736789237280468623035670507148245363130379"
+        },
+        {
+            "logStreamName": "2026/07/15/[$LATEST]92f0c57c4218480882f0289d89a7611d",
+            "timestamp": 1784144669911,
+            "message": "at com.prayerlink.group.GroupApplication.main(GroupApplication.java:9)\n",
+            "ingestionTime": 1784144669968,
+            "eventId": "39787755681001736789237280468623035670507148245363130380"
+        },
+        {
+            "logStreamName": "2026/07/15/[$LATEST]92f0c57c4218480882f0289d89a7611d",
+            "timestamp": 1784144669911,
+            "message": "at java.base@21.0.11/java.lang.invoke.LambdaForm$DMH/sa346b79c.invokeStaticInit(LambdaForm$DMH)\n",
+            "ingestionTime": 1784144669968,
+            "eventId": "39787755681001736789237280468623035670507148245363130381"
+        },
+        {
+            "logStreamName": "2026/07/15/[$LATEST]92f0c57c4218480882f0289d89a7611d",
+            "timestamp": 1784144669912,
+            "message": "Caused by: java.lang.ClassNotFoundException: org.springframework.boot.webmvc.WebMvcWebApplicationTypeDeducer\n",
+            "ingestionTime": 1784144669968,
+            "eventId": "39787755681024037534435811091764571388779796606869110798"
+        },
+        {
+            "logStreamName": "2026/07/15/[$LATEST]92f0c57c4218480882f0289d89a7611d",
+            "timestamp": 1784144669912,
+            "message": "at org.graalvm.nativeimage.builder/com.oracle.svm.core.hub.ClassForNameSupport.forName(ClassForNameSupport.java:126)\n",
+            "ingestionTime": 1784144669968,
+            "eventId": "39787755681024037534435811091764571388779796606869110799"
+        },
+        {
+            "logStreamName": "2026/07/15/[$LATEST]92f0c57c4218480882f0289d89a7611d",
+            "timestamp": 1784144669912,
+            "message": "at org.graalvm.nativeimage.builder/com.oracle.svm.core.hub.ClassForNameSupport.forName(ClassForNameSupport.java:87)\n",
+            "ingestionTime": 1784144669968,
+            "eventId": "39787755681024037534435811091764571388779796606869110800"
+        },
+        {
+            "logStreamName": "2026/07/15/[$LATEST]92f0c57c4218480882f0289d89a7611d",
+            "timestamp": 1784144669912,
+            "message": "at java.base@21.0.11/java.lang.Class.forName(DynamicHub.java:1359)\n",
+            "ingestionTime": 1784144669968,
+            "eventId": "39787755681024037534435811091764571388779796606869110801"
+        },
+        {
+            "logStreamName": "2026/07/15/[$LATEST]92f0c57c4218480882f0289d89a7611d",
+            "timestamp": 1784144669912,
+            "message": "at java.base@21.0.11/java.lang.Class.forName(DynamicHub.java:1348)\n",
+            "ingestionTime": 1784144669968,
+            "eventId": "39787755681024037534435811091764571388779796606869110802"
+        },
+        {
+            "logStreamName": "2026/07/15/[$LATEST]92f0c57c4218480882f0289d89a7611d",
+            "timestamp": 1784144669912,
+            "message": "at org.springframework.util.ClassUtils.forName(ClassUtils.java:308)\n",
+            "ingestionTime": 1784144669968,
+            "eventId": "39787755681024037534435811091764571388779796606869110803"
+        },
+        {
+            "logStreamName": "2026/07/15/[$LATEST]92f0c57c4218480882f0289d89a7611d",
+            "timestamp": 1784144669912,
+            "message": "at org.springframework.core.io.support.SpringFactoriesLoader.instantiateFactory(SpringFactoriesLoader.java:218)\n",
+            "ingestionTime": 1784144669968,
+            "eventId": "39787755681024037534435811091764571388779796606869110804"
+        },
+        {
+            "logStreamName": "2026/07/15/[$LATEST]92f0c57c4218480882f0289d89a7611d",
+            "timestamp": 1784144669912,
+            "message": "... 9 more\n",
+            "ingestionTime": 1784144669968,
+            "eventId": "39787755681024037534435811091764571388779796606869110805"
+        },
+        {
+            "logStreamName": "2026/07/15/[$LATEST]92f0c57c4218480882f0289d89a7611d",
+            "timestamp": 1784144669914,
+            "message": "INIT_REPORT Init Duration: 408.51 ms\tPhase: init\tStatus: error\tError Type: Runtime.ExitError\n",
+            "ingestionTime": 1784144669988,
+            "eventId": "39787755681068639024832872338071639759624995687037337600"
+        },
+        {
+            "logStreamName": "2026/07/15/[$LATEST]92f0c57c4218480882f0289d89a7611d",
+            "timestamp": 1784144670269,
+            "message": "Exception in thread \"main\" java.lang.IllegalArgumentException: Unable to instantiate factory class [org.springframework.boot.webmvc.WebMvcWebApplicationTypeDeducer] for factory type [org.springframework.boot.WebApplicationType$Deducer]\n",
+            "ingestionTime": 1784144670297,
+            "eventId": "39787755688985403570311243553690361744015633605361729536"
+        },
+        {
+            "logStreamName": "2026/07/15/[$LATEST]92f0c57c4218480882f0289d89a7611d",
+            "timestamp": 1784144670290,
+            "message": "at org.springframework.core.io.support.SpringFactoriesLoader$FailureHandler.lambda$throwing$0(SpringFactoriesLoader.java:632)\n",
+            "ingestionTime": 1784144670297,
+            "eventId": "39787755689453719219480386639662611827741249196987318273"
+        },
+        {
+            "logStreamName": "2026/07/15/[$LATEST]92f0c57c4218480882f0289d89a7611d",
+            "timestamp": 1784144670291,
+            "message": "at org.springframework.core.io.support.SpringFactoriesLoader$FailureHandler.lambda$handleMessage$0(SpringFactoriesLoader.java:656)\n",
+            "ingestionTime": 1784144670297,
+            "eventId": "39787755689476019964678917262804147546013897558493298690"
+        },
+        {
+            "logStreamName": "2026/07/15/[$LATEST]92f0c57c4218480882f0289d89a7611d",
+            "timestamp": 1784144670291,
+            "message": "at org.springframework.core.io.support.SpringFactoriesLoader.instantiateFactory(SpringFactoriesLoader.java:225)\n",
+            "ingestionTime": 1784144670297,
+            "eventId": "39787755689476019964678917262804147546013897558493298691"
+        },
+        {
+            "logStreamName": "2026/07/15/[$LATEST]92f0c57c4218480882f0289d89a7611d",
+            "timestamp": 1784144670291,
+            "message": "at org.springframework.core.io.support.SpringFactoriesLoader.load(SpringFactoriesLoader.java:201)\n",
+            "ingestionTime": 1784144670297,
+            "eventId": "39787755689476019964678917262804147546013897558493298692"
+        },
+        {
+            "logStreamName": "2026/07/15/[$LATEST]92f0c57c4218480882f0289d89a7611d",
+            "timestamp": 1784144670291,
+            "message": "at org.springframework.core.io.support.SpringFactoriesLoader.load(SpringFactoriesLoader.java:140)\n",
+            "ingestionTime": 1784144670297,
+            "eventId": "39787755689476019964678917262804147546013897558493298693"
+        },
+        {
+            "logStreamName": "2026/07/15/[$LATEST]92f0c57c4218480882f0289d89a7611d",
+            "timestamp": 1784144670293,
+            "message": "at org.springframework.boot.WebApplicationType.deduce(WebApplicationType.java:64)\n",
+            "ingestionTime": 1784144670297,
+            "eventId": "39787755689520621455075978509087218982559194281505259526"
+        },
+        {
+            "logStreamName": "2026/07/15/[$LATEST]92f0c57c4218480882f0289d89a7611d",
+            "timestamp": 1784144670293,
+            "message": "at org.springframework.boot.SpringApplication.<init>(SpringApplication.java:278)\n",
+            "ingestionTime": 1784144670297,
+            "eventId": "39787755689520621455075978509087218982559194281505259527"
+        },
+        {
+            "logStreamName": "2026/07/15/[$LATEST]92f0c57c4218480882f0289d89a7611d",
+            "timestamp": 1784144670293,
+            "message": "at org.springframework.boot.SpringApplication.<init>(SpringApplication.java:260)\n",
+            "ingestionTime": 1784144670297,
+            "eventId": "39787755689520621455075978509087218982559194281505259528"
+        },
+        {
+            "logStreamName": "2026/07/15/[$LATEST]92f0c57c4218480882f0289d89a7611d",
+            "timestamp": 1784144670293,
+            "message": "at org.springframework.boot.SpringApplication.run(SpringApplication.java:1365)\n",
+            "ingestionTime": 1784144670297,
+            "eventId": "39787755689520621455075978509087218982559194281505259529"
+        },
+        {
+            "logStreamName": "2026/07/15/[$LATEST]92f0c57c4218480882f0289d89a7611d",
+            "timestamp": 1784144670293,
+            "message": "at org.springframework.boot.SpringApplication.run(SpringApplication.java:1354)\n",
+            "ingestionTime": 1784144670297,
+            "eventId": "39787755689520621455075978509087218982559194281505259530"
+        },
+        {
+            "logStreamName": "2026/07/15/[$LATEST]92f0c57c4218480882f0289d89a7611d",
+            "timestamp": 1784144670293,
+            "message": "at com.prayerlink.group.GroupApplication.main(GroupApplication.java:9)\n",
+            "ingestionTime": 1784144670297,
+            "eventId": "39787755689520621455075978509087218982559194281505259531"
+        },
+        {
+            "logStreamName": "2026/07/15/[$LATEST]92f0c57c4218480882f0289d89a7611d",
+            "timestamp": 1784144670293,
+            "message": "at java.base@21.0.11/java.lang.invoke.LambdaForm$DMH/sa346b79c.invokeStaticInit(LambdaForm$DMH)\n",
+            "ingestionTime": 1784144670297,
+            "eventId": "39787755689520621455075978509087218982559194281505259532"
+        },
+        {
+            "logStreamName": "2026/07/15/[$LATEST]92f0c57c4218480882f0289d89a7611d",
+            "timestamp": 1784144670293,
+            "message": "Caused by: java.lang.ClassNotFoundException: org.springframework.boot.webmvc.WebMvcWebApplicationTypeDeducer\n",
+            "ingestionTime": 1784144670297,
+            "eventId": "39787755689520621455075978509087218982559194281505259533"
+        },
+        {
+            "logStreamName": "2026/07/15/[$LATEST]92f0c57c4218480882f0289d89a7611d",
+            "timestamp": 1784144670293,
+            "message": "at org.graalvm.nativeimage.builder/com.oracle.svm.core.hub.ClassForNameSupport.forName(ClassForNameSupport.java:126)\n",
+            "ingestionTime": 1784144670297,
+            "eventId": "39787755689520621455075978509087218982559194281505259534"
+        },
+        {
+            "logStreamName": "2026/07/15/[$LATEST]92f0c57c4218480882f0289d89a7611d",
+            "timestamp": 1784144670293,
+            "message": "at org.graalvm.nativeimage.builder/com.oracle.svm.core.hub.ClassForNameSupport.forName(ClassForNameSupport.java:87)\n",
+            "ingestionTime": 1784144670297,
+            "eventId": "39787755689520621455075978509087218982559194281505259535"
+        },
+        {
+            "logStreamName": "2026/07/15/[$LATEST]92f0c57c4218480882f0289d89a7611d",
+            "timestamp": 1784144670293,
+            "message": "at java.base@21.0.11/java.lang.Class.forName(DynamicHub.java:1359)\n",
+            "ingestionTime": 1784144670297,
+            "eventId": "39787755689520621455075978509087218982559194281505259536"
+        },
+        {
+            "logStreamName": "2026/07/15/[$LATEST]92f0c57c4218480882f0289d89a7611d",
+            "timestamp": 1784144670293,
+            "message": "at java.base@21.0.11/java.lang.Class.forName(DynamicHub.java:1348)\n",
+            "ingestionTime": 1784144670297,
+            "eventId": "39787755689520621455075978509087218982559194281505259537"
+        },
+        {
+            "logStreamName": "2026/07/15/[$LATEST]92f0c57c4218480882f0289d89a7611d",
+            "timestamp": 1784144670293,
+            "message": "at org.springframework.util.ClassUtils.forName(ClassUtils.java:308)\n",
+            "ingestionTime": 1784144670297,
+            "eventId": "39787755689520621455075978509087218982559194281505259538"
+        },
+        {
+            "logStreamName": "2026/07/15/[$LATEST]92f0c57c4218480882f0289d89a7611d",
+            "timestamp": 1784144670293,
+            "message": "at org.springframework.core.io.support.SpringFactoriesLoader.instantiateFactory(SpringFactoriesLoader.java:218)\n",
+            "ingestionTime": 1784144670297,
+            "eventId": "39787755689520621455075978509087218982559194281505259539"
+        },
+        {
+            "logStreamName": "2026/07/15/[$LATEST]92f0c57c4218480882f0289d89a7611d",
+            "timestamp": 1784144670293,
+            "message": "... 9 more\n",
+            "ingestionTime": 1784144670297,
+            "eventId": "39787755689520621455075978509087218982559194281505259540"
+        },
+        {
+            "logStreamName": "2026/07/15/[$LATEST]92f0c57c4218480882f0289d89a7611d",
+            "timestamp": 1784144670295,
+            "message": "INIT_REPORT Init Duration: 362.58 ms\tPhase: invoke\tStatus: error\tError Type: Runtime.ExitError\n",
+            "ingestionTime": 1784144670309,
+            "eventId": "39787755689565222945473039755385172146018229549008158720"
+        },
+        {
+            "logStreamName": "2026/07/15/[$LATEST]92f0c57c4218480882f0289d89a7611d",
+            "timestamp": 1784144670295,
+            "message": "START RequestId: 68d40f01-b770-4dfb-bcb4-a55272213a4f Version: $LATEST\n",
+            "ingestionTime": 1784144670309,
+            "eventId": "39787755689565222945473039755385172146018229549008158721"
+        },
+        {
+            "logStreamName": "2026/07/15/[$LATEST]92f0c57c4218480882f0289d89a7611d",
+            "timestamp": 1784144670302,
+            "message": "END RequestId: 68d40f01-b770-4dfb-bcb4-a55272213a4f\n",
+            "ingestionTime": 1784144670309,
+            "eventId": "39787755689721328161862754117375922173926768079550021634"
+        },
+        {
+            "logStreamName": "2026/07/15/[$LATEST]92f0c57c4218480882f0289d89a7611d",
+            "timestamp": 1784144670302,
+            "message": "REPORT RequestId: 68d40f01-b770-4dfb-bcb4-a55272213a4f\tDuration: 376.09 ms\tBilled Duration: 377 ms\tMemory Size: 512 MB\tMax Memory Used: 65 MB\tStatus: error\tError Type: Runtime.ExitError\n",
+            "ingestionTime": 1784144670309,
+            "eventId": "39787755689721328161862754117375922173926768079550021635"
+        }
+    ],
+    "searchedLogStreams": []
+}

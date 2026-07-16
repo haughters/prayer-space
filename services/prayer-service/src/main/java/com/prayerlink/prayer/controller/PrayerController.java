@@ -457,7 +457,7 @@ public class PrayerController {
     return ResponseEntity.ok(Map.of(
         "message", "Thank you for praying",
         "prayedForCount", updatedDto.getPrayedForCount(),
-        "hasPrayed", updatedDto.isHasPrayed()
+        "hasPrayed", updatedDto.getHasPrayed()
     ));
   }
 

@@ -115,7 +115,7 @@ public class CommonCoverageTest {
         assertEquals(5, prayer.getPrayedForCount());
         assertNotNull(prayer.getCreatedAt());
         assertNotNull(prayer.getUpdatedAt());
-        assertTrue(prayer.isHasPrayed());
+        assertTrue(prayer.getHasPrayed());
         assertEquals(1, prayer.getUpdates().size());
 
         // 6. Events

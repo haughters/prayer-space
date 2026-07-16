@@ -1,0 +1,1 @@
+{"body":"{\"timestamp\":\"2026-07-16T16:34:54.456790327Z\",\"status\":400,\"error\":\"Bad Request\",\"message\":\"Malformed request body\",\"path\":\"/api/prayers\"}","isBase64Encoded":false,"multiValueHeaders":{"Content-Type":["application/json"]},"statusCode":400}

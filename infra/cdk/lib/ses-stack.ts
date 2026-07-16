@@ -31,8 +31,9 @@ export class SesStack extends cdk.Stack {
     });
 
     // 3. Create verified email identity for sending emails
+    const emailAddress = props.deployEnv === 'live' ? 'prayers@prayer-link.org' : 'prayers-test@prayer-link.org';
     new ses.EmailIdentity(this, 'EmailIdentity', {
-      identity: ses.Identity.email('prayers@prayer-link.org'),
+      identity: ses.Identity.email(emailAddress),
       configurationSet: configSet,
     });
 

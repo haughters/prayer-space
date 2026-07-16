@@ -1,0 +1,17 @@
+{
+  "version": "2.0",
+  "routeKey": "$default",
+  "rawPath": "/api/prayers",
+  "rawQueryString": "",
+  "headers": {
+    "content-type": "application/json"
+  },
+  "requestContext": {
+    "http": {
+      "method": "POST",
+      "path": "/api/prayers"
+    }
+  },
+  "body": "eyJkZXZpY2VJZCI6IjkxYWYyNTJkLTkxMjgtNDVjZi05MGEzLWU0NDEwYmQ3MzU1NiIsInByYXllclRleHQiOiJUaGlzIGlzIGEgdGVzdCIsImdyb3VwSWQiOm51bGx9",
+  "isBase64Encoded": true
+}

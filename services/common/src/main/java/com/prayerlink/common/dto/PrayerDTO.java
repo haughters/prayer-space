@@ -24,10 +24,10 @@ public class PrayerDTO {
   private String groupId;
   private String assignedGroupId;
   private String status;
-  private int prayedForCount;
+  private Integer prayedForCount;
   private Instant createdAt;
   private Instant updatedAt;
-  private boolean hasPrayed;
+  private Boolean hasPrayed;
   private List<PrayerUpdateDTO> updates;
 }
 
