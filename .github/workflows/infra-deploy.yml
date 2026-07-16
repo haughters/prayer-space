@@ -28,7 +28,7 @@ concurrency:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    environment: ${{ inputs.environment || 'test' }}
+    environment: ${{ github.event_name == 'pull_request' && format('pr-{0}-infra', github.event.pull_request.number) || inputs.environment || 'test-infra' }}
     permissions:
       id-token: write
       contents: read

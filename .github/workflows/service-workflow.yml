@@ -72,7 +72,7 @@ jobs:
     needs: build-and-test
     runs-on: ubuntu-24.04
     environment:
-      name: ${{ github.event_name == 'pull_request' && format('pr-{0}', github.event.pull_request.number) || 'test' }}
+      name: ${{ github.event_name == 'pull_request' && format('pr-{0}-{1}', github.event.pull_request.number, inputs.service) || format('test-{0}', inputs.service) }}
       url: ${{ env.SERVICE_URL }}
     permissions:
       id-token: write

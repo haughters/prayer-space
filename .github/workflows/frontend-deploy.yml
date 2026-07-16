@@ -20,6 +20,9 @@ concurrency:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    environment:
+      name: ${{ github.event_name == 'pull_request' && format('pr-{0}-frontend', github.event.pull_request.number) || 'test-frontend' }}
+      url: ${{ env.URL }}
     permissions:
       id-token: write
       contents: read
