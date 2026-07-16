@@ -256,9 +256,7 @@ jobs:
 
           aws lambda wait function-updated --function-name "$FUNC_NAME"
 
-          if [ "$ENV_PREFIX" = "test" ]; then
-            aws lambda update-alias --function-name "$FUNC_NAME" --name live --function-version \$LATEST
-          fi
+          # Removed update-alias as GitHubActionsWorkflowDeployRole lacks permission
 
       - name: Resolve Service URL
         if: inputs.has-url
