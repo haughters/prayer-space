@@ -230,7 +230,7 @@ jobs:
 
           case "$SVC" in
             prayer-service)
-              ENV_VARS="${ENV_VARS},AWS_EVENTBRIDGE_BUS_NAME=test-prayer-link-bus"
+              ENV_VARS="${ENV_VARS},AWS_EVENTBRIDGE_BUS=test-prayer-link-bus"
               ENV_VARS="${ENV_VARS},SERVICES_GROUP_SERVICE_URL=${URL_GROUP_SERVICE}"
               ;;
             identity-service)
@@ -449,7 +449,7 @@ jobs:
 
           case "$SVC" in
             prayer-service)
-              ENV_VARS="${ENV_VARS},AWS_EVENTBRIDGE_BUS_NAME=live-prayer-link-bus"
+              ENV_VARS="${ENV_VARS},AWS_EVENTBRIDGE_BUS=live-prayer-link-bus"
               ENV_VARS="${ENV_VARS},SERVICES_GROUP_SERVICE_URL=${URL_GROUP_SERVICE}"
               ;;
             identity-service)

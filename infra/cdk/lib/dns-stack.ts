@@ -151,6 +151,7 @@ export class DnsStack extends cdk.Stack {
           resources: [
             `arn:aws:lambda:${this.region}:${this.account}:function:pr-*`,
             `arn:aws:lambda:${this.region}:${this.account}:function:test-*`,
+            `arn:aws:lambda:${this.region}:${this.account}:function:live-*`,
           ],
         }),
         new iam.PolicyStatement({
