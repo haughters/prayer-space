@@ -12,12 +12,17 @@ on:
 
 jobs:
   build-and-test:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-24.04
+    container:
+      image: amazonlinux:2023
     permissions:
       contents: read
       pull-requests: write
       packages: write
     steps:
+      - name: Install dependencies
+        run: dnf install -y tar gzip git gcc findutils maven zlib-devel make
+
       - uses: actions/checkout@v7
 
       - name: Set up JDK 25
@@ -65,7 +70,7 @@ jobs:
 
   deploy:
     needs: build-and-test
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-24.04
     environment:
       name: ${{ github.event_name == 'pull_request' && format('pr-{0}', github.event.pull_request.number) || 'test' }}
       url: ${{ env.SERVICE_URL }}
