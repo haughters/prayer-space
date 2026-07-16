@@ -6,6 +6,7 @@ import * as dynamodb from 'aws-cdk-lib/aws-dynamodb';
 import * as events from 'aws-cdk-lib/aws-events';
 import * as sqs from 'aws-cdk-lib/aws-sqs';
 import * as iam from 'aws-cdk-lib/aws-iam';
+import { IdentityPool } from 'aws-cdk-lib/aws-cognito-identitypool';
 
 
 import { Construct } from 'constructs';
@@ -74,18 +75,16 @@ export class ComputeStack extends cdk.Stack {
       if (hasUrl) {
         functionUrl = alias.addFunctionUrl({
           authType: lambda.FunctionUrlAuthType.AWS_IAM,
+          cors: {
+            allowedOrigins: ['*'], // The frontend will hit this from S3/localhost
+            allowedMethods: [lambda.HttpMethod.ALL],
+            allowedHeaders: ['*'],
+          },
         });
-
-        functionUrl.grantInvokeUrl(new iam.ServicePrincipal('cloudfront.amazonaws.com', {
-          conditions: {
-            ArnLike: {
-              'aws:SourceArn': `arn:aws:cloudfront::${cdk.Stack.of(this).account}:distribution/*`,
-            }
-          }
-        }));
 
         new cdk.CfnOutput(this, `${name}FunctionUrlOut`, {
           value: functionUrl.url,
+          exportName: `${props.deployEnv}-PrayerLink${name}FunctionUrlOut`,
         });
       }
 
@@ -175,6 +174,31 @@ export class ComputeStack extends cdk.Stack {
         actions: ['lambda:InvokeFunctionUrl', 'lambda:InvokeFunction'],
         resources: [prayerSvc.fn.functionArn],
       }));
+    });
+
+    const identityPool = new IdentityPool(this, 'GuestAccessPool', {
+      identityPoolName: `${props.deployEnv}GuestAccessPool`,
+      allowUnauthenticatedIdentities: true,
+    });
+
+    identityPool.unauthenticatedRole.addToPrincipalPolicy(new iam.PolicyStatement({
+      effect: iam.Effect.ALLOW,
+      actions: ['lambda:InvokeFunctionUrl', 'lambda:InvokeFunction'],
+      resources: [
+        identitySvc.alias.functionArn,
+        prayerSvc.alias.functionArn,
+        groupSvc.alias.functionArn,
+        adminSvc.alias.functionArn,
+      ],
+    }));
+
+    new cdk.CfnOutput(this, 'ViteIdentityPoolId', {
+      value: identityPool.identityPoolId,
+      exportName: `${props.deployEnv}-PrayerLinkViteIdentityPoolId`,
+    });
+    new cdk.CfnOutput(this, 'ViteRegion', {
+      value: this.region,
+      exportName: `${props.deployEnv}-PrayerLinkViteRegion`,
     });
 
 

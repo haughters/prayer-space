@@ -44,22 +44,10 @@ export class DnsStack extends cdk.Stack {
     // 3. Define Origins
     const s3Origin = origins.S3BucketOrigin.withOriginAccessIdentity(this.frontendBucket, { originAccessIdentity });
 
-    const lambdaOac = new cloudfront.FunctionUrlOriginAccessControl(this, 'LambdaOAC', {
-      originAccessControlName: `${props.deployEnv}-LambdaOAC`,
-    });
-
-    const identityOrigin = new origins.FunctionUrlOrigin(props.computeStack.identityFunctionUrl, {
-      originAccessControlId: lambdaOac.originAccessControlId,
-    });
-    const prayerOrigin = new origins.FunctionUrlOrigin(props.computeStack.prayerFunctionUrl, {
-      originAccessControlId: lambdaOac.originAccessControlId,
-    });
-    const groupOrigin = new origins.FunctionUrlOrigin(props.computeStack.groupFunctionUrl, {
-      originAccessControlId: lambdaOac.originAccessControlId,
-    });
-    const adminOrigin = new origins.FunctionUrlOrigin(props.computeStack.adminFunctionUrl, {
-      originAccessControlId: lambdaOac.originAccessControlId,
-    });
+    const identityOrigin = new origins.FunctionUrlOrigin(props.computeStack.identityFunctionUrl);
+    const prayerOrigin = new origins.FunctionUrlOrigin(props.computeStack.prayerFunctionUrl);
+    const groupOrigin = new origins.FunctionUrlOrigin(props.computeStack.groupFunctionUrl);
+    const adminOrigin = new origins.FunctionUrlOrigin(props.computeStack.adminFunctionUrl);
 
     // 4. CloudFront Distribution
     this.distribution = new cloudfront.Distribution(this, 'CloudFrontDistribution', {

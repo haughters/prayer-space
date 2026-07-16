@@ -49,6 +49,33 @@ jobs:
           echo "📦 Frontend version: $VERSION"
         working-directory: frontend
 
+      - name: Fetch CloudFormation Exports
+        run: |
+          FRONTEND_BUCKET=$(aws cloudformation list-exports --query "Exports[?Name=='test-PrayerLinkFrontendBucketName'].Value" --output text)
+          CLOUDFRONT_ID=$(aws cloudformation list-exports --query "Exports[?Name=='test-PrayerLinkCloudFrontDistributionId'].Value" --output text)
+          CLOUDFRONT_DOMAIN=$(aws cloudformation list-exports --query "Exports[?Name=='test-PrayerLinkCloudFrontDomainName'].Value" --output text)
+          IDENTITY_POOL_ID=$(aws cloudformation list-exports --query "Exports[?Name=='test-PrayerLinkViteIdentityPoolId'].Value" --output text)
+          REGION=$(aws cloudformation list-exports --query "Exports[?Name=='test-PrayerLinkViteRegion'].Value" --output text)
+          IDENTITY_URL=$(aws cloudformation list-exports --query "Exports[?Name=='test-PrayerLinkidentity-serviceFunctionUrlOut'].Value" --output text)
+          PRAYER_URL=$(aws cloudformation list-exports --query "Exports[?Name=='test-PrayerLinkprayer-serviceFunctionUrlOut'].Value" --output text)
+          GROUP_URL=$(aws cloudformation list-exports --query "Exports[?Name=='test-PrayerLinkgroup-serviceFunctionUrlOut'].Value" --output text)
+          ADMIN_URL=$(aws cloudformation list-exports --query "Exports[?Name=='test-PrayerLinkadmin-serviceFunctionUrlOut'].Value" --output text)
+
+          if [ -z "$FRONTEND_BUCKET" ] || [ -z "$CLOUDFRONT_ID" ]; then
+            echo "Error: Could not resolve required CloudFormation exports."
+            exit 1
+          fi
+
+          echo "FRONTEND_BUCKET=$FRONTEND_BUCKET" >> $GITHUB_ENV
+          echo "CLOUDFRONT_ID=$CLOUDFRONT_ID" >> $GITHUB_ENV
+          echo "CLOUDFRONT_DOMAIN=$CLOUDFRONT_DOMAIN" >> $GITHUB_ENV
+          echo "VITE_COGNITO_IDENTITY_POOL_ID=$IDENTITY_POOL_ID" >> $GITHUB_ENV
+          echo "VITE_AWS_REGION=$REGION" >> $GITHUB_ENV
+          echo "VITE_IDENTITY_LAMBDA_URL=$IDENTITY_URL" >> $GITHUB_ENV
+          echo "VITE_PRAYER_LAMBDA_URL=$PRAYER_URL" >> $GITHUB_ENV
+          echo "VITE_GROUP_LAMBDA_URL=$GROUP_URL" >> $GITHUB_ENV
+          echo "VITE_ADMIN_LAMBDA_URL=$ADMIN_URL" >> $GITHUB_ENV
+
       - name: Build
         run: |
           npm ci
@@ -59,21 +86,16 @@ jobs:
           fi
         env:
           VITE_APP_VERSION: ${{ steps.version.outputs.version }}
+          VITE_AWS_REGION: ${{ env.VITE_AWS_REGION }}
+          VITE_COGNITO_IDENTITY_POOL_ID: ${{ env.VITE_COGNITO_IDENTITY_POOL_ID }}
+          VITE_IDENTITY_LAMBDA_URL: ${{ env.VITE_IDENTITY_LAMBDA_URL }}
+          VITE_PRAYER_LAMBDA_URL: ${{ env.VITE_PRAYER_LAMBDA_URL }}
+          VITE_GROUP_LAMBDA_URL: ${{ env.VITE_GROUP_LAMBDA_URL }}
+          VITE_ADMIN_LAMBDA_URL: ${{ env.VITE_ADMIN_LAMBDA_URL }}
         working-directory: frontend
 
       - name: Deploy to S3
         run: |
-          FRONTEND_BUCKET=$(aws cloudformation list-exports --query "Exports[?Name=='test-PrayerLinkFrontendBucketName'].Value" --output text)
-          CLOUDFRONT_ID=$(aws cloudformation list-exports --query "Exports[?Name=='test-PrayerLinkCloudFrontDistributionId'].Value" --output text)
-          CLOUDFRONT_DOMAIN=$(aws cloudformation list-exports --query "Exports[?Name=='test-PrayerLinkCloudFrontDomainName'].Value" --output text)
-          
-          if [ -z "$FRONTEND_BUCKET" ] || [ -z "$CLOUDFRONT_ID" ] || [ -z "$CLOUDFRONT_DOMAIN" ]; then
-            echo "Error: Could not resolve Frontend Bucket, CloudFront ID, or Domain Name from CloudFormation exports."
-            exit 1
-          fi
-          
-          echo "CLOUDFRONT_DOMAIN=$CLOUDFRONT_DOMAIN" >> $GITHUB_ENV
-
           if [ "${{ github.event_name }}" = "pull_request" ]; then
             aws s3 sync dist/ s3://${FRONTEND_BUCKET}/pr-${{ github.event.pull_request.number }} \
               --delete \
