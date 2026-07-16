@@ -4,7 +4,6 @@ server:
 spring:
   application:
     name: admin-service
-  profiles:
 
 services:
   group-service:

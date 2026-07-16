@@ -4,7 +4,6 @@ server:
 spring:
   application:
     name: identity-service
-  profiles:
 
 services:
   group-service:
