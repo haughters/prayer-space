@@ -21,6 +21,8 @@ import java.util.stream.Stream;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+import com.prayerlink.common.config.TableNameResolver;
+
 public class RepositoryTests {
 
     private DynamoDbTable<Admin> adminTable;
@@ -38,16 +40,17 @@ public class RepositoryTests {
     @BeforeEach
     void setUp() {
         DynamoDbEnhancedClient enhancedClient = mock(DynamoDbEnhancedClient.class);
+        TableNameResolver tableNameResolver = new TableNameResolver("");
 
         adminTable = mock(DynamoDbTable.class);
         usernameIndex = mock(DynamoDbIndex.class);
         when(enhancedClient.table(eq("Admins"), any(TableSchema.class))).thenReturn(adminTable);
         when(adminTable.index(eq("UsernameIndex"))).thenReturn(usernameIndex);
-        adminRepository = new AdminRepository(enhancedClient);
+        adminRepository = new AdminRepository(enhancedClient, tableNameResolver);
 
         accountTable = mock(DynamoDbTable.class);
         when(enhancedClient.table(eq("IntercessorAccounts"), any(TableSchema.class))).thenReturn(accountTable);
-        accountRepository = new IntercessorAccountRepository(enhancedClient);
+        accountRepository = new IntercessorAccountRepository(enhancedClient, tableNameResolver);
 
         prayerTable = mock(DynamoDbTable.class);
         updatesTable = mock(DynamoDbTable.class);
@@ -55,7 +58,7 @@ public class RepositoryTests {
         when(enhancedClient.table(eq("Prayers"), any(TableSchema.class))).thenReturn(prayerTable);
         when(enhancedClient.table(eq("PrayerUpdates"), any(TableSchema.class))).thenReturn(updatesTable);
         when(prayerTable.index(eq("GroupIdIndex"))).thenReturn(groupIdIndex);
-        prayerRepository = new PrayerRepository(enhancedClient);
+        prayerRepository = new PrayerRepository(enhancedClient, tableNameResolver);
     }
 
     @Test

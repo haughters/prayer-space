@@ -1,4 +1,5 @@
 // portal.js - Entry point for the unified Prayer Link Portal
+import './shared/apiClient.js';
 import './styles/tokens.css';
 import './styles/reset.css';
 import './styles/base.css';

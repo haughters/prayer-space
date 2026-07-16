@@ -1,0 +1,49 @@
+name: PR Cleanup
+
+on:
+  pull_request:
+    types: [closed]
+    paths:
+      - 'services/**'
+      - 'frontend/**'
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
+          aws-region: eu-west-1
+
+      - name: Delete PR Lambdas
+        run: |
+          PR_NUM=${{ github.event.pull_request.number }}
+          PREFIX="pr-${PR_NUM}-"
+          
+          # List all functions matching the prefix
+          FUNCTIONS=$(aws lambda list-functions --query "Functions[?starts_with(FunctionName, '${PREFIX}')].FunctionName" --output text)
+          
+          if [ -z "$FUNCTIONS" ]; then
+            echo "No functions found for PR $PR_NUM"
+          else
+            for func in $FUNCTIONS; do
+              echo "Deleting $func..."
+              aws lambda delete-function --function-name "$func"
+            done
+          fi
+
+      - name: Delete PR Frontend
+        run: |
+          PR_NUM=${{ github.event.pull_request.number }}
+          FRONTEND_BUCKET=$(aws cloudformation list-exports --query "Exports[?Name=='test-PrayerLinkFrontendBucketName'].Value" --output text 2>/dev/null || echo "")
+          
+          if [ -n "$FRONTEND_BUCKET" ]; then
+            echo "Cleaning up S3 frontend folder: s3://${FRONTEND_BUCKET}/pr-${PR_NUM}"
+            aws s3 rm "s3://${FRONTEND_BUCKET}/pr-${PR_NUM}" --recursive
+          fi

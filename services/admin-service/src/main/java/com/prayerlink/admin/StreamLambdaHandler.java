@@ -1,7 +1,7 @@
 package com.prayerlink.admin;
 
 import com.amazonaws.serverless.exceptions.ContainerInitializationException;
-import com.amazonaws.serverless.proxy.model.AwsProxyRequest;
+import com.amazonaws.serverless.proxy.model.HttpApiV2ProxyRequest;
 import com.amazonaws.serverless.proxy.model.AwsProxyResponse;
 import com.amazonaws.serverless.proxy.spring.SpringBootLambdaContainerHandler;
 import com.amazonaws.services.lambda.runtime.Context;
@@ -12,10 +12,10 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 public class StreamLambdaHandler implements RequestStreamHandler {
-    private final static SpringBootLambdaContainerHandler<AwsProxyRequest, AwsProxyResponse> HANDLER;
+    private final static SpringBootLambdaContainerHandler<HttpApiV2ProxyRequest, AwsProxyResponse> HANDLER;
     static {
         try {
-            HANDLER = SpringBootLambdaContainerHandler.getAwsProxyHandler(AdminApplication.class);
+            HANDLER = SpringBootLambdaContainerHandler.getHttpApiV2ProxyHandler(AdminApplication.class);
         } catch (ContainerInitializationException e) {
             e.printStackTrace();
             throw new RuntimeException("Could not initialize Spring Boot application", e);

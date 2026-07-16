@@ -6,6 +6,7 @@ export default defineConfig({
   define: {
     __BUNDLED_DEV__: false,
     __SERVER_FORWARD_CONSOLE__: null,
+    __APP_VERSION__: JSON.stringify(process.env.VITE_APP_VERSION || 'dev'),
   },
   server: {
     port: 5173,

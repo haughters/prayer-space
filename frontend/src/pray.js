@@ -1,4 +1,5 @@
 // pray.js - Entry point for the intercessor action page with interactive animations
+import './shared/apiClient.js';
 import './styles/tokens.css';
 import './styles/reset.css';
 import './styles/base.css';

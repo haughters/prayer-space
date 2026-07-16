@@ -2,7 +2,6 @@ package com.prayerlink.notification;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import com.prayerlink.notification.config.AppConfig;
 import com.prayerlink.notification.config.SesConfig;
 import com.prayerlink.notification.config.SqsConfig;
 import org.junit.jupiter.api.Test;
@@ -12,9 +11,6 @@ public class NotificationCoverageTest {
 
     @Test
     void testConfigs() {
-        AppConfig appConfig = new AppConfig();
-        assertNotNull(appConfig.restTemplate());
-        
         SesConfig sesConfig = new SesConfig();
         try {
             SesClient sesClient = sesConfig.sesClient();
@@ -34,10 +30,17 @@ public class NotificationCoverageTest {
 
     @Test
     void testApplicationMain() {
+        System.setProperty("aws.accessKeyId", "dummy");
+        System.setProperty("aws.secretAccessKey", "dummy");
+        System.setProperty("aws.region", "eu-west-1");
         try {
-            NotificationApplication.main(new String[]{"--server.port=0"});
+            NotificationApplication.main(new String[]{"--server.port=0", "--spring.profiles.active=local"});
         } catch (Throwable e) {
             // expected
+        } finally {
+            System.clearProperty("aws.accessKeyId");
+            System.clearProperty("aws.secretAccessKey");
+            System.clearProperty("aws.region");
         }
         try {
             StreamLambdaHandler handler = new StreamLambdaHandler();

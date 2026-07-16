@@ -4,10 +4,18 @@ server:
 spring:
   application:
     name: admin-service
-  profiles:
-    active: local
+
+services:
+  group-service:
+    url: http://localhost:8083
+  prayer-service:
+    url: http://localhost:8082
+
 
 management:
+  health:
+    diskspace:
+      enabled: false
   endpoints:
     web:
       exposure:
@@ -27,7 +35,7 @@ spring:
 aws:
   dynamodb:
     endpoint: http://localhost:8000
-    region: us-east-1
+    region: eu-west-1
 
 cookie:
   secure: false

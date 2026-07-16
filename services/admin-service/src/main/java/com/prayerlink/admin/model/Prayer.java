@@ -1,4 +1,7 @@
 package com.prayerlink.admin.model;
+import software.amazon.awssdk.enhanced.dynamodb.TableSchema;
+import software.amazon.awssdk.enhanced.dynamodb.mapper.StaticTableSchema;
+import static software.amazon.awssdk.enhanced.dynamodb.mapper.StaticAttributeTags.*;
 
 import java.time.Instant;
 import java.util.Set;
@@ -17,6 +20,45 @@ import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbSecon
 @AllArgsConstructor
 @DynamoDbBean
 public class Prayer {
+
+  public static final TableSchema<Prayer> SCHEMA = StaticTableSchema.builder(Prayer.class)
+    .newItemSupplier(Prayer::new)
+    .addAttribute(String.class, a -> a.name("prayerId")
+      .getter(Prayer::getPrayerId)
+      .setter(Prayer::setPrayerId)
+      .tags(primaryPartitionKey()))
+    .addAttribute(String.class, a -> a.name("deviceId")
+      .getter(Prayer::getDeviceId)
+      .setter(Prayer::setDeviceId)
+      .tags(secondaryPartitionKey("DeviceIdIndex")))
+    .addAttribute(String.class, a -> a.name("prayerText")
+      .getter(Prayer::getPrayerText)
+      .setter(Prayer::setPrayerText))
+    .addAttribute(String.class, a -> a.name("groupId")
+      .getter(Prayer::getGroupId)
+      .setter(Prayer::setGroupId))
+    .addAttribute(String.class, a -> a.name("assignedGroupId")
+      .getter(Prayer::getAssignedGroupId)
+      .setter(Prayer::setAssignedGroupId)
+      .tags(secondaryPartitionKey("GroupIdIndex")))
+    .addAttribute(String.class, a -> a.name("status")
+      .getter(Prayer::getStatus)
+      .setter(Prayer::setStatus))
+    .addAttribute(Integer.class, a -> a.name("prayedForCount")
+      .getter(Prayer::getPrayedForCount)
+      .setter(Prayer::setPrayedForCount))
+    .addAttribute(software.amazon.awssdk.enhanced.dynamodb.EnhancedType.setOf(String.class), a -> a.name("prayedByEmails")
+      .getter(Prayer::getPrayedByEmails)
+      .setter(Prayer::setPrayedByEmails))
+    .addAttribute(Instant.class, a -> a.name("createdAt")
+      .getter(Prayer::getCreatedAt)
+      .setter(Prayer::setCreatedAt)
+      .tags(secondarySortKey("DeviceIdIndex"), secondarySortKey("GroupIdIndex")))
+    .addAttribute(Instant.class, a -> a.name("updatedAt")
+      .getter(Prayer::getUpdatedAt)
+      .setter(Prayer::setUpdatedAt))
+    .build();
+
   private String prayerId;
   private String deviceId;
   private String prayerText;

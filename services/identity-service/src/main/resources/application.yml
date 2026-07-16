@@ -4,10 +4,16 @@ server:
 spring:
   application:
     name: identity-service
-  profiles:
-    active: local
+
+services:
+  group-service:
+    url: http://localhost:8083
+
 
 management:
+  health:
+    diskspace:
+      enabled: false
   endpoints:
     web:
       exposure:
@@ -24,4 +30,4 @@ spring:
 aws:
   dynamodb:
     endpoint: http://localhost:8000
-    region: us-east-1
+    region: eu-west-1

@@ -16,7 +16,7 @@ public class EventBridgeConfig {
   @Value("${aws.eventbridge.endpoint:#{null}}")
   private String endpoint;
 
-  @Value("${aws.eventbridge.region:us-east-1}")
+  @Value("${aws.eventbridge.region:eu-west-1}")
   private String region;
 
   @Bean

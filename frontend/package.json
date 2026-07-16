@@ -1,7 +1,7 @@
 {
   "name": "prayer-link-frontend",
   "private": true,
-  "version": "1.0.0",
+  "version": "1.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -21,6 +21,7 @@
     "vitest": "^4.1.10"
   },
   "dependencies": {
+    "aws4fetch": "^1.0.20",
     "html5-qrcode": "^2.3.8",
     "qrcode": "^1.5.4"
   }

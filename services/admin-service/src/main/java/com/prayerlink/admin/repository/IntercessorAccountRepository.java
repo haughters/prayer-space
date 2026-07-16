@@ -3,16 +3,20 @@ package com.prayerlink.admin.repository;
 import com.prayerlink.admin.model.IntercessorAccount;
 import java.util.Optional;
 import org.springframework.stereotype.Repository;
+import org.springframework.aot.hint.annotation.RegisterReflectionForBinding;
 import software.amazon.awssdk.enhanced.dynamodb.DynamoDbEnhancedClient;
 import software.amazon.awssdk.enhanced.dynamodb.DynamoDbTable;
 import software.amazon.awssdk.enhanced.dynamodb.TableSchema;
 
+import com.prayerlink.common.config.TableNameResolver;
+
 @Repository
+@RegisterReflectionForBinding({IntercessorAccount.class})
 public class IntercessorAccountRepository {
   private final DynamoDbTable<IntercessorAccount> table;
 
-  public IntercessorAccountRepository(DynamoDbEnhancedClient enhancedClient) {
-    this.table = enhancedClient.table("IntercessorAccounts", TableSchema.fromBean(IntercessorAccount.class));
+  public IntercessorAccountRepository(DynamoDbEnhancedClient enhancedClient, TableNameResolver tableNameResolver) {
+    this.table = enhancedClient.table(tableNameResolver.resolve("IntercessorAccounts"), IntercessorAccount.SCHEMA);
   }
 
   public void save(IntercessorAccount account) {

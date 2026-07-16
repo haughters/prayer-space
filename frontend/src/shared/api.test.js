@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { registerDevice, fetchPrayers, submitPrayer, validatePasscode } from './api';
+import * as apiClient from './apiClient';
 
 describe('API Client tests', () => {
   beforeEach(() => {
@@ -8,17 +9,15 @@ describe('API Client tests', () => {
 
   it('registerDeviceCallsCorrectEndpoint', async () => {
     const mockResponse = { deviceId: 'device-123', status: 'CREATED' };
-    const fetchMock = vi.fn().mockResolvedValue({
+    const fetchMock = vi.spyOn(apiClient, 'fetchSecureData').mockResolvedValue({
       ok: true,
       json: async () => mockResponse,
     });
-    vi.stubGlobal('fetch', fetchMock);
 
     const result = await registerDevice('device-123');
 
     expect(fetchMock).toHaveBeenCalledWith('/api/identity/register', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ deviceId: 'device-123' }),
     });
     expect(result).toEqual(mockResponse);
@@ -29,18 +28,16 @@ describe('API Client tests', () => {
   });
 
   it('registerDevice throws error on !res.ok', async () => {
-    const fetchMock = vi.fn().mockResolvedValue({ ok: false, status: 500 });
-    vi.stubGlobal('fetch', fetchMock);
+    vi.spyOn(apiClient, 'fetchSecureData').mockResolvedValue({ ok: false, status: 500 });
     await expect(registerDevice('d123')).rejects.toThrow('Registration failed with status 500');
   });
 
   it('fetchPrayersPassesDeviceId', async () => {
     const mockPrayers = [{ prayerId: 'p-1', text: 'Test' }];
-    const fetchMock = vi.fn().mockResolvedValue({
+    const fetchMock = vi.spyOn(apiClient, 'fetchSecureData').mockResolvedValue({
       ok: true,
       json: async () => mockPrayers,
     });
-    vi.stubGlobal('fetch', fetchMock);
 
     const result = await fetchPrayers('device-123');
 
@@ -49,24 +46,21 @@ describe('API Client tests', () => {
   });
 
   it('fetchPrayers throws error on !res.ok', async () => {
-    const fetchMock = vi.fn().mockResolvedValue({ ok: false, status: 500 });
-    vi.stubGlobal('fetch', fetchMock);
+    vi.spyOn(apiClient, 'fetchSecureData').mockResolvedValue({ ok: false, status: 500 });
     await expect(fetchPrayers('d123')).rejects.toThrow('Failed to fetch prayers: 500');
   });
 
   it('submitPrayerSendsCorrectPayload', async () => {
     const mockResponse = { prayerId: 'p-1', status: 'OPEN' };
-    const fetchMock = vi.fn().mockResolvedValue({
+    const fetchMock = vi.spyOn(apiClient, 'fetchSecureData').mockResolvedValue({
       ok: true,
       json: async () => mockResponse,
     });
-    vi.stubGlobal('fetch', fetchMock);
 
     const result = await submitPrayer('This is a long prayer text of 10+ chars', 'device-123', 'group-456');
 
     expect(fetchMock).toHaveBeenCalledWith('/api/prayers', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         text: 'This is a long prayer text of 10+ chars',
         deviceId: 'device-123',
@@ -81,19 +75,17 @@ describe('API Client tests', () => {
   });
 
   it('submitPrayer throws error on !res.ok', async () => {
-    const fetchMock = vi.fn().mockResolvedValue({ ok: false, status: 500 });
-    vi.stubGlobal('fetch', fetchMock);
+    vi.spyOn(apiClient, 'fetchSecureData').mockResolvedValue({ ok: false, status: 500 });
     await expect(submitPrayer('This is a long prayer text of 10+ chars', 'd123')).rejects.toThrow('Submission failed with status 500');
   });
 
   it('validatePasscodeReturnsGroupOnSuccess', async () => {
     const mockGroup = { groupId: 'g-123', passcode: 'AAABBB' };
-    const fetchMock = vi.fn().mockResolvedValue({
+    const fetchMock = vi.spyOn(apiClient, 'fetchSecureData').mockResolvedValue({
       ok: true,
       status: 200,
       json: async () => mockGroup,
     });
-    vi.stubGlobal('fetch', fetchMock);
 
     const result = await validatePasscode('AAABBB');
 
@@ -102,15 +94,14 @@ describe('API Client tests', () => {
   });
 
   it('validatePasscodeReturnsNullOn404', async () => {
-    const fetchMock = vi.fn().mockResolvedValue({
+    const fetchMock = vi.spyOn(apiClient, 'fetchSecureData').mockResolvedValue({
       ok: false,
       status: 404,
     });
-    vi.stubGlobal('fetch', fetchMock);
 
-    const result = await validatePasscode('AAABBB');
+    const result = await validatePasscode('NOTFND');
 
-    expect(fetchMock).toHaveBeenCalledWith('/api/groups/validate?passcode=AAABBB');
+    expect(fetchMock).toHaveBeenCalledWith('/api/groups/validate?passcode=NOTFND');
     expect(result).toBeNull();
   });
 
@@ -119,8 +110,7 @@ describe('API Client tests', () => {
   });
 
   it('validatePasscode throws error on !res.ok', async () => {
-    const fetchMock = vi.fn().mockResolvedValue({ ok: false, status: 500 });
-    vi.stubGlobal('fetch', fetchMock);
+    vi.spyOn(apiClient, 'fetchSecureData').mockResolvedValue({ ok: false, status: 500 });
     await expect(validatePasscode('AAABBB')).rejects.toThrow('Passcode validation failed: 500');
   });
 });

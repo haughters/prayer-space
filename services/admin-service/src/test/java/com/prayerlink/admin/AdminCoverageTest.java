@@ -84,7 +84,6 @@ public class AdminCoverageTest {
         AppConfig appConfig = new AppConfig();
         PasswordEncoder encoder = appConfig.passwordEncoder();
         assertNotNull(encoder);
-        assertNotNull(appConfig.restTemplate());
 
         DynamoDbConfig dbConfig = new DynamoDbConfig();
         DynamoDbClient mockClient = mock(DynamoDbClient.class);
@@ -94,10 +93,17 @@ public class AdminCoverageTest {
 
     @Test
     void testApplicationMain() {
+        System.setProperty("aws.accessKeyId", "dummy");
+        System.setProperty("aws.secretAccessKey", "dummy");
+        System.setProperty("aws.region", "eu-west-1");
         try {
-            AdminApplication.main(new String[]{"--server.port=0"});
+            AdminApplication.main(new String[]{"--server.port=0", "--spring.profiles.active=local"});
         } catch (Throwable e) {
             // expected
+        } finally {
+            System.clearProperty("aws.accessKeyId");
+            System.clearProperty("aws.secretAccessKey");
+            System.clearProperty("aws.region");
         }
         try {
             StreamLambdaHandler handler = new StreamLambdaHandler();

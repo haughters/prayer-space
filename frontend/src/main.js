@@ -1,5 +1,8 @@
+import './shared/apiClient.js';
 import './styles/home.css';
 import { Html5Qrcode } from 'html5-qrcode';
+
+console.log("Prayer Link Client Version:", __APP_VERSION__);
 
 const CONFIG = {
     acronyms: ["Let", "Us"],

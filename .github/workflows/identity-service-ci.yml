@@ -18,13 +18,21 @@ on:
       - 'services/identity-service/**'
 
 permissions:
+  id-token: write
   contents: read
-  code-quality: write
   pull-requests: write
   packages: write
 
 jobs:
   run:
     uses: ./.github/workflows/service-workflow.yml
+    permissions:
+      id-token: write
+      contents: read
+      pull-requests: write
+      packages: write
+
+    secrets: inherit
+
     with:
       service: identity-service

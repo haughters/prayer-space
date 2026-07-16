@@ -3,7 +3,6 @@ package com.prayerlink.prayer;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-import com.prayerlink.prayer.config.RestTemplateConfig;
 import com.prayerlink.prayer.config.EventBridgeConfig;
 import com.prayerlink.prayer.config.DynamoDbConfig;
 import com.prayerlink.prayer.model.Prayer;
@@ -61,9 +60,6 @@ public class PrayerCoverageTest {
 
     @Test
     void testConfigs() {
-        RestTemplateConfig restConfig = new RestTemplateConfig();
-        assertNotNull(restConfig.restTemplate());
-
         EventBridgeConfig ebConfig = new EventBridgeConfig();
         try {
             assertNotNull(ebConfig.eventBridgeClient());
@@ -79,10 +75,17 @@ public class PrayerCoverageTest {
 
     @Test
     void testApplicationMain() {
+        System.setProperty("aws.accessKeyId", "dummy");
+        System.setProperty("aws.secretAccessKey", "dummy");
+        System.setProperty("aws.region", "eu-west-1");
         try {
-            PrayerApplication.main(new String[]{"--server.port=0"});
+            PrayerApplication.main(new String[]{"--server.port=0", "--spring.profiles.active=local"});
         } catch (Throwable e) {
             // expected
+        } finally {
+            System.clearProperty("aws.accessKeyId");
+            System.clearProperty("aws.secretAccessKey");
+            System.clearProperty("aws.region");
         }
         try {
             StreamLambdaHandler handler = new StreamLambdaHandler();

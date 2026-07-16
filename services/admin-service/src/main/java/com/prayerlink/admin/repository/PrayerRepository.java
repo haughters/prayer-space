@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.stereotype.Repository;
+import org.springframework.aot.hint.annotation.RegisterReflectionForBinding;
 import software.amazon.awssdk.enhanced.dynamodb.DynamoDbEnhancedClient;
 import software.amazon.awssdk.enhanced.dynamodb.DynamoDbIndex;
 import software.amazon.awssdk.enhanced.dynamodb.DynamoDbTable;
@@ -14,15 +15,18 @@ import software.amazon.awssdk.enhanced.dynamodb.TableSchema;
 import software.amazon.awssdk.enhanced.dynamodb.model.Page;
 import software.amazon.awssdk.enhanced.dynamodb.model.QueryConditional;
 
+import com.prayerlink.common.config.TableNameResolver;
+
 @Repository
+@RegisterReflectionForBinding({PrayerUpdate.class, Prayer.class})
 public class PrayerRepository {
   private final DynamoDbTable<Prayer> table;
   private final DynamoDbTable<PrayerUpdate> updatesTable;
   private final DynamoDbIndex<Prayer> groupIdIndex;
 
-  public PrayerRepository(DynamoDbEnhancedClient enhancedClient) {
-    this.table = enhancedClient.table("Prayers", TableSchema.fromBean(Prayer.class));
-    this.updatesTable = enhancedClient.table("PrayerUpdates", TableSchema.fromBean(PrayerUpdate.class));
+  public PrayerRepository(DynamoDbEnhancedClient enhancedClient, TableNameResolver tableNameResolver) {
+    this.table = enhancedClient.table(tableNameResolver.resolve("Prayers"), Prayer.SCHEMA);
+    this.updatesTable = enhancedClient.table(tableNameResolver.resolve("PrayerUpdates"), PrayerUpdate.SCHEMA);
     this.groupIdIndex = this.table.index("GroupIdIndex");
   }
 

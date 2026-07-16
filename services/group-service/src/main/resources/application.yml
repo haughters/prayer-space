@@ -4,10 +4,11 @@ server:
 spring:
   application:
     name: group-service
-  profiles:
-    active: local
 
 management:
+  health:
+    diskspace:
+      enabled: false
   endpoints:
     web:
       exposure:
@@ -24,7 +25,9 @@ spring:
 aws:
   dynamodb:
     endpoint: http://localhost:8000
-    region: us-east-1
+    region: eu-west-1
   eventbridge:
     endpoint: http://localhost:4566
-    region: us-east-1
+    region: eu-west-1
+    bus: prayer-link-bus
+

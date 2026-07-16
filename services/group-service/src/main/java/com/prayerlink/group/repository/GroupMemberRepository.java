@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.stereotype.Repository;
+import org.springframework.aot.hint.annotation.RegisterReflectionForBinding;
 import software.amazon.awssdk.enhanced.dynamodb.DynamoDbEnhancedClient;
 import software.amazon.awssdk.enhanced.dynamodb.DynamoDbIndex;
 import software.amazon.awssdk.enhanced.dynamodb.DynamoDbTable;
@@ -12,13 +13,16 @@ import software.amazon.awssdk.enhanced.dynamodb.TableSchema;
 import software.amazon.awssdk.enhanced.dynamodb.model.Page;
 import software.amazon.awssdk.enhanced.dynamodb.model.QueryConditional;
 
+import com.prayerlink.common.config.TableNameResolver;
+
 @Repository
+@RegisterReflectionForBinding({GroupMember.class})
 public class GroupMemberRepository {
   private final DynamoDbTable<GroupMember> table;
   private final DynamoDbIndex<GroupMember> emailIndex;
 
-  public GroupMemberRepository(DynamoDbEnhancedClient enhancedClient) {
-    this.table = enhancedClient.table("GroupMembers", TableSchema.fromBean(GroupMember.class));
+  public GroupMemberRepository(DynamoDbEnhancedClient enhancedClient, TableNameResolver tableNameResolver) {
+    this.table = enhancedClient.table(tableNameResolver.resolve("GroupMembers"), GroupMember.SCHEMA);
     this.emailIndex = this.table.index("EmailIndex");
   }
 

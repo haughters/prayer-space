@@ -17,7 +17,7 @@ public class DynamoDbConfig {
   @Value("${aws.dynamodb.endpoint:#{null}}")
   private String endpoint;
 
-  @Value("${aws.dynamodb.region:us-east-1}")
+  @Value("${aws.dynamodb.region:eu-west-1}")
   private String region;
 
   @Bean
