@@ -111,8 +111,26 @@ if (typeof window !== 'undefined' && typeof window.vitest === 'undefined' && !wi
         }
       }
 
-      // Only intercept relative /api/ calls
+      // Only intercept relative /api/ calls. Avoid infinite recursion when aws4fetch sends signed Requests.
+      let shouldIntercept = false;
       if (typeof path === 'string' && path.startsWith('/api/')) {
+        // If the original input was a full absolute URL, make sure we only intercept our own relative calls
+        if (typeof input === 'string') {
+          shouldIntercept = input.startsWith('/api/');
+        } else if (input instanceof Request) {
+          try {
+            // aws4fetch converts the URL to absolute AWS endpoint, we MUST NOT intercept it
+            const parsedUrl = new URL(input.url);
+            shouldIntercept = parsedUrl.origin === window.location.origin && parsedUrl.pathname.startsWith('/api/');
+          } catch(e) {
+            shouldIntercept = false;
+          }
+        } else if (input instanceof URL) {
+          shouldIntercept = input.origin === window.location.origin && input.pathname.startsWith('/api/');
+        }
+      }
+
+      if (shouldIntercept) {
         // If the input was a Request object, extract its properties
         if (input instanceof Request) {
           init = {
