@@ -5,7 +5,6 @@ spring:
   application:
     name: prayer-service
   profiles:
-    active: local
 
 management:
   health:

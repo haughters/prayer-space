@@ -5,7 +5,6 @@ spring:
   application:
     name: group-service
   profiles:
-    active: local
 
 management:
   health:
