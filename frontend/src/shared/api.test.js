@@ -62,7 +62,7 @@ describe('API Client tests', () => {
     expect(fetchMock).toHaveBeenCalledWith('/api/prayers', {
       method: 'POST',
       body: JSON.stringify({
-        text: 'This is a long prayer text of 10+ chars',
+        prayerText: 'This is a long prayer text of 10+ chars',
         deviceId: 'device-123',
         groupId: 'group-456',
       }),

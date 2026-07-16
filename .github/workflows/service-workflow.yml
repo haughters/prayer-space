@@ -70,6 +70,7 @@ jobs:
 
   deploy:
     needs: build-and-test
+    if: github.actor != 'dependabot[bot]'
     runs-on: ubuntu-24.04
     environment:
       name: ${{ github.event_name == 'pull_request' && format('pr-{0}-{1}', github.event.pull_request.number, inputs.service) || format('test-{0}', inputs.service) }}
@@ -254,6 +255,10 @@ jobs:
             --environment "Variables={${ENV_VARS}}"
 
           aws lambda wait function-updated --function-name "$FUNC_NAME"
+
+          if [ "$ENV_PREFIX" = "test" ]; then
+            aws lambda update-alias --function-name "$FUNC_NAME" --name live --function-version \$LATEST
+          fi
 
       - name: Resolve Service URL
         if: inputs.has-url

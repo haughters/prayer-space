@@ -21,7 +21,7 @@ export async function submitPrayer(text, deviceId, groupId = null) {
   if (!text || text.trim().length < 10) {
     throw new Error("Prayer text must be at least 10 characters long");
   }
-  const payload = { text, deviceId };
+  const payload = { prayerText: text, deviceId };
   if (groupId) {
     payload.groupId = groupId;
   }

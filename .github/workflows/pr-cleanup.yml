@@ -47,3 +47,17 @@ jobs:
             echo "Cleaning up S3 frontend folder: s3://${FRONTEND_BUCKET}/pr-${PR_NUM}"
             aws s3 rm "s3://${FRONTEND_BUCKET}/pr-${PR_NUM}" --recursive
           fi
+
+      - name: Delete GitHub Environments
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          PR_NUM=${{ github.event.pull_request.number }}
+          for env in "pr-${PR_NUM}-frontend" "pr-${PR_NUM}-identity-service" "pr-${PR_NUM}-prayer-service" "pr-${PR_NUM}-group-service" "pr-${PR_NUM}-admin-service" "pr-${PR_NUM}-notification-service"; do
+            echo "Deleting GitHub Environment: $env"
+            gh api \
+              --method DELETE \
+              -H "Accept: application/vnd.github+json" \
+              -H "X-GitHub-Api-Version: 2022-11-28" \
+              /repos/${{ github.repository }}/environments/$env || echo "Environment $env not found or could not be deleted"
+          done
