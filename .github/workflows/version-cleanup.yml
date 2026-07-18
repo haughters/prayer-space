@@ -1,0 +1,44 @@
+name: Lambda Version Cleanup
+
+on:
+  schedule:
+    - cron: '0 3 1 * *'
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
+          aws-region: eu-west-1
+
+      - name: Delete old Lambda versions
+        run: |
+          SERVICES="prayer-service identity-service group-service admin-service notification-service"
+          ENVS="test live"
+          KEEP=5
+
+          for env in $ENVS; do
+            for svc in $SERVICES; do
+              FUNC="${env}-${svc}"
+              ALIAS_VER=$(aws lambda get-alias --function-name "$FUNC" --name stable --query 'FunctionVersion' --output text 2>/dev/null || echo "0")
+              VERSIONS=$(aws lambda list-versions-by-function --function-name "$FUNC" --query "Versions[?Version!='\$LATEST'].Version" --output text | tr '\t' '\n' | sort -n)
+              TOTAL=$(echo "$VERSIONS" | grep -c . || echo 0)
+
+              if [ "$TOTAL" -le "$KEEP" ]; then continue; fi
+
+              DELETE_COUNT=$((TOTAL - KEEP))
+              TO_DELETE=$(echo "$VERSIONS" | head -n "$DELETE_COUNT")
+
+              for ver in $TO_DELETE; do
+                if [ "$ver" = "$ALIAS_VER" ]; then continue; fi
+                aws lambda delete-function --function-name "$FUNC" --qualifier "$ver" || true
+              done
+            done
+          done

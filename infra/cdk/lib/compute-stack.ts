@@ -66,8 +66,8 @@ export class ComputeStack extends cdk.Stack {
 
       const version = fn.currentVersion;
 
-      const alias = new lambda.Alias(this, `${name}LiveAlias`, {
-        aliasName: 'live',
+      const alias = new lambda.Alias(this, `${name}StableAlias`, {
+        aliasName: 'stable',
         version,
       });
 
@@ -76,7 +76,7 @@ export class ComputeStack extends cdk.Stack {
         functionUrl = alias.addFunctionUrl({
           authType: lambda.FunctionUrlAuthType.AWS_IAM,
           cors: {
-            allowedOrigins: ['*'], // The frontend will hit this from S3/localhost
+            allowedOrigins: ['*'],
             allowedMethods: [lambda.HttpMethod.ALL],
             allowedHeaders: ['*'],
           },
