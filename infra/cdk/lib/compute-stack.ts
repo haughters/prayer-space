@@ -160,11 +160,13 @@ export class ComputeStack extends cdk.Stack {
 
     // Grant inter-service Lambda invocation permissions
     // Each service needs both InvokeFunctionUrl and InvokeFunction on the services it calls.
+    // Use alias.functionArn (not fn.functionArn) because Function URLs are attached to the
+    // :stable alias, and AWS IAM treats qualified/unqualified ARNs as different resources.
     // group-service is called by: identity, prayer, admin, notification
     [identitySvc, prayerSvc, adminSvc, notificationSvc].forEach(svc => {
       svc.fn.addToRolePolicy(new iam.PolicyStatement({
         actions: ['lambda:InvokeFunctionUrl', 'lambda:InvokeFunction'],
-        resources: [groupSvc.fn.functionArn],
+        resources: [groupSvc.alias.functionArn],
       }));
     });
 
@@ -172,7 +174,7 @@ export class ComputeStack extends cdk.Stack {
     [adminSvc, notificationSvc].forEach(svc => {
       svc.fn.addToRolePolicy(new iam.PolicyStatement({
         actions: ['lambda:InvokeFunctionUrl', 'lambda:InvokeFunction'],
-        resources: [prayerSvc.fn.functionArn],
+        resources: [prayerSvc.alias.functionArn],
       }));
     });
 
