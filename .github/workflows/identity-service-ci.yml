@@ -36,3 +36,7 @@ jobs:
 
     with:
       service: identity-service
+      smoke-test-path: '/api/identity/register'
+      smoke-test-method: 'POST'
+      smoke-test-expected-status: '400'
+      smoke-test-body: '{}'

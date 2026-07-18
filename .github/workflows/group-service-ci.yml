@@ -36,3 +36,6 @@ jobs:
 
     with:
       service: group-service
+      smoke-test-path: '/api/groups/validate?passcode=a'
+      smoke-test-method: 'GET'
+      smoke-test-expected-status: '400'

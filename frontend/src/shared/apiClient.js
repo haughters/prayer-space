@@ -79,12 +79,25 @@ export async function fetchSecureData(path, options = {}) {
   // Base URL from CDK already has a trailing slash usually, but URL constructor handles it
   const url = new URL(path, baseUrl).toString();
 
+  const headers = {
+    'Content-Type': 'application/json',
+    ...options.headers
+  };
+
+  const authToken = localStorage.getItem('pl-auth-token');
+  if (authToken) {
+    headers['X-Auth-Token'] = authToken;
+  }
+  
+  const deviceId = localStorage.getItem('pl-device-id');
+  if (deviceId) {
+    headers['X-Device-Id'] = deviceId;
+  }
+
   const response = await aws.fetch(url, {
     ...options,
-    headers: {
-      'Content-Type': 'application/json',
-      ...options.headers
-    }
+    credentials: 'omit', // Force omit credentials for SigV4 cross-origin requests to allow wildcard CORS origin responses
+    headers
   });
 
   return response;

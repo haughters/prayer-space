@@ -154,6 +154,7 @@ public class AuthController {
         respBody.put("role", admin.getRole());
         respBody.put("groupId", admin.getGroupId() != null ? admin.getGroupId() : "");
         respBody.put("username", admin.getUsername());
+        respBody.put("token", token);
         return ResponseEntity.ok(respBody);
       }
     }
@@ -170,6 +171,7 @@ public class AuthController {
         respBody.put("role", "INTERCESSOR");
         respBody.put("email", intercessor.getEmail());
         respBody.put("name", intercessor.getName());
+        respBody.put("token", token);
         return ResponseEntity.ok(respBody);
       }
     }

@@ -111,6 +111,37 @@
             <a href="#login" id="go-to-login" style="color: var(--color-accent); font-weight: 500; text-decoration: none; margin-left: var(--space-1);">Log In</a>
           </div>
         </section>
+
+        <!-- 1. Setup Admin Account Form (First-time setup only) -->
+        <section class="card" id="setup-view" style="border-radius: var(--radius-md); padding: var(--space-8); display: none;">
+          <h2 class="font-display mb-2 text-center" style="font-size: var(--font-size-xl);">Platform Setup</h2>
+          <p class="color-text-secondary text-center mb-6" style="font-size: var(--font-size-sm);">
+            Create the initial application administrator account to get started.
+          </p>
+          <form id="admin-setup-form" class="flex flex-col gap-4">
+            <div class="flex flex-col gap-1">
+              <label for="setup-username" style="font-size: var(--font-size-sm); font-weight: 500;">Username *</label>
+              <input type="text" id="setup-username" class="input" placeholder="Alphanumeric + underscores" required minlength="3" maxlength="50" pattern="^[a-zA-Z0-9_]+$" />
+            </div>
+            <div class="flex flex-col gap-1">
+              <label for="setup-password" style="font-size: var(--font-size-sm); font-weight: 500;">Password *</label>
+              <div style="position: relative; display: flex; align-items: center">
+                <input type="password" id="setup-password" class="input" placeholder="Minimum 8 characters" required minlength="8" style="width: 100%" />
+                <button type="button" class="btn-toggle-password" aria-label="Toggle Password Visibility">
+                  <svg class="icon-eye" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width: 20px; height: 20px; display: block;"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                  <svg class="icon-eye-off" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width: 20px; height: 20px; display: none;"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>
+                </button>
+              </div>
+            </div>
+            <div class="flex flex-col gap-1">
+              <label for="setup-confirm-password" style="font-size: var(--font-size-sm); font-weight: 500;">Confirm Password *</label>
+              <input type="password" id="setup-confirm-password" class="input" placeholder="Re-type password" required minlength="8" />
+            </div>
+            <button class="btn-primary w-full mt-2" type="submit" id="btn-setup-submit" style="min-height: 44px;">
+              Initialize Admin
+            </button>
+          </form>
+        </section>
       </div>
     </main>
 
@@ -151,65 +182,6 @@
 
       <!-- Main Content Area -->
       <main class="admin-content" id="admin-content-view">
-        <!-- 1. Setup Admin Account Form (First-time setup only) -->
-        <section id="setup-view" style="display: none">
-          <div class="card content-narrow" style="margin: 10vh auto 0">
-            <h2 class="font-display text-center mb-2" style="font-size: var(--font-size-xl)">
-              Platform Setup
-            </h2>
-            <p class="color-text-secondary text-center mb-6" style="font-size: var(--font-size-sm)">
-              Create the initial application administrator account to get started.
-            </p>
-            <form id="admin-setup-form">
-              <div class="admin-form-group">
-                <label class="admin-form-label" for="setup-username">Username *</label>
-                <input
-                  class="input"
-                  type="text"
-                  id="setup-username"
-                  required
-                  placeholder="Alphanumeric + underscores"
-                  minlength="3"
-                  maxlength="50"
-                  pattern="^[a-zA-Z0-9_]+$"
-                />
-              </div>
-              <div class="admin-form-group">
-                <label class="admin-form-label" for="setup-password">Password *</label>
-                <div style="position: relative; display: flex; align-items: center">
-                  <input
-                    class="input"
-                    type="password"
-                    id="setup-password"
-                    required
-                    placeholder="Minimum 8 characters"
-                    minlength="8"
-                    style="width: 100%"
-                  />
-                  <button type="button" class="btn-toggle-password" aria-label="Toggle Password Visibility">
-                    <svg class="icon-eye" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width: 20px; height: 20px; display: block;"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
-                    <svg class="icon-eye-off" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width: 20px; height: 20px; display: none;"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>
-                  </button>
-                </div>
-              </div>
-              <div class="admin-form-group">
-                <label class="admin-form-label" for="setup-confirm-password">Confirm Password *</label>
-                <input
-                  class="input"
-                  type="password"
-                  id="setup-confirm-password"
-                  required
-                  placeholder="Re-type password"
-                  minlength="8"
-                />
-              </div>
-              <button class="btn-primary w-full mt-4" type="submit" id="btn-setup-submit">
-                Initialize Admin
-              </button>
-            </form>
-          </div>
-        </section>
-
         <!-- 2. Prayers Dashboard View -->
         <section id="dashboard-view" style="display: none">
           <h2 class="font-display mb-2" style="font-size: var(--font-size-2xl)">
