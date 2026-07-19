@@ -57,8 +57,13 @@ jobs:
 
       - name: Build Native Lambda Zip
         run: |
+          OPTIMIZE_FLAG="-Dnative.build.optimize=-Os"
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            OPTIMIZE_FLAG="-Dnative.build.optimize=-Ob"
+          fi
+          
           # Build the native executable
-          mvn package -P lambda -pl :${{ inputs.service }} -DskipTests -Dspring.profiles.active=default --batch-mode
+          mvn package -P lambda -pl :${{ inputs.service }} -DskipTests -Dspring.profiles.active=default $OPTIMIZE_FLAG --batch-mode
         working-directory: services
 
       - name: Upload Lambda Zip Artifact

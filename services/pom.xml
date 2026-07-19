@@ -34,6 +34,7 @@
         <maven-compiler-plugin.version>3.15.0</maven-compiler-plugin.version>
         <jacoco-maven-plugin.version>0.8.15</jacoco-maven-plugin.version>
         <skip.native.build>true</skip.native.build>
+        <native.build.optimize>-Os</native.build.optimize>
     </properties>
 
     <dependencyManagement>
@@ -226,8 +227,9 @@
                             <imageName>bootstrap</imageName>
                             <skip>${skip.native.build}</skip>
                             <buildArgs>
-                                <buildArg>-Os</buildArg>
+                                <buildArg>${native.build.optimize}</buildArg>
                                 <buildArg>-H:-InstallExitHandlers</buildArg>
+                                <buildArg>-J-Xmx6g</buildArg>
                             </buildArgs>
                         </configuration>
                         <executions>
