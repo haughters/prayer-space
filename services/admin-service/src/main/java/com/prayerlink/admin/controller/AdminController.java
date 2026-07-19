@@ -124,7 +124,7 @@ public class AdminController {
     setJwtCookie(response, token);
 
     return ResponseEntity.status(HttpStatus.CREATED)
-        .body(Map.of("role", admin.getRole(), "groupId", ""));
+        .body(Map.of("role", admin.getRole(), "groupId", "", "token", token));
   }
 
   @PostMapping("/login")
@@ -151,6 +151,7 @@ public class AdminController {
     respBody.put("role", admin.getRole());
     respBody.put("groupId", admin.getGroupId() != null ? admin.getGroupId() : "");
     respBody.put("username", admin.getUsername());
+    respBody.put("token", token);
     return ResponseEntity.ok(respBody);
   }
 

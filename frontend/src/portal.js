@@ -125,31 +125,29 @@ function showAuthCard(cardType) {
   const adminRoot = document.getElementById('admin-root');
   const authContainer = document.getElementById('auth-container');
 
+  authContainer.style.display = 'flex';
+  adminRoot.style.display = 'none';
+
+  loginCard.style.display = 'none';
+  registerCard.style.display = 'none';
+  if (setupView) setupView.style.display = 'none';
+
   if (cardType === 'setup') {
-    authContainer.style.display = 'none';
-    adminRoot.style.display = 'block';
-    navigateToAdminView('setup-view');
-  } else {
-    authContainer.style.display = 'flex';
-    adminRoot.style.display = 'none';
+    if (setupView) setupView.style.display = 'block';
+  } else if (cardType === 'register') {
+    registerCard.style.display = 'block';
 
-    if (cardType === 'register') {
-      loginCard.style.display = 'none';
-      registerCard.style.display = 'block';
-
-      // Parse email param if register?email=...
-      const hash = window.location.hash || '';
-      const pathAndQuery = hash.split('?');
-      const queryString = pathAndQuery[1] || '';
-      const urlParams = new URLSearchParams(queryString);
-      const emailParam = urlParams.get('email');
-      if (emailParam) {
-        document.getElementById('register-email').value = emailParam;
-      }
-    } else {
-      loginCard.style.display = 'block';
-      registerCard.style.display = 'none';
+    // Parse email param if register?email=...
+    const hash = window.location.hash || '';
+    const pathAndQuery = hash.split('?');
+    const queryString = pathAndQuery[1] || '';
+    const urlParams = new URLSearchParams(queryString);
+    const emailParam = urlParams.get('email');
+    if (emailParam) {
+      document.getElementById('register-email').value = emailParam;
     }
+  } else {
+    loginCard.style.display = 'block';
   }
 }
 
@@ -922,6 +920,8 @@ function setupGlobalListeners() {
         });
 
         if (res.status === 201 || res.ok) {
+          const data = await res.json();
+          if (data.token) localStorage.setItem('pl-auth-token', data.token);
           showToast('Platform initialized successfully!', 'success');
           await checkAuthStatus();
           window.location.hash = '#dashboard';
@@ -961,6 +961,7 @@ function setupGlobalListeners() {
 
         if (res.ok) {
           const data = await res.json();
+          if (data.token) localStorage.setItem('pl-auth-token', data.token);
           showToast(`Welcome back, ${data.name || data.username}!`, 'success');
           await checkAuthStatus();
           window.location.hash = '#dashboard';
@@ -1356,6 +1357,7 @@ function setupGlobalListeners() {
 async function handleLogout() {
   try {
     await fetch('/api/auth/logout', { method: 'POST' });
+    localStorage.removeItem('pl-auth-token');
     showToast('Signed out successfully.', 'info');
   } catch (e) {
     console.error('Logout error:', e);

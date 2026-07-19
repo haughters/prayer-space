@@ -4,8 +4,6 @@ server:
 spring:
   application:
     name: notification-service
-  profiles:
-    active: local
 
 management:
   health:

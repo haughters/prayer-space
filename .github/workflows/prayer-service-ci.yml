@@ -38,3 +38,6 @@ jobs:
 
     with:
       service: prayer-service
+      smoke-test-path: '/api/prayers?deviceId=smoke-test-device'
+      smoke-test-method: 'GET'
+      smoke-test-expected-status: '200'

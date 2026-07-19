@@ -27,6 +27,7 @@ concurrency:
 
 jobs:
   deploy:
+    if: github.actor != 'dependabot[bot]'
     runs-on: ubuntu-latest
     environment: ${{ github.event_name == 'pull_request' && format('pr-{0}-infra', github.event.pull_request.number) || inputs.environment || 'test-infra' }}
     permissions:
@@ -50,10 +51,20 @@ jobs:
           npm run build
         working-directory: infra/cdk
 
-      - name: Deploy Infrastructure
+      - name: Deploy Test Infrastructure
+        if: github.event_name != 'workflow_dispatch' || inputs.environment == 'test'
         run: |
           npx cdk deploy --all \
             --require-approval never \
-            -c deployEnv=${{ inputs.environment || 'test' }} \
+            -c deployEnv=test \
+            -c gitSha=${{ github.sha }}
+        working-directory: infra/cdk
+
+      - name: Deploy Live Infrastructure
+        if: github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && inputs.environment == 'live')
+        run: |
+          npx cdk deploy --all \
+            --require-approval never \
+            -c deployEnv=live \
             -c gitSha=${{ github.sha }}
         working-directory: infra/cdk

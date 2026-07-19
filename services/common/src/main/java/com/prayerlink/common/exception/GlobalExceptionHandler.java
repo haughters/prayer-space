@@ -26,7 +26,7 @@ public class GlobalExceptionHandler {
   @ExceptionHandler(HttpMessageNotReadableException.class)
   public ResponseEntity<ErrorResponse> handleMessageNotReadable(
       HttpMessageNotReadableException ex, WebRequest request) {
-    return buildErrorResponse(HttpStatus.BAD_REQUEST, "Malformed request body", request);
+    return buildErrorResponse(HttpStatus.BAD_REQUEST, "Malformed request body: " + ex.getMessage(), request);
   }
 
   @ExceptionHandler(ConstraintViolationException.class)

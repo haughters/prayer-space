@@ -36,3 +36,7 @@ jobs:
 
     with:
       service: admin-service
+      smoke-test-path: '/api/auth/login'
+      smoke-test-method: 'POST'
+      smoke-test-expected-status: '400'
+      smoke-test-body: '{}'

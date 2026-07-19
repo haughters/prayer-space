@@ -4,8 +4,13 @@ server:
 spring:
   application:
     name: admin-service
-  profiles:
-    active: local
+
+services:
+  group-service:
+    url: http://localhost:8083
+  prayer-service:
+    url: http://localhost:8082
+
 
 services:
   group-service:

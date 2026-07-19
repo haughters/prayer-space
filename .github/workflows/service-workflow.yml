@@ -9,6 +9,21 @@ on:
         required: false
         type: boolean
         default: true
+      smoke-test-path:
+        required: false
+        type: string
+      smoke-test-method:
+        required: false
+        type: string
+        default: 'GET'
+      smoke-test-expected-status:
+        required: false
+        type: string
+        default: '200'
+      smoke-test-body:
+        required: false
+        type: string
+        default: ''
 
 jobs:
   build-and-test:
@@ -61,7 +76,7 @@ jobs:
           if [ "${{ github.event_name }}" = "pull_request" ]; then
             OPTIMIZE_FLAG="-Dnative.build.optimize=-Ob"
           fi
-          
+
           # Build the native executable
           mvn package -P lambda -pl :${{ inputs.service }} -DskipTests -Dspring.profiles.active=default $OPTIMIZE_FLAG --batch-mode
         working-directory: services
@@ -73,8 +88,9 @@ jobs:
           path: services/${{ inputs.service }}/target/${{ inputs.service }}-lambda.zip
           retention-days: 7
 
-  deploy:
+  deploy-test:
     needs: build-and-test
+    if: github.actor != 'dependabot[bot]'
     runs-on: ubuntu-24.04
     environment:
       name: ${{ github.event_name == 'pull_request' && format('pr-{0}-{1}', github.event.pull_request.number, inputs.service) || format('test-{0}', inputs.service) }}
@@ -98,11 +114,8 @@ jobs:
           aws-region: eu-west-1
 
       - name: Resolve Environment
-        id: env
         run: |
           SVC="${{ inputs.service }}"
-          AWS_ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
-
           if [ "${{ github.event_name }}" = "pull_request" ]; then
             ENV_PREFIX="pr-${{ github.event.pull_request.number }}"
             PR_NUMBER="${{ github.event.pull_request.number }}"
@@ -110,180 +123,165 @@ jobs:
             ENV_PREFIX="test"
             PR_NUMBER=""
           fi
-
           FUNC_NAME="${ENV_PREFIX}-${SVC}"
 
           echo "SVC=$SVC" >> $GITHUB_ENV
-          echo "AWS_ACCOUNT_ID=$AWS_ACCOUNT_ID" >> $GITHUB_ENV
           echo "ENV_PREFIX=$ENV_PREFIX" >> $GITHUB_ENV
           echo "PR_NUMBER=$PR_NUMBER" >> $GITHUB_ENV
           echo "FUNC_NAME=$FUNC_NAME" >> $GITHUB_ENV
-          echo "TABLE_PREFIX=test-" >> $GITHUB_ENV
           echo "DEPLOY_ENV=test" >> $GITHUB_ENV
 
-      - name: Create or Update Lambda
+      - name: Deploy Code and Configuration
+        env:
+          HAS_URL: ${{ inputs.has-url }}
+          GITHUB_TOKEN: ${{ github.token }}
+        run: bash .github/scripts/deploy-lambda.sh
+
+      - name: Publish Version
+        if: env.PR_NUMBER == ''
         run: |
-          if aws lambda get-function --function-name "$FUNC_NAME" 2>/dev/null; then
-            echo "Updating existing function: $FUNC_NAME"
-            aws lambda update-function-code \
-              --function-name "$FUNC_NAME" \
-              --zip-file "fileb://artifact-dir/${SVC}-lambda.zip"
-          else
-            echo "Creating new function: $FUNC_NAME"
-            LAMBDA_ROLE=$(aws lambda get-function --function-name "test-${SVC}" --query 'Configuration.Role' --output text)
-            if [ -z "$LAMBDA_ROLE" ]; then
-              echo "::error::Could not find IAM role from test-${SVC}"
-              exit 1
-            fi
-
-            aws lambda create-function \
-              --function-name "$FUNC_NAME" \
-              --runtime provided.al2023 \
-              --handler bootstrap \
-              --role "$LAMBDA_ROLE" \
-              --zip-file "fileb://artifact-dir/${SVC}-lambda.zip" \
-              --memory-size 512 \
-              --timeout 30 \
-              --environment "Variables={SPRING_PROFILES_ACTIVE=default}"
-          fi
-
-          aws lambda wait function-updated --function-name "$FUNC_NAME"
-
-      - name: Configure Function URL
-        if: inputs.has-url && env.PR_NUMBER != ''
-        run: |
-          # Remove stale permission (may not exist — OK to fail)
-          aws lambda remove-permission \
+          VERSION=$(aws lambda publish-version \
             --function-name "$FUNC_NAME" \
-            --statement-id GithubActionsInvoke 2>/dev/null || true
-
-          # Grant the GitHub Actions role permission to invoke this Function URL
-          aws lambda add-permission \
+            --description "sha:${GITHUB_SHA::8} run:${GITHUB_RUN_NUMBER}" \
+            --query 'Version' --output text)
+          echo "Published version $VERSION for $FUNC_NAME"
+          echo "PUBLISHED_VERSION=$VERSION" >> $GITHUB_ENV
+          
+          PREV_VERSION=$(aws lambda get-alias \
             --function-name "$FUNC_NAME" \
-            --statement-id GithubActionsInvoke \
-            --action lambda:InvokeFunctionUrl \
-            --principal "arn:aws:iam::${AWS_ACCOUNT_ID}:role/GitHubActionsWorkflowDeployRole" \
-            --function-url-auth-type AWS_IAM || true
+            --name stable \
+            --query 'FunctionVersion' --output text 2>/dev/null || echo "")
+          echo "PREV_VERSION=$PREV_VERSION" >> $GITHUB_ENV
 
-          # Grant the Unauthenticated Cognito role permission to invoke this Function URL
-          UNAUTH_ROLE=$(aws iam list-roles --query "Roles[?contains(RoleName, 'GuestAccessPoolUnauthenti')].Arn" --output text | awk '{print $1}')
-          if [ -n "$UNAUTH_ROLE" ]; then
-            aws lambda add-permission \
-              --function-name "$FUNC_NAME" \
-              --statement-id CognitoInvoke \
-              --action lambda:InvokeFunctionUrl \
-              --principal "$UNAUTH_ROLE" \
-              --function-url-auth-type AWS_IAM || true
-          fi
+      - name: Smoke Test Version
+        if: env.PR_NUMBER == '' && inputs.has-url
+        env:
+          SMOKE_TEST_PATH: ${{ inputs.smoke-test-path }}
+          SMOKE_TEST_METHOD: ${{ inputs.smoke-test-method }}
+          SMOKE_TEST_EXPECTED_STATUS: ${{ inputs.smoke-test-expected-status }}
+          SMOKE_TEST_BODY: ${{ inputs.smoke-test-body }}
+        run: bash .github/scripts/smoke-test-version.sh
 
-          # Create or update the Function URL config
-          if aws lambda get-function-url-config --function-name "$FUNC_NAME" >/dev/null 2>&1; then
-            aws lambda update-function-url-config \
-              --function-name "$FUNC_NAME" \
-              --auth-type AWS_IAM
-          else
-            aws lambda create-function-url-config \
-              --function-name "$FUNC_NAME" \
-              --auth-type AWS_IAM
-          fi
-
-      - name: Resolve Service Dependencies
+      - name: Update Alias
+        if: env.PR_NUMBER == ''
         run: |
-          get_url() {
-            local dep=$1
-            local url=""
-
-            if [ -n "$PR_NUMBER" ]; then
-              CHANGED_FILES=$(curl -s -H "Authorization: Bearer ${{ github.token }}" \
-                "https://api.github.com/repos/${{ github.repository }}/pulls/${PR_NUMBER}/files?per_page=100" \
-                | jq -r '.[].filename' || echo "")
-
-              if echo "$CHANGED_FILES" | grep -q "^services/${dep}/"; then
-                echo "Waiting for parallel PR deployment of ${dep}..." >&2
-                for i in $(seq 1 40); do
-                  url=$(aws lambda get-function-url-config --function-name "pr-${PR_NUMBER}-${dep}" --query 'FunctionUrl' --output text 2>/dev/null || echo "")
-                  [ -n "$url" ] && break
-                  sleep 15
-                done
-              else
-                url=$(aws lambda get-function-url-config --function-name "pr-${PR_NUMBER}-${dep}" --query 'FunctionUrl' --output text 2>/dev/null || echo "")
-              fi
-            fi
-
-            if [ -z "$url" ]; then
-              url=$(aws lambda get-function-url-config --function-name "test-${dep}" --query 'FunctionUrl' --output text 2>/dev/null || echo "")
-            fi
-            echo "$url"
-          }
-
-          URL_GROUP_SERVICE=$(get_url "group-service")
-          [ -z "$URL_GROUP_SERVICE" ] && URL_GROUP_SERVICE="http://localhost"
-
-          URL_PRAYER_SERVICE=$(get_url "prayer-service")
-          [ -z "$URL_PRAYER_SERVICE" ] && URL_PRAYER_SERVICE="http://localhost"
-
-          echo "URL_GROUP_SERVICE=$URL_GROUP_SERVICE" >> $GITHUB_ENV
-          echo "URL_PRAYER_SERVICE=$URL_PRAYER_SERVICE" >> $GITHUB_ENV
-
-      - name: Configure Environment Variables
-        run: |
-          ENV_VARS="SPRING_PROFILES_ACTIVE=default"
-          ENV_VARS="${ENV_VARS},DEPLOY_ENV=${DEPLOY_ENV}"
-          ENV_VARS="${ENV_VARS},APP_TABLE_PREFIX=${TABLE_PREFIX}"
-          [ -n "$PR_NUMBER" ] && ENV_VARS="${ENV_VARS},PR_NUMBER=${PR_NUMBER}"
-
-          case "$SVC" in
-            prayer-service)
-              ENV_VARS="${ENV_VARS},AWS_EVENTBRIDGE_BUS_NAME=test-prayer-link-bus"
-              ENV_VARS="${ENV_VARS},SERVICES_GROUP_SERVICE_URL=${URL_GROUP_SERVICE}"
-              ;;
-            identity-service)
-              ENV_VARS="${ENV_VARS},SERVICES_GROUP_SERVICE_URL=${URL_GROUP_SERVICE}"
-              ;;
-            admin-service)
-              ENV_VARS="${ENV_VARS},SERVICES_GROUP_SERVICE_URL=${URL_GROUP_SERVICE}"
-              ENV_VARS="${ENV_VARS},SERVICES_PRAYER_SERVICE_URL=${URL_PRAYER_SERVICE}"
-              ;;
-            notification-service)
-              ENV_VARS="${ENV_VARS},AWS_SQS_QUEUE_URL=https://sqs.eu-west-1.amazonaws.com/${AWS_ACCOUNT_ID}/test-notification-queue"
-              ENV_VARS="${ENV_VARS},AWS_SQS_BOUNCE_QUEUE_URL=https://sqs.eu-west-1.amazonaws.com/${AWS_ACCOUNT_ID}/test-bounce-queue"
-              ENV_VARS="${ENV_VARS},AWS_SQS_NOTIFICATION_QUEUE=test-notification-queue"
-              ENV_VARS="${ENV_VARS},AWS_SQS_BOUNCE_QUEUE=test-bounce-queue"
-              ENV_VARS="${ENV_VARS},SERVICES_GROUP_SERVICE_URL=${URL_GROUP_SERVICE}"
-              ENV_VARS="${ENV_VARS},SERVICES_PRAYER_SERVICE_URL=${URL_PRAYER_SERVICE}"
-              ;;
-          esac
-
-          aws lambda update-function-configuration \
+          aws lambda update-alias \
             --function-name "$FUNC_NAME" \
-            --environment "Variables={${ENV_VARS}}"
-
-          aws lambda wait function-updated --function-name "$FUNC_NAME"
+            --name stable \
+            --function-version "$PUBLISHED_VERSION"
+          echo "Alias 'stable' updated to $PUBLISHED_VERSION"
 
       - name: Resolve Service URL
         if: inputs.has-url
         run: |
-          FINAL_URL=$(aws lambda get-function-url-config --function-name "$FUNC_NAME" --query 'FunctionUrl' --output text 2>/dev/null || echo "")
+          if [ -n "$PR_NUMBER" ]; then
+            FINAL_URL=$(aws lambda get-function-url-config --function-name "$FUNC_NAME" --query 'FunctionUrl' --output text 2>/dev/null || echo "")
+          else
+            FINAL_URL=$(aws lambda get-function-url-config --function-name "$FUNC_NAME" --qualifier stable --query 'FunctionUrl' --output text 2>/dev/null || echo "")
+          fi
           echo "SERVICE_URL=$FINAL_URL" >> $GITHUB_ENV
 
-      - name: Smoke Test
+      - name: Smoke Test URL
+        if: inputs.has-url
+        env:
+          SMOKE_TEST_PATH: ${{ inputs.smoke-test-path }}
+          SMOKE_TEST_METHOD: ${{ inputs.smoke-test-method }}
+          SMOKE_TEST_EXPECTED_STATUS: ${{ inputs.smoke-test-expected-status }}
+          SMOKE_TEST_BODY: ${{ inputs.smoke-test-body }}
+        run: bash .github/scripts/smoke-test-url.sh
+
+  deploy-live:
+    needs: deploy-test
+    if: github.actor != 'dependabot[bot]' && github.event_name == 'push'
+    runs-on: ubuntu-24.04
+    environment:
+      name: ${{ format('live-{0}', inputs.service) }}
+      url: ${{ env.SERVICE_URL }}
+    permissions:
+      id-token: write
+      contents: read
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Download Lambda Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ inputs.service }}-lambda-zip
+          path: artifact-dir
+
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
+          aws-region: eu-west-1
+
+      - name: Resolve Environment
+        run: |
+          SVC="${{ inputs.service }}"
+          ENV_PREFIX="live"
+          FUNC_NAME="${ENV_PREFIX}-${SVC}"
+
+          echo "SVC=$SVC" >> $GITHUB_ENV
+          echo "ENV_PREFIX=$ENV_PREFIX" >> $GITHUB_ENV
+          echo "PR_NUMBER=" >> $GITHUB_ENV
+          echo "FUNC_NAME=$FUNC_NAME" >> $GITHUB_ENV
+          echo "DEPLOY_ENV=live" >> $GITHUB_ENV
+
+      - name: Deploy Code and Configuration
+        env:
+          HAS_URL: ${{ inputs.has-url }}
+          GITHUB_TOKEN: ${{ github.token }}
+        run: bash .github/scripts/deploy-lambda.sh
+
+      - name: Publish Version
+        if: env.PR_NUMBER == ''
+        run: |
+          VERSION=$(aws lambda publish-version \
+            --function-name "$FUNC_NAME" \
+            --description "sha:${GITHUB_SHA::8} run:${GITHUB_RUN_NUMBER}" \
+            --query 'Version' --output text)
+          echo "Published version $VERSION for $FUNC_NAME"
+          echo "PUBLISHED_VERSION=$VERSION" >> $GITHUB_ENV
+          
+          PREV_VERSION=$(aws lambda get-alias \
+            --function-name "$FUNC_NAME" \
+            --name stable \
+            --query 'FunctionVersion' --output text 2>/dev/null || echo "")
+          echo "PREV_VERSION=$PREV_VERSION" >> $GITHUB_ENV
+
+      - name: Smoke Test Version
+        if: env.PR_NUMBER == '' && inputs.has-url
+        env:
+          SMOKE_TEST_PATH: ${{ inputs.smoke-test-path }}
+          SMOKE_TEST_METHOD: ${{ inputs.smoke-test-method }}
+          SMOKE_TEST_EXPECTED_STATUS: ${{ inputs.smoke-test-expected-status }}
+          SMOKE_TEST_BODY: ${{ inputs.smoke-test-body }}
+        run: bash .github/scripts/smoke-test-version.sh
+
+      - name: Update Alias
+        if: env.PR_NUMBER == ''
+        run: |
+          aws lambda update-alias \
+            --function-name "$FUNC_NAME" \
+            --name stable \
+            --function-version "$PUBLISHED_VERSION"
+          echo "Alias 'stable' updated to $PUBLISHED_VERSION"
+
+      - name: Resolve Service URL
         if: inputs.has-url
         run: |
-          if [ -z "$SERVICE_URL" ] || [ "$SERVICE_URL" = "None" ]; then
-            echo "No Function URL exposed for ${SVC}, skipping smoke test."
-            exit 0
-          fi
-
-          echo "Testing ${SERVICE_URL}actuator/health"
-          STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
-            --aws-sigv4 "aws:amz:${AWS_REGION}:lambda" \
-            --user "$AWS_ACCESS_KEY_ID:$AWS_SECRET_ACCESS_KEY" \
-            -H "x-amz-security-token:$AWS_SESSION_TOKEN" \
-            "${SERVICE_URL}actuator/health")
-
-          if [ "$STATUS" = "200" ]; then
-            echo "✅ Smoke test passed (HTTP $STATUS)"
+          if [ -n "$PR_NUMBER" ]; then
+            FINAL_URL=$(aws lambda get-function-url-config --function-name "$FUNC_NAME" --query 'FunctionUrl' --output text 2>/dev/null || echo "")
           else
-            echo "❌ Smoke test failed (HTTP $STATUS)"
-            exit 1
+            FINAL_URL=$(aws lambda get-function-url-config --function-name "$FUNC_NAME" --qualifier stable --query 'FunctionUrl' --output text 2>/dev/null || echo "")
           fi
+          echo "SERVICE_URL=$FINAL_URL" >> $GITHUB_ENV
+
+      - name: Smoke Test URL
+        if: inputs.has-url
+        env:
+          SMOKE_TEST_PATH: ${{ inputs.smoke-test-path }}
+          SMOKE_TEST_METHOD: ${{ inputs.smoke-test-method }}
+          SMOKE_TEST_EXPECTED_STATUS: ${{ inputs.smoke-test-expected-status }}
+          SMOKE_TEST_BODY: ${{ inputs.smoke-test-body }}
+        run: bash .github/scripts/smoke-test-url.sh
