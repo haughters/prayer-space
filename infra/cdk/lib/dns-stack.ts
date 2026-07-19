@@ -129,7 +129,7 @@ export class DnsStack extends cdk.Stack {
     const githubActionsRole = iam.Role.fromRoleName(this, 'GitHubActionsRole', 'GitHubActionsWorkflowDeployRole');
 
     const deployPolicy = new iam.Policy(this, 'GitHubActionsDeployPolicy', {
-      policyName: 'GitHubActionsDeployPolicy',
+      policyName: `${props.deployEnv}-GitHubActionsDeployPolicy`,
       statements: [
         new iam.PolicyStatement({
           actions: [
