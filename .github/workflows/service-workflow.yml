@@ -98,7 +98,7 @@ jobs:
       - uses: actions/checkout@v7
 
       - name: Download Lambda Artifact
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: ${{ inputs.service }}-lambda-zip
           path: artifact-dir
@@ -200,7 +200,7 @@ jobs:
       - uses: actions/checkout@v7
 
       - name: Download Lambda Artifact
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: ${{ inputs.service }}-lambda-zip
           path: artifact-dir
