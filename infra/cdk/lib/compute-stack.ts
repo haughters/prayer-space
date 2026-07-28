@@ -42,10 +42,10 @@ export class ComputeStack extends cdk.Stack {
 
     // Retrieve the secret from CDK context
     const jwtSecret = this.node.tryGetContext('jwtSecret');
-    if (!jwtSecret && props.deployEnv === 'live') {
-      throw new Error("You must provide a secure jwtSecret for 'live' deployments! E.g. cdk deploy -c jwtSecret='...'");
+    if (!jwtSecret) {
+      throw new Error("You must provide a secure jwtSecret for deployments! E.g. cdk deploy -c jwtSecret='...'");
     }
-    const finalSecret = jwtSecret || 'default-secret-key-change-me-in-production';
+    const finalSecret = jwtSecret;
 
     const createLambda = (name: string, environment: { [key: string]: string } = {}, hasUrl = false) => {
       const zipPath = path.resolve(__dirname, `../../services/${name}/target/${name}-lambda.zip`);
