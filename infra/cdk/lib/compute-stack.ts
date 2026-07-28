@@ -40,6 +40,13 @@ export class ComputeStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props: ComputeStackProps) {
     super(scope, id, props);
 
+    // Retrieve the secret from CDK context
+    const jwtSecret = this.node.tryGetContext('jwtSecret');
+    if (!jwtSecret && props.deployEnv === 'live') {
+      throw new Error("You must provide a secure jwtSecret for 'live' deployments! E.g. cdk deploy -c jwtSecret='...'");
+    }
+    const finalSecret = jwtSecret || 'default-secret-key-change-me-in-production';
+
     const createLambda = (name: string, environment: { [key: string]: string } = {}, hasUrl = false) => {
       const zipPath = path.resolve(__dirname, `../../services/${name}/target/${name}-lambda.zip`);
       const code = fs.existsSync(zipPath)
@@ -57,6 +64,8 @@ export class ComputeStack extends cdk.Stack {
           SPRING_PROFILES_ACTIVE: 'default',
           GIT_COMMIT_SHA: this.node.tryGetContext('gitSha') || 'local',
           APP_TABLE_PREFIX: `${props.deployEnv}-`,
+          HMAC_SECRET_KEY: finalSecret,
+          JWT_SECRET: finalSecret,
           ...environment,
         },
         currentVersionOptions: {
