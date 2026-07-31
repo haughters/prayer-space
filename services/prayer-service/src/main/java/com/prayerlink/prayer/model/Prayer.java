@@ -14,6 +14,9 @@ import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbParti
 import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbSecondaryPartitionKey;
 import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbSecondarySortKey;
 
+import software.amazon.awssdk.enhanced.dynamodb.mapper.StaticTableSchema;
+import software.amazon.awssdk.enhanced.dynamodb.mapper.StaticAttributeTags;
+
 @Data
 @Builder
 @NoArgsConstructor
@@ -21,7 +24,43 @@ import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbSecon
 @DynamoDbBean
 public class Prayer {
 
-    public static final TableSchema<Prayer> SCHEMA = TableSchema.fromBean(Prayer.class);
+    public static final TableSchema<Prayer> SCHEMA = StaticTableSchema.builder(Prayer.class)
+            .newItemSupplier(Prayer::new)
+            .addAttribute(UUID.class, a -> a.name("prayerId")
+                    .getter(Prayer::getPrayerId)
+                    .setter(Prayer::setPrayerId)
+                    .tags(StaticAttributeTags.primaryPartitionKey()))
+            .addAttribute(UUID.class, a -> a.name("deviceId")
+                    .getter(Prayer::getDeviceId)
+                    .setter(Prayer::setDeviceId)
+                    .tags(StaticAttributeTags.secondaryPartitionKey("DeviceIdIndex")))
+            .addAttribute(String.class, a -> a.name("prayerText")
+                    .getter(Prayer::getPrayerText)
+                    .setter(Prayer::setPrayerText))
+            .addAttribute(UUID.class, a -> a.name("groupId")
+                    .getter(Prayer::getGroupId)
+                    .setter(Prayer::setGroupId))
+            .addAttribute(UUID.class, a -> a.name("assignedGroupId")
+                    .getter(Prayer::getAssignedGroupId)
+                    .setter(Prayer::setAssignedGroupId)
+                    .tags(StaticAttributeTags.secondaryPartitionKey("GroupIdIndex")))
+            .addAttribute(PrayerStatus.class, a -> a.name("status")
+                    .getter(Prayer::getStatus)
+                    .setter(Prayer::setStatus))
+            .addAttribute(Integer.class, a -> a.name("prayedForCount")
+                    .getter(Prayer::getPrayedForCount)
+                    .setter(Prayer::setPrayedForCount))
+            .addAttribute(software.amazon.awssdk.enhanced.dynamodb.EnhancedType.setOf(String.class), a -> a.name("prayedByEmails")
+                    .getter(Prayer::getPrayedByEmails)
+                    .setter(Prayer::setPrayedByEmails))
+            .addAttribute(Instant.class, a -> a.name("createdAt")
+                    .getter(Prayer::getCreatedAt)
+                    .setter(Prayer::setCreatedAt)
+                    .tags(StaticAttributeTags.secondarySortKey("DeviceIdIndex"), StaticAttributeTags.secondarySortKey("GroupIdIndex")))
+            .addAttribute(Instant.class, a -> a.name("updatedAt")
+                    .getter(Prayer::getUpdatedAt)
+                    .setter(Prayer::setUpdatedAt))
+            .build();
 
     private UUID prayerId;
     private UUID deviceId;

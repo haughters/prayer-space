@@ -11,6 +11,9 @@ import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbBean;
 import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbPartitionKey;
 import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbSortKey;
 
+import software.amazon.awssdk.enhanced.dynamodb.mapper.StaticTableSchema;
+import software.amazon.awssdk.enhanced.dynamodb.mapper.StaticAttributeTags;
+
 @Data
 @Builder
 @NoArgsConstructor
@@ -18,7 +21,23 @@ import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbSortK
 @DynamoDbBean
 public class PrayerUpdate {
 
-    public static final TableSchema<PrayerUpdate> SCHEMA = TableSchema.fromBean(PrayerUpdate.class);
+    public static final TableSchema<PrayerUpdate> SCHEMA = StaticTableSchema.builder(PrayerUpdate.class)
+            .newItemSupplier(PrayerUpdate::new)
+            .addAttribute(UUID.class, a -> a.name("prayerId")
+                    .getter(PrayerUpdate::getPrayerId)
+                    .setter(PrayerUpdate::setPrayerId)
+                    .tags(StaticAttributeTags.primaryPartitionKey()))
+            .addAttribute(Instant.class, a -> a.name("updatedAt")
+                    .getter(PrayerUpdate::getUpdatedAt)
+                    .setter(PrayerUpdate::setUpdatedAt)
+                    .tags(StaticAttributeTags.primarySortKey()))
+            .addAttribute(String.class, a -> a.name("updateText")
+                    .getter(PrayerUpdate::getUpdateText)
+                    .setter(PrayerUpdate::setUpdateText))
+            .addAttribute(UUID.class, a -> a.name("updatedByDeviceId")
+                    .getter(PrayerUpdate::getUpdatedByDeviceId)
+                    .setter(PrayerUpdate::setUpdatedByDeviceId))
+            .build();
 
     private UUID prayerId;
     private Instant updatedAt;
