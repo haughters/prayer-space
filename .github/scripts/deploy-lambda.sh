@@ -66,15 +66,8 @@ else
   if [ "${HAS_URL:-}" = "true" ]; then
     aws lambda create-function-url-config \
       --function-name "$FUNC_NAME" \
-      --auth-type "NONE" \
+      --auth-type "AWS_IAM" \
       --cors "AllowOrigins=*,AllowMethods=*" >/dev/null
-      
-    aws lambda add-permission \
-      --function-name "$FUNC_NAME" \
-      --statement-id "FunctionURLAllowPublicAccess" \
-      --action "lambda:InvokeFunctionUrl" \
-      --principal "*" \
-      --function-url-auth-type "NONE" >/dev/null
   fi
 fi
 
