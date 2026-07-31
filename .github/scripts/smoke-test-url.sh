@@ -17,11 +17,17 @@ curl_and_check() {
 
   CURL_ARGS=(
     -s -o /tmp/curl.txt -w "%{http_code}"
-    --aws-sigv4 "aws:amz:${AWS_REGION}:lambda"
-    --user "$AWS_ACCESS_KEY_ID:$AWS_SECRET_ACCESS_KEY"
-    -H "x-amz-security-token:$AWS_SESSION_TOKEN"
     -X "$method"
   )
+
+  # PR environments have AuthType NONE, so we skip IAM signatures to avoid 403s.
+  if [ -z "${PR_NUMBER:-}" ]; then
+    CURL_ARGS+=(
+      --aws-sigv4 "aws:amz:${AWS_REGION}:lambda"
+      --user "$AWS_ACCESS_KEY_ID:$AWS_SECRET_ACCESS_KEY"
+      -H "x-amz-security-token:$AWS_SESSION_TOKEN"
+    )
+  fi
   if [ -n "$body" ]; then
     CURL_ARGS+=(-H "Content-Type: application/json" -d "$body")
   fi
