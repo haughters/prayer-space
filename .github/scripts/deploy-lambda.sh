@@ -17,7 +17,7 @@ AWS_REGION=${AWS_REGION:-eu-west-1}
 # Resolve prefixes and environments
 if [ -n "${PR_NUMBER:-}" ]; then
   ENV_PREFIX="pr-${PR_NUMBER}"
-  TABLE_PREFIX="pr-${PR_NUMBER}-"
+  TABLE_PREFIX="test-"
   DEP_PREFIX="pr-${PR_NUMBER}-"
   SQS_ENV="test"
   BUS_ENV="test"
