@@ -5,24 +5,25 @@ import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-import tools.jackson.databind.ObjectMapper;
 import com.prayerlink.common.dto.GroupDTO;
 import com.prayerlink.group.model.Group;
 import com.prayerlink.group.repository.GroupMemberRepository;
 import com.prayerlink.group.repository.GroupRepository;
 import java.util.Optional;
+import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import software.amazon.awssdk.services.eventbridge.EventBridgeClient;
 import software.amazon.awssdk.services.eventbridge.model.PutEventsRequest;
 import software.amazon.awssdk.services.eventbridge.model.PutEventsResponse;
+import tools.jackson.databind.ObjectMapper;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -46,7 +47,8 @@ public class GroupControllerIntegrationTest {
 
     @BeforeEach
     void setUp() {
-        PutEventsResponse mockResponse = PutEventsResponse.builder().failedEntryCount(0).build();
+        PutEventsResponse mockResponse =
+                PutEventsResponse.builder().failedEntryCount(0).build();
         when(eventBridgeClient.putEvents(any(PutEventsRequest.class))).thenReturn(mockResponse);
     }
 
@@ -59,8 +61,8 @@ public class GroupControllerIntegrationTest {
         when(groupRepository.findByPasscode("INTG12")).thenReturn(Optional.empty());
 
         mockMvc.perform(post("/api/groups")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(inputDto)))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(inputDto)))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.name").value("Integration Group"))
                 .andExpect(jsonPath("$.passcode").value("INTG12"));
@@ -70,7 +72,7 @@ public class GroupControllerIntegrationTest {
 
     @Test
     void testGroupUpdatesIntegration() throws Exception {
-        String groupId = "group_int";
+        UUID groupId = UUID.fromString("00000000-0000-0000-0000-000000000001");
         Group existingGroup = new Group();
         existingGroup.setGroupId(groupId);
         existingGroup.setName("Old Name");
@@ -84,8 +86,8 @@ public class GroupControllerIntegrationTest {
         when(groupRepository.findByPasscode("NEWCODE")).thenReturn(Optional.empty());
 
         mockMvc.perform(put("/api/groups/" + groupId)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(updateDto)))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(updateDto)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.name").value("New Name"))
                 .andExpect(jsonPath("$.passcode").value("NEWCODE"));
@@ -97,13 +99,13 @@ public class GroupControllerIntegrationTest {
     void testGroupPasscodeValidationIntegration() throws Exception {
         String passcode = "VALIDCODE";
         Group group = new Group();
-        group.setGroupId("group123");
+        group.setGroupId(UUID.fromString("00000000-0000-0000-0000-000000000002"));
         group.setPasscode(passcode);
 
         when(groupRepository.findByPasscode(passcode)).thenReturn(Optional.of(group));
 
         mockMvc.perform(get("/api/groups/validate?passcode=" + passcode))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.groupId").value("group123"));
+                .andExpect(jsonPath("$.groupId").value("00000000-0000-0000-0000-000000000002"));
     }
 }

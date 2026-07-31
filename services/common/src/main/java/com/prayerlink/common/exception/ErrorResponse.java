@@ -11,9 +11,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ErrorResponse {
-  private Instant timestamp;
-  private int status;
-  private String error;
-  private String message;
-  private String path;
+    private Instant timestamp;
+    private int status;
+    private String error;
+    private String message;
+    private String path;
 }

@@ -14,7 +14,8 @@ public class JwtUtilTest {
     @BeforeEach
     void setUp() {
         jwtUtil = new JwtUtil();
-        ReflectionTestUtils.setField(jwtUtil, "secret", "my-test-secret-key-must-be-very-long-and-secure-for-hmac-sha-256-prayer-link");
+        ReflectionTestUtils.setField(
+                jwtUtil, "secret", "my-test-secret-key-must-be-very-long-and-secure-for-hmac-sha-256-prayer-link");
     }
 
     @Test

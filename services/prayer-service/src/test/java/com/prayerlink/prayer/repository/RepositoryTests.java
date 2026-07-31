@@ -3,10 +3,12 @@ package com.prayerlink.prayer.repository;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+import com.prayerlink.common.config.TableNameResolver;
 import com.prayerlink.prayer.model.Prayer;
 import com.prayerlink.prayer.model.PrayerUpdate;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.function.Consumer;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -20,13 +22,12 @@ import software.amazon.awssdk.enhanced.dynamodb.model.QueryEnhancedRequest;
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
 import software.amazon.awssdk.services.dynamodb.model.UpdateItemRequest;
 
-import com.prayerlink.common.config.TableNameResolver;
-
+@SuppressWarnings("unchecked")
 public class RepositoryTests {
 
     private DynamoDbEnhancedClient enhancedClient;
     private DynamoDbClient rawClient;
-    
+
     private DynamoDbTable<Prayer> prayerTable;
     private DynamoDbIndex<Prayer> deviceIdIndex;
     private DynamoDbIndex<Prayer> groupIdIndex;
@@ -57,9 +58,9 @@ public class RepositoryTests {
     @Test
     void testPrayerRepository() {
         Prayer prayer = new Prayer();
-        prayer.setPrayerId("p-1");
-        prayer.setDeviceId("d-1");
-        prayer.setAssignedGroupId("g-1");
+        prayer.setPrayerId(UUID.fromString("00000000-0000-0000-0000-000000000001"));
+        prayer.setDeviceId(UUID.fromString("00000000-0000-0000-0000-000000000002"));
+        prayer.setAssignedGroupId(UUID.fromString("00000000-0000-0000-0000-000000000003"));
 
         // save
         prayerRepository.save(prayer);
@@ -67,7 +68,7 @@ public class RepositoryTests {
 
         // findById
         when(prayerTable.getItem(any(Consumer.class))).thenReturn(prayer);
-        Optional<Prayer> found = prayerRepository.findById("p-1");
+        Optional<Prayer> found = prayerRepository.findById(UUID.fromString("00000000-0000-0000-0000-000000000001"));
         assertTrue(found.isPresent());
 
         // findByDeviceId
@@ -77,23 +78,24 @@ public class RepositoryTests {
         when(mockIterable.iterator()).thenAnswer(inv -> List.of(mockPage).iterator());
         when(deviceIdIndex.query(any(QueryEnhancedRequest.class))).thenReturn(mockIterable);
 
-        List<Prayer> listDev = prayerRepository.findByDeviceId("d-1");
+        List<Prayer> listDev = prayerRepository.findByDeviceId(UUID.fromString("00000000-0000-0000-0000-000000000002"));
         assertEquals(1, listDev.size());
 
         // findByGroupId
         when(groupIdIndex.query(any(QueryEnhancedRequest.class))).thenReturn(mockIterable);
-        List<Prayer> listGroup = prayerRepository.findByGroupId("g-1");
+        List<Prayer> listGroup =
+                prayerRepository.findByGroupId(UUID.fromString("00000000-0000-0000-0000-000000000003"));
         assertEquals(1, listGroup.size());
 
         // recordPrayer
-        prayerRepository.recordPrayer("p-1", "user@example.com");
+        prayerRepository.recordPrayer(UUID.fromString("00000000-0000-0000-0000-000000000001"), "user@example.com");
         verify(rawClient).updateItem(any(UpdateItemRequest.class));
     }
 
     @Test
     void testPrayerUpdateRepository() {
         PrayerUpdate update = new PrayerUpdate();
-        update.setPrayerId("p-1");
+        update.setPrayerId(UUID.fromString("00000000-0000-0000-0000-000000000001"));
 
         // save
         updateRepository.save(update);
@@ -102,11 +104,13 @@ public class RepositoryTests {
         // findByPrayerId
         Page<PrayerUpdate> mockPage = mock(Page.class);
         when(mockPage.items()).thenReturn(List.of(update));
-        software.amazon.awssdk.enhanced.dynamodb.model.PageIterable<PrayerUpdate> mockIterable = mock(software.amazon.awssdk.enhanced.dynamodb.model.PageIterable.class);
+        software.amazon.awssdk.enhanced.dynamodb.model.PageIterable<PrayerUpdate> mockIterable =
+                mock(software.amazon.awssdk.enhanced.dynamodb.model.PageIterable.class);
         when(mockIterable.iterator()).thenReturn(List.of(mockPage).iterator());
         when(updateTable.query(any(QueryEnhancedRequest.class))).thenReturn(mockIterable);
 
-        List<PrayerUpdate> list = updateRepository.findByPrayerId("p-1");
+        List<PrayerUpdate> list =
+                updateRepository.findByPrayerId(UUID.fromString("00000000-0000-0000-0000-000000000001"));
         assertEquals(1, list.size());
     }
 }

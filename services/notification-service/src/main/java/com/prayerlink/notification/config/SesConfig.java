@@ -13,22 +13,21 @@ import software.amazon.awssdk.services.ses.SesClientBuilder;
 @Configuration
 public class SesConfig {
 
-  @Value("${aws.ses.endpoint:#{null}}")
-  private String endpoint;
+    @Value("${aws.ses.endpoint:#{null}}")
+    private String endpoint;
 
-  @Value("${aws.ses.region:eu-west-1}")
-  private String region;
+    @Value("${aws.ses.region:eu-west-1}")
+    private String region;
 
-  @Bean
-  public SesClient sesClient() {
-    SesClientBuilder builder = SesClient.builder().region(Region.of(region));
+    @Bean
+    public SesClient sesClient() {
+        SesClientBuilder builder = SesClient.builder().region(Region.of(region));
 
-    if (endpoint != null && !endpoint.isEmpty()) {
-      builder
-          .endpointOverride(URI.create(endpoint))
-          .credentialsProvider(
-              StaticCredentialsProvider.create(AwsBasicCredentials.create("local", "local")));
+        if (endpoint != null && !endpoint.isEmpty()) {
+            builder.endpointOverride(URI.create(endpoint))
+                    .credentialsProvider(
+                            StaticCredentialsProvider.create(AwsBasicCredentials.create("local", "local")));
+        }
+        return builder.build();
     }
-    return builder.build();
-  }
 }

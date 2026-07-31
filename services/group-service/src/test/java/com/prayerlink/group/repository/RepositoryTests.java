@@ -3,21 +3,20 @@ package com.prayerlink.group.repository;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+import com.prayerlink.common.config.TableNameResolver;
 import com.prayerlink.group.model.Group;
 import com.prayerlink.group.model.GroupMember;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.function.Consumer;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import software.amazon.awssdk.core.pagination.sync.SdkIterable;
 import software.amazon.awssdk.enhanced.dynamodb.DynamoDbEnhancedClient;
 import software.amazon.awssdk.enhanced.dynamodb.DynamoDbIndex;
 import software.amazon.awssdk.enhanced.dynamodb.DynamoDbTable;
 import software.amazon.awssdk.enhanced.dynamodb.TableSchema;
 import software.amazon.awssdk.enhanced.dynamodb.model.Page;
-
-import com.prayerlink.common.config.TableNameResolver;
 
 public class RepositoryTests {
 
@@ -34,7 +33,7 @@ public class RepositoryTests {
     void setUp() {
         enhancedClient = mock(DynamoDbEnhancedClient.class);
         TableNameResolver tableNameResolver = new TableNameResolver("");
-        
+
         groupTable = mock(DynamoDbTable.class);
         passcodeIndex = mock(DynamoDbIndex.class);
         when(enhancedClient.table(eq("Groups"), any(TableSchema.class))).thenReturn(groupTable);
@@ -51,7 +50,7 @@ public class RepositoryTests {
     @Test
     void testGroupRepository() {
         Group group = new Group();
-        group.setGroupId("g-1");
+        group.setGroupId(UUID.fromString("00000000-0000-0000-0000-000000000001"));
         group.setPasscode("123456");
 
         // save
@@ -60,14 +59,17 @@ public class RepositoryTests {
 
         // findById
         when(groupTable.getItem(any(Consumer.class))).thenReturn(group);
-        Optional<Group> found = groupRepository.findById("g-1");
+        Optional<Group> found = groupRepository.findById(UUID.fromString("00000000-0000-0000-0000-000000000001"));
         assertTrue(found.isPresent());
-        assertEquals("g-1", found.get().getGroupId());
+        assertEquals(
+                UUID.fromString("00000000-0000-0000-0000-000000000001"),
+                found.get().getGroupId());
 
         // findByPasscode
         Page<Group> mockPage = mock(Page.class);
         when(mockPage.items()).thenReturn(List.of(group));
-        software.amazon.awssdk.enhanced.dynamodb.model.PageIterable<Group> mockIterable = mock(software.amazon.awssdk.enhanced.dynamodb.model.PageIterable.class);
+        software.amazon.awssdk.enhanced.dynamodb.model.PageIterable<Group> mockIterable =
+                mock(software.amazon.awssdk.enhanced.dynamodb.model.PageIterable.class);
         when(mockIterable.iterator()).thenAnswer(inv -> List.of(mockPage).iterator());
         when(passcodeIndex.query(any(Consumer.class))).thenReturn(mockIterable);
 
@@ -76,7 +78,8 @@ public class RepositoryTests {
         assertEquals("123456", foundPass.get().getPasscode());
 
         // findAll
-        software.amazon.awssdk.enhanced.dynamodb.model.PageIterable<Group> mockScanIterable = mock(software.amazon.awssdk.enhanced.dynamodb.model.PageIterable.class);
+        software.amazon.awssdk.enhanced.dynamodb.model.PageIterable<Group> mockScanIterable =
+                mock(software.amazon.awssdk.enhanced.dynamodb.model.PageIterable.class);
         when(mockScanIterable.iterator()).thenAnswer(inv -> List.of(mockPage).iterator());
         when(groupTable.scan()).thenReturn(mockScanIterable);
 
@@ -84,15 +87,15 @@ public class RepositoryTests {
         assertEquals(1, all.size());
 
         // delete
-        groupRepository.delete("g-1");
+        groupRepository.delete(UUID.fromString("00000000-0000-0000-0000-000000000001"));
         verify(groupTable).deleteItem(any(Consumer.class));
     }
 
     @Test
     void testGroupMemberRepository() {
         GroupMember member = new GroupMember();
-        member.setGroupId("g-1");
-        member.setMemberId("m-1");
+        member.setGroupId(UUID.fromString("00000000-0000-0000-0000-000000000001"));
+        member.setMemberId(UUID.fromString("00000000-0000-0000-0000-000000000002"));
         member.setEmail("m@example.com");
 
         // save
@@ -101,21 +104,26 @@ public class RepositoryTests {
 
         // findById
         when(memberTable.getItem(any(Consumer.class))).thenReturn(member);
-        Optional<GroupMember> found = memberRepository.findById("g-1", "m-1");
+        Optional<GroupMember> found = memberRepository.findById(
+                UUID.fromString("00000000-0000-0000-0000-000000000001"),
+                UUID.fromString("00000000-0000-0000-0000-000000000002"));
         assertTrue(found.isPresent());
 
         // findByGroupId
         Page<GroupMember> mockPage = mock(Page.class);
         when(mockPage.items()).thenReturn(List.of(member));
-        software.amazon.awssdk.enhanced.dynamodb.model.PageIterable<GroupMember> mockIterable = mock(software.amazon.awssdk.enhanced.dynamodb.model.PageIterable.class);
+        software.amazon.awssdk.enhanced.dynamodb.model.PageIterable<GroupMember> mockIterable =
+                mock(software.amazon.awssdk.enhanced.dynamodb.model.PageIterable.class);
         when(mockIterable.iterator()).thenAnswer(inv -> List.of(mockPage).iterator());
         when(memberTable.query(any(Consumer.class))).thenReturn(mockIterable);
 
-        List<GroupMember> list = memberRepository.findByGroupId("g-1");
+        List<GroupMember> list =
+                memberRepository.findByGroupId(UUID.fromString("00000000-0000-0000-0000-000000000001"));
         assertEquals(1, list.size());
 
         // findByEmail
-        software.amazon.awssdk.enhanced.dynamodb.model.PageIterable<GroupMember> mockEmailIterable = mock(software.amazon.awssdk.enhanced.dynamodb.model.PageIterable.class);
+        software.amazon.awssdk.enhanced.dynamodb.model.PageIterable<GroupMember> mockEmailIterable =
+                mock(software.amazon.awssdk.enhanced.dynamodb.model.PageIterable.class);
         when(mockEmailIterable.iterator()).thenAnswer(inv -> List.of(mockPage).iterator());
         when(emailIndex.query(any(Consumer.class))).thenReturn(mockEmailIterable);
 
@@ -123,7 +131,9 @@ public class RepositoryTests {
         assertEquals(1, listEmail.size());
 
         // delete
-        memberRepository.delete("g-1", "m-1");
+        memberRepository.delete(
+                UUID.fromString("00000000-0000-0000-0000-000000000001"),
+                UUID.fromString("00000000-0000-0000-0000-000000000002"));
         verify(memberTable).deleteItem(any(Consumer.class));
     }
 }

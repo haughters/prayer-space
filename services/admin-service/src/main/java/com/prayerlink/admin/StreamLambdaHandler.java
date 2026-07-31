@@ -1,18 +1,18 @@
 package com.prayerlink.admin;
 
 import com.amazonaws.serverless.exceptions.ContainerInitializationException;
-import com.amazonaws.serverless.proxy.model.HttpApiV2ProxyRequest;
 import com.amazonaws.serverless.proxy.model.AwsProxyResponse;
+import com.amazonaws.serverless.proxy.model.HttpApiV2ProxyRequest;
 import com.amazonaws.serverless.proxy.spring.SpringBootLambdaContainerHandler;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestStreamHandler;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
 public class StreamLambdaHandler implements RequestStreamHandler {
-    private final static SpringBootLambdaContainerHandler<HttpApiV2ProxyRequest, AwsProxyResponse> HANDLER;
+    private static final SpringBootLambdaContainerHandler<HttpApiV2ProxyRequest, AwsProxyResponse> HANDLER;
+
     static {
         try {
             HANDLER = SpringBootLambdaContainerHandler.getHttpApiV2ProxyHandler(AdminApplication.class);
@@ -23,8 +23,7 @@ public class StreamLambdaHandler implements RequestStreamHandler {
     }
 
     @Override
-    public void handleRequest(InputStream inputStream, OutputStream outputStream, Context context)
-            throws IOException {
+    public void handleRequest(InputStream inputStream, OutputStream outputStream, Context context) throws IOException {
         HANDLER.proxyStream(inputStream, outputStream, context);
     }
 }

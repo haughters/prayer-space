@@ -3,17 +3,17 @@ package com.prayerlink.identity.repository;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+import com.prayerlink.common.config.TableNameResolver;
 import com.prayerlink.identity.model.Device;
 import com.prayerlink.identity.model.IntercessorAccount;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.function.Consumer;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import software.amazon.awssdk.enhanced.dynamodb.DynamoDbEnhancedClient;
 import software.amazon.awssdk.enhanced.dynamodb.DynamoDbTable;
 import software.amazon.awssdk.enhanced.dynamodb.TableSchema;
-
-import com.prayerlink.common.config.TableNameResolver;
 
 public class RepositoryTests {
 
@@ -28,42 +28,46 @@ public class RepositoryTests {
     void setUp() {
         enhancedClient = mock(DynamoDbEnhancedClient.class);
         TableNameResolver tableNameResolver = new TableNameResolver("");
-        
+
         deviceTable = mock(DynamoDbTable.class);
         when(enhancedClient.table(eq("Devices"), any(TableSchema.class))).thenReturn(deviceTable);
         deviceRepository = new DeviceRepository(enhancedClient, tableNameResolver);
 
         accountTable = mock(DynamoDbTable.class);
-        when(enhancedClient.table(eq("IntercessorAccounts"), any(TableSchema.class))).thenReturn(accountTable);
+        when(enhancedClient.table(eq("IntercessorAccounts"), any(TableSchema.class)))
+                .thenReturn(accountTable);
         accountRepository = new IntercessorAccountRepository(enhancedClient, tableNameResolver);
     }
 
     @Test
     void testDeviceRepository() {
         Device dev = new Device();
-        dev.setDeviceId("d-1");
+        UUID id = UUID.randomUUID();
+        dev.setDeviceId(id);
 
         deviceRepository.save(dev);
         verify(deviceTable).putItem(dev);
 
         when(deviceTable.getItem(any(Consumer.class))).thenReturn(dev);
-        Optional<Device> found = deviceRepository.findById("d-1");
+        Optional<Device> found = deviceRepository.findById(id);
         assertTrue(found.isPresent());
     }
 
     @Test
     void testIntercessorAccountRepository() {
         IntercessorAccount account = new IntercessorAccount();
+        UUID id = UUID.randomUUID();
+        account.setAccountId(id);
         account.setEmail("test@example.com");
 
         accountRepository.save(account);
         verify(accountTable).putItem(account);
 
         when(accountTable.getItem(any(Consumer.class))).thenReturn(account);
-        Optional<IntercessorAccount> found = accountRepository.findById("test@example.com");
+        Optional<IntercessorAccount> found = accountRepository.findById(id);
         assertTrue(found.isPresent());
 
-        Optional<IntercessorAccount> foundNull = accountRepository.findById(null);
+        Optional<IntercessorAccount> foundNull = accountRepository.findById((UUID) null);
         assertFalse(foundNull.isPresent());
     }
 }
