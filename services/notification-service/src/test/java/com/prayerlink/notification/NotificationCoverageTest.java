@@ -34,7 +34,7 @@ public class NotificationCoverageTest {
         System.setProperty("aws.secretAccessKey", "dummy");
         System.setProperty("aws.region", "eu-west-1");
         try {
-            NotificationApplication.main(new String[]{"--server.port=0", "--spring.profiles.active=local"});
+            NotificationApplication.main(new String[] {"--server.port=0", "--spring.profiles.active=local"});
         } catch (Throwable e) {
             // expected
         } finally {
@@ -44,9 +44,10 @@ public class NotificationCoverageTest {
         }
         try {
             StreamLambdaHandler handler = new StreamLambdaHandler();
-            java.io.InputStream is = new java.io.ByteArrayInputStream(new byte[]{});
+            java.io.InputStream is = new java.io.ByteArrayInputStream(new byte[] {});
             java.io.OutputStream os = new java.io.ByteArrayOutputStream();
-            com.amazonaws.services.lambda.runtime.Context context = org.mockito.Mockito.mock(com.amazonaws.services.lambda.runtime.Context.class);
+            com.amazonaws.services.lambda.runtime.Context context =
+                    org.mockito.Mockito.mock(com.amazonaws.services.lambda.runtime.Context.class);
             handler.handleRequest(is, os, context);
         } catch (Throwable e) {
             // expected

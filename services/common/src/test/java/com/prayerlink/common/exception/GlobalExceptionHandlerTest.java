@@ -25,7 +25,7 @@ public class GlobalExceptionHandlerTest {
     void handleResourceNotFoundReturnsNotFoundResponse() {
         ResourceNotFoundException ex = new ResourceNotFoundException("Not Found Error");
         ResponseEntity<ErrorResponse> response = handler.handleResourceNotFound(ex, mockRequest);
-        
+
         assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
         assertNotNull(response.getBody());
         assertEquals("Not Found Error", response.getBody().getMessage());
@@ -38,7 +38,7 @@ public class GlobalExceptionHandlerTest {
     void handleUnauthorizedReturnsUnauthorizedResponse() {
         UnauthorizedException ex = new UnauthorizedException("Unauthorized Access");
         ResponseEntity<ErrorResponse> response = handler.handleUnauthorized(ex, mockRequest);
-        
+
         assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
         assertNotNull(response.getBody());
         assertEquals("Unauthorized Access", response.getBody().getMessage());
@@ -50,7 +50,7 @@ public class GlobalExceptionHandlerTest {
     void handleBadRequestReturnsBadRequestResponse() {
         BadRequestException ex = new BadRequestException("Bad Request Payload");
         ResponseEntity<ErrorResponse> response = handler.handleBadRequest(ex, mockRequest);
-        
+
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
         assertNotNull(response.getBody());
         assertEquals("Bad Request Payload", response.getBody().getMessage());
@@ -62,7 +62,7 @@ public class GlobalExceptionHandlerTest {
     void handleGlobalExceptionReturnsInternalServerErrorResponse() {
         Exception ex = new Exception("General Server Error");
         ResponseEntity<ErrorResponse> response = handler.handleGlobalException(ex, mockRequest);
-        
+
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
         assertNotNull(response.getBody());
         assertEquals("General Server Error", response.getBody().getMessage());

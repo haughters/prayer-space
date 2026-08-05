@@ -8,12 +8,11 @@ import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletRequestWrapper;
-import org.springframework.stereotype.Component;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import org.springframework.stereotype.Component;
 
 @Component
 public class HeaderToCookieFilter implements Filter {
@@ -35,14 +34,14 @@ public class HeaderToCookieFilter implements Filter {
                         if (existingCookies != null) {
                             cookies.addAll(Arrays.asList(existingCookies));
                         }
-                        
+
                         if (authToken != null) {
                             cookies.add(new Cookie("pl-auth-token", authToken));
                         }
                         if (deviceId != null) {
                             cookies.add(new Cookie("pl-device-id", deviceId));
                         }
-                        
+
                         return cookies.toArray(new Cookie[0]);
                     }
                 };

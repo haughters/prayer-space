@@ -5,7 +5,6 @@ import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-import tools.jackson.databind.ObjectMapper;
 import com.prayerlink.common.dto.GroupDTO;
 import com.prayerlink.common.dto.GroupMemberDTO;
 import com.prayerlink.identity.model.Device;
@@ -21,21 +20,22 @@ import java.util.UUID;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.client.RestTemplate;
+import tools.jackson.databind.ObjectMapper;
 
 @WebMvcTest(IdentityController.class)
-@TestPropertySource(properties = {
-    "services.group-service.url=http://localhost:8083",
-    "cookie.secure=false"
-})
+@TestPropertySource(properties = {"services.group-service.url=http://localhost:8083", "cookie.secure=false"})
 public class IdentityControllerTest {
+
+    private static final UUID GROUP_ID = UUID.randomUUID();
+    private static final UUID MEMBER_ID = UUID.randomUUID();
 
     @Autowired
     private MockMvc mockMvc;
@@ -64,11 +64,11 @@ public class IdentityControllerTest {
         Map<String, String> requestBody = new HashMap<>();
         requestBody.put("deviceId", deviceId);
 
-        when(deviceRepository.findById(deviceId)).thenReturn(Optional.empty());
+        when(deviceRepository.findById(UUID.fromString(deviceId))).thenReturn(Optional.empty());
 
         mockMvc.perform(post("/api/identity/register")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(requestBody)))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(requestBody)))
                 .andExpect(status().isCreated())
                 .andExpect(header().exists("Set-Cookie"))
                 .andExpect(jsonPath("$.deviceId").value(deviceId));
@@ -81,13 +81,13 @@ public class IdentityControllerTest {
         requestBody.put("deviceId", deviceId);
 
         Device mockDevice = new Device();
-        mockDevice.setDeviceId(deviceId);
+        mockDevice.setDeviceId(UUID.fromString(deviceId));
 
-        when(deviceRepository.findById(deviceId)).thenReturn(Optional.of(mockDevice));
+        when(deviceRepository.findById(UUID.fromString(deviceId))).thenReturn(Optional.of(mockDevice));
 
         mockMvc.perform(post("/api/identity/register")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(requestBody)))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(requestBody)))
                 .andExpect(status().isOk())
                 .andExpect(header().exists("Set-Cookie"))
                 .andExpect(jsonPath("$.deviceId").value(deviceId));
@@ -95,20 +95,18 @@ public class IdentityControllerTest {
 
     @Test
     void getMeWithNoCookieReturns401() throws Exception {
-        mockMvc.perform(get("/api/identity/me"))
-                .andExpect(status().isUnauthorized());
+        mockMvc.perform(get("/api/identity/me")).andExpect(status().isUnauthorized());
     }
 
     @Test
     void getMeWithValidCookieReturnsDevice() throws Exception {
         String deviceId = UUID.randomUUID().toString();
         Device mockDevice = new Device();
-        mockDevice.setDeviceId(deviceId);
+        mockDevice.setDeviceId(UUID.fromString(deviceId));
 
-        when(deviceRepository.findById(deviceId)).thenReturn(Optional.of(mockDevice));
+        when(deviceRepository.findById(UUID.fromString(deviceId))).thenReturn(Optional.of(mockDevice));
 
-        mockMvc.perform(get("/api/identity/me")
-                .cookie(new jakarta.servlet.http.Cookie("pl-device-id", deviceId)))
+        mockMvc.perform(get("/api/identity/me").cookie(new jakarta.servlet.http.Cookie("pl-device-id", deviceId)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.deviceId").value(deviceId));
     }
@@ -117,21 +115,19 @@ public class IdentityControllerTest {
     void updateSeenWithValidDeviceUpdatesTimestamp() throws Exception {
         String deviceId = UUID.randomUUID().toString();
         Device mockDevice = new Device();
-        mockDevice.setDeviceId(deviceId);
+        mockDevice.setDeviceId(UUID.fromString(deviceId));
 
-        when(deviceRepository.findById(deviceId)).thenReturn(Optional.of(mockDevice));
+        when(deviceRepository.findById(UUID.fromString(deviceId))).thenReturn(Optional.of(mockDevice));
 
-        mockMvc.perform(put("/api/identity/" + deviceId + "/seen"))
-                .andExpect(status().isNoContent());
+        mockMvc.perform(put("/api/identity/" + deviceId + "/seen")).andExpect(status().isNoContent());
     }
 
     @Test
     void updateSeenWithUnknownDeviceReturns404() throws Exception {
         String deviceId = UUID.randomUUID().toString();
-        when(deviceRepository.findById(deviceId)).thenReturn(Optional.empty());
+        when(deviceRepository.findById(UUID.fromString(deviceId))).thenReturn(Optional.empty());
 
-        mockMvc.perform(put("/api/identity/" + deviceId + "/seen"))
-                .andExpect(status().isNotFound());
+        mockMvc.perform(put("/api/identity/" + deviceId + "/seen")).andExpect(status().isNotFound());
     }
 
     @Test
@@ -143,28 +139,32 @@ public class IdentityControllerTest {
         body.put("inviteCode", "INVITE");
 
         GroupDTO group = GroupDTO.builder()
-                .groupId("group123")
+                .groupId(GROUP_ID)
                 .name("Group Name")
                 .passcode("INVITE")
                 .build();
 
         GroupMemberDTO member = GroupMemberDTO.builder()
-                .groupId("group123")
-                .memberId("member123")
+                .groupId(GROUP_ID)
+                .memberId(MEMBER_ID)
                 .email("member@example.com")
                 .build();
 
         when(restTemplate.getForEntity(anyString(), eq(GroupDTO.class)))
                 .thenReturn(new org.springframework.http.ResponseEntity<>(group, HttpStatus.OK));
-        when(restTemplate.exchange(anyString(), eq(HttpMethod.GET), any(), any(org.springframework.core.ParameterizedTypeReference.class)))
+        when(restTemplate.exchange(
+                        anyString(),
+                        eq(HttpMethod.GET),
+                        any(),
+                        any(org.springframework.core.ParameterizedTypeReference.class)))
                 .thenReturn(new org.springframework.http.ResponseEntity<>(List.of(member), HttpStatus.OK));
-        when(intercessorAccountRepository.findById("member@example.com")).thenReturn(Optional.empty());
+        when(intercessorAccountRepository.findByEmail("member@example.com")).thenReturn(Optional.empty());
         when(passwordEncoder.encode("securepassword")).thenReturn("hashed_password");
         when(jwtUtil.generateToken("member@example.com", "Member Name")).thenReturn("mock_jwt");
 
         mockMvc.perform(post("/api/identity/intercessor/register")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(body)))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(body)))
                 .andExpect(status().isCreated())
                 .andExpect(header().exists("Set-Cookie"))
                 .andExpect(jsonPath("$.email").value("member@example.com"));
@@ -179,19 +179,23 @@ public class IdentityControllerTest {
         body.put("inviteCode", "INVITE");
 
         GroupDTO group = GroupDTO.builder()
-                .groupId("group123")
+                .groupId(GROUP_ID)
                 .name("Group Name")
                 .passcode("INVITE")
                 .build();
 
         when(restTemplate.getForEntity(anyString(), eq(GroupDTO.class)))
                 .thenReturn(new org.springframework.http.ResponseEntity<>(group, HttpStatus.OK));
-        when(restTemplate.exchange(anyString(), eq(HttpMethod.GET), any(), any(org.springframework.core.ParameterizedTypeReference.class)))
+        when(restTemplate.exchange(
+                        anyString(),
+                        eq(HttpMethod.GET),
+                        any(),
+                        any(org.springframework.core.ParameterizedTypeReference.class)))
                 .thenReturn(new org.springframework.http.ResponseEntity<>(List.of(), HttpStatus.OK));
 
         mockMvc.perform(post("/api/identity/intercessor/register")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(body)))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(body)))
                 .andExpect(status().isForbidden());
     }
 
@@ -204,30 +208,35 @@ public class IdentityControllerTest {
         body.put("inviteCode", "INVITE");
 
         GroupDTO group = GroupDTO.builder()
-                .groupId("group123")
+                .groupId(GROUP_ID)
                 .name("Group Name")
                 .passcode("INVITE")
                 .build();
 
         GroupMemberDTO member = GroupMemberDTO.builder()
-                .groupId("group123")
-                .memberId("member123")
+                .groupId(GROUP_ID)
+                .memberId(MEMBER_ID)
                 .email("duplicate@example.com")
                 .build();
 
         when(restTemplate.getForEntity(anyString(), eq(GroupDTO.class)))
                 .thenReturn(new org.springframework.http.ResponseEntity<>(group, HttpStatus.OK));
-        when(restTemplate.exchange(anyString(), eq(HttpMethod.GET), any(), any(org.springframework.core.ParameterizedTypeReference.class)))
+        when(restTemplate.exchange(
+                        anyString(),
+                        eq(HttpMethod.GET),
+                        any(),
+                        any(org.springframework.core.ParameterizedTypeReference.class)))
                 .thenReturn(new org.springframework.http.ResponseEntity<>(List.of(member), HttpStatus.OK));
 
         IntercessorAccount existingAccount = new IntercessorAccount();
         existingAccount.setEmail("duplicate@example.com");
 
-        when(intercessorAccountRepository.findById("duplicate@example.com")).thenReturn(Optional.of(existingAccount));
+        when(intercessorAccountRepository.findByEmail("duplicate@example.com"))
+                .thenReturn(Optional.of(existingAccount));
 
         mockMvc.perform(post("/api/identity/intercessor/register")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(body)))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(body)))
                 .andExpect(status().isConflict());
     }
 
@@ -243,13 +252,13 @@ public class IdentityControllerTest {
                 .passwordHash("hashed_password")
                 .build();
 
-        when(intercessorAccountRepository.findById("login@example.com")).thenReturn(Optional.of(account));
+        when(intercessorAccountRepository.findByEmail("login@example.com")).thenReturn(Optional.of(account));
         when(passwordEncoder.matches("password123", "hashed_password")).thenReturn(true);
         when(jwtUtil.generateToken("login@example.com", "Login User")).thenReturn("mock_jwt");
 
         mockMvc.perform(post("/api/identity/intercessor/login")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(body)))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(body)))
                 .andExpect(status().isOk())
                 .andExpect(header().exists("Set-Cookie"))
                 .andExpect(jsonPath("$.email").value("login@example.com"));
@@ -267,12 +276,12 @@ public class IdentityControllerTest {
                 .passwordHash("hashed_password")
                 .build();
 
-        when(intercessorAccountRepository.findById("login@example.com")).thenReturn(Optional.of(account));
+        when(intercessorAccountRepository.findByEmail("login@example.com")).thenReturn(Optional.of(account));
         when(passwordEncoder.matches("wrongpassword", "hashed_password")).thenReturn(false);
 
         mockMvc.perform(post("/api/identity/intercessor/login")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(body)))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(body)))
                 .andExpect(status().isUnauthorized());
     }
 
@@ -282,11 +291,11 @@ public class IdentityControllerTest {
         body.put("email", "unknown@example.com");
         body.put("password", "password123");
 
-        when(intercessorAccountRepository.findById("unknown@example.com")).thenReturn(Optional.empty());
+        when(intercessorAccountRepository.findByEmail("unknown@example.com")).thenReturn(Optional.empty());
 
         mockMvc.perform(post("/api/identity/intercessor/login")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(body)))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(body)))
                 .andExpect(status().isUnauthorized());
     }
 
@@ -305,25 +314,26 @@ public class IdentityControllerTest {
         when(jwtUtil.verifyToken(token)).thenReturn(decoded);
 
         GroupMemberDTO member = GroupMemberDTO.builder()
-                .groupId("group123")
-                .memberId("member123")
+                .groupId(GROUP_ID)
+                .memberId(MEMBER_ID)
                 .email("me@example.com")
                 .build();
 
-        GroupDTO group = GroupDTO.builder()
-                .groupId("group123")
-                .name("My Group")
-                .build();
+        GroupDTO group = GroupDTO.builder().groupId(GROUP_ID).name("My Group").build();
 
-        when(restTemplate.exchange(anyString(), eq(HttpMethod.GET), any(), any(org.springframework.core.ParameterizedTypeReference.class)))
+        when(restTemplate.exchange(
+                        anyString(),
+                        eq(HttpMethod.GET),
+                        any(),
+                        any(org.springframework.core.ParameterizedTypeReference.class)))
                 .thenReturn(new org.springframework.http.ResponseEntity<>(List.of(member), HttpStatus.OK));
         when(restTemplate.getForObject(anyString(), eq(GroupDTO.class))).thenReturn(group);
 
         mockMvc.perform(get("/api/identity/intercessor/me")
-                .cookie(new jakarta.servlet.http.Cookie("pl-auth-token", token)))
+                        .cookie(new jakarta.servlet.http.Cookie("pl-auth-token", token)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.email").value("me@example.com"))
-                .andExpect(jsonPath("$.groups[0].groupId").value("group123"))
+                .andExpect(jsonPath("$.groups[0].groupId").value(GROUP_ID.toString()))
                 .andExpect(jsonPath("$.groups[0].name").value("My Group"));
     }
 
@@ -340,15 +350,14 @@ public class IdentityControllerTest {
                 "email", "test@example.com",
                 "name", "Test",
                 "password", "pass",
-                "inviteCode", "CODE123"
-        );
+                "inviteCode", "CODE123");
 
         when(restTemplate.getForEntity(anyString(), eq(GroupDTO.class)))
                 .thenThrow(new org.springframework.web.client.RestClientException("group error"));
 
         mockMvc.perform(post("/api/identity/intercessor/register")
-                .contentType("application/json")
-                .content(objectMapper.writeValueAsString(body)))
+                        .contentType("application/json")
+                        .content(objectMapper.writeValueAsString(body)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.error").value("Invalid invite code"));
     }
@@ -359,22 +368,22 @@ public class IdentityControllerTest {
                 "email", "test@example.com",
                 "name", "Test",
                 "password", "pass",
-                "inviteCode", "CODE123"
-        );
+                "inviteCode", "CODE123");
 
-        GroupDTO group = GroupDTO.builder()
-                .groupId("group123")
-                .name("Group")
-                .build();
+        GroupDTO group = GroupDTO.builder().groupId(GROUP_ID).name("Group").build();
 
         when(restTemplate.getForEntity(anyString(), eq(GroupDTO.class)))
                 .thenReturn(new org.springframework.http.ResponseEntity<>(group, HttpStatus.OK));
-        when(restTemplate.exchange(anyString(), eq(HttpMethod.GET), any(), any(org.springframework.core.ParameterizedTypeReference.class)))
+        when(restTemplate.exchange(
+                        anyString(),
+                        eq(HttpMethod.GET),
+                        any(),
+                        any(org.springframework.core.ParameterizedTypeReference.class)))
                 .thenThrow(new org.springframework.web.client.RestClientException("member error"));
 
         mockMvc.perform(post("/api/identity/intercessor/register")
-                .contentType("application/json")
-                .content(objectMapper.writeValueAsString(body)))
+                        .contentType("application/json")
+                        .content(objectMapper.writeValueAsString(body)))
                 .andExpect(status().isForbidden())
                 .andExpect(jsonPath("$.error").value("Email is not pre-authorized for this invite code"));
     }
@@ -391,11 +400,15 @@ public class IdentityControllerTest {
         when(nameClaim.asString()).thenReturn("Me");
 
         when(jwtUtil.verifyToken(token)).thenReturn(decoded);
-        when(restTemplate.exchange(anyString(), eq(HttpMethod.GET), any(), any(org.springframework.core.ParameterizedTypeReference.class)))
+        when(restTemplate.exchange(
+                        anyString(),
+                        eq(HttpMethod.GET),
+                        any(),
+                        any(org.springframework.core.ParameterizedTypeReference.class)))
                 .thenThrow(new org.springframework.web.client.RestClientException("search error"));
 
         mockMvc.perform(get("/api/identity/intercessor/me")
-                .cookie(new jakarta.servlet.http.Cookie("pl-auth-token", token)))
+                        .cookie(new jakarta.servlet.http.Cookie("pl-auth-token", token)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.groups").isEmpty());
     }
@@ -414,18 +427,22 @@ public class IdentityControllerTest {
         when(jwtUtil.verifyToken(token)).thenReturn(decoded);
 
         GroupMemberDTO member = GroupMemberDTO.builder()
-                .groupId("group123")
-                .memberId("member123")
+                .groupId(GROUP_ID)
+                .memberId(MEMBER_ID)
                 .email("me@example.com")
                 .build();
 
-        when(restTemplate.exchange(anyString(), eq(HttpMethod.GET), any(), any(org.springframework.core.ParameterizedTypeReference.class)))
+        when(restTemplate.exchange(
+                        anyString(),
+                        eq(HttpMethod.GET),
+                        any(),
+                        any(org.springframework.core.ParameterizedTypeReference.class)))
                 .thenReturn(new org.springframework.http.ResponseEntity<>(List.of(member), HttpStatus.OK));
         when(restTemplate.getForObject(anyString(), eq(GroupDTO.class)))
                 .thenThrow(new org.springframework.web.client.RestClientException("details error"));
 
         mockMvc.perform(get("/api/identity/intercessor/me")
-                .cookie(new jakarta.servlet.http.Cookie("pl-auth-token", token)))
+                        .cookie(new jakarta.servlet.http.Cookie("pl-auth-token", token)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.groups").isEmpty());
     }
@@ -436,7 +453,7 @@ public class IdentityControllerTest {
         when(jwtUtil.verifyToken(token)).thenThrow(new RuntimeException("invalid token"));
 
         mockMvc.perform(get("/api/identity/intercessor/me")
-                .cookie(new jakarta.servlet.http.Cookie("pl-auth-token", token)))
+                        .cookie(new jakarta.servlet.http.Cookie("pl-auth-token", token)))
                 .andExpect(status().isUnauthorized())
                 .andExpect(jsonPath("$.error").value("Invalid or expired token"));
     }

@@ -1,33 +1,25 @@
 package com.prayerlink.common.dto;
 
-import java.time.Instant;
-import java.util.List;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import com.prayerlink.common.enums.PrayerStatus;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
+import java.time.Instant;
+import java.util.List;
+import java.util.UUID;
+import lombok.Builder;
 
-@Data
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
-public class PrayerDTO {
-  private String prayerId;
-  private String deviceId;
+@Builder(toBuilder = true)
+public record PrayerDTO(
+        UUID prayerId,
+        UUID deviceId,
 
-  @NotBlank
-  @Size(min = 10, max = 2000)
-  private String prayerText;
+        @NotBlank @Size(min = 10, max = 2000) String prayerText,
 
-  private String groupId;
-  private String assignedGroupId;
-  private String status;
-  private Integer prayedForCount;
-  private Instant createdAt;
-  private Instant updatedAt;
-  private Boolean hasPrayed;
-  private List<PrayerUpdateDTO> updates;
-}
-
+        UUID groupId,
+        UUID assignedGroupId,
+        PrayerStatus status,
+        Integer prayedForCount,
+        Instant createdAt,
+        Instant updatedAt,
+        Boolean hasPrayed,
+        List<PrayerUpdateDTO> updates) {}

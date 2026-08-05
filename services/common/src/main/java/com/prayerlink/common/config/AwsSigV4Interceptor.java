@@ -4,20 +4,20 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
-
+import org.jspecify.annotations.NullMarked;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpRequest;
 import org.springframework.http.client.ClientHttpRequestExecution;
 import org.springframework.http.client.ClientHttpRequestInterceptor;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.http.client.support.HttpRequestWrapper;
-
 import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
-import software.amazon.awssdk.auth.credentials.DefaultCredentialsProvider;
-import software.amazon.awssdk.auth.signer.Aws4Signer;
-import software.amazon.awssdk.auth.signer.params.Aws4SignerParams;
+import software.amazon.awssdk.auth.credentials.EnvironmentVariableCredentialsProvider;
 import software.amazon.awssdk.http.SdkHttpFullRequest;
 import software.amazon.awssdk.http.SdkHttpMethod;
+import software.amazon.awssdk.http.SdkHttpRequest;
+import software.amazon.awssdk.http.auth.aws.signer.AwsV4HttpSigner;
+import software.amazon.awssdk.http.auth.spi.signer.SignedRequest;
 import software.amazon.awssdk.regions.Region;
 
 /**
@@ -29,7 +29,7 @@ import software.amazon.awssdk.regions.Region;
  */
 public class AwsSigV4Interceptor implements ClientHttpRequestInterceptor {
 
-    private Aws4Signer signer;
+    private AwsV4HttpSigner signer;
     private AwsCredentialsProvider credentialsProvider;
     private final Region region;
 
@@ -38,21 +38,21 @@ public class AwsSigV4Interceptor implements ClientHttpRequestInterceptor {
     }
 
     @Override
-    public ClientHttpResponse intercept(HttpRequest request, byte[] body,
-            ClientHttpRequestExecution execution) throws IOException {
+    @NullMarked
+    public ClientHttpResponse intercept(HttpRequest request, byte[] body, ClientHttpRequestExecution execution)
+            throws IOException {
 
         URI uri = request.getURI();
         String host = uri.getHost();
 
-        // Only sign requests to Lambda Function URLs
         if (host == null || !host.contains(".lambda-url.") || !host.endsWith(".on.aws")) {
             return execution.execute(request, body);
         }
 
         // Lazy initialization to avoid GraalVM startup reflection crashes
         if (this.signer == null) {
-            this.signer = Aws4Signer.create();
-            this.credentialsProvider = software.amazon.awssdk.auth.credentials.EnvironmentVariableCredentialsProvider.create();
+            this.signer = AwsV4HttpSigner.create();
+            this.credentialsProvider = EnvironmentVariableCredentialsProvider.create();
         }
 
         // Convert Spring HttpRequest → AWS SDK SdkHttpFullRequest
@@ -66,31 +66,28 @@ public class AwsSigV4Interceptor implements ClientHttpRequestInterceptor {
             }
         });
 
-        if (body != null && body.length > 0) {
+        if (body.length > 0) {
             sdkBuilder.contentStreamProvider(() -> new ByteArrayInputStream(body));
         }
 
-        // Sign the request
-        Aws4SignerParams params = Aws4SignerParams.builder()
-                .signingName("lambda")
-                .signingRegion(this.region)
-                .awsCredentials(credentialsProvider.resolveCredentials())
-                .build();
+        SdkHttpFullRequest builtRequest = sdkBuilder.build();
+        SignedRequest signedRequest = signer.sign(r -> r.identity(credentialsProvider.resolveCredentials())
+                .request(builtRequest)
+                .payload(builtRequest.contentStreamProvider().orElse(null))
+                .putProperty(AwsV4HttpSigner.SERVICE_SIGNING_NAME, "lambda")
+                .putProperty(AwsV4HttpSigner.REGION_NAME, this.region.id()));
 
-        SdkHttpFullRequest signed = signer.sign(sdkBuilder.build(), params);
-
-        // Copy all headers from the signed request (originals + Authorization, X-Amz-Date, etc.)
+        SdkHttpRequest signed = signedRequest.request();
         HttpHeaders signedHeaders = new HttpHeaders();
-        signed.headers().forEach((name, values) ->
-                signedHeaders.addAll(name, new ArrayList<>(values)));
+        signed.headers().forEach((name, values) -> signedHeaders.addAll(name, new ArrayList<>(values)));
 
-        HttpRequest signedRequest = new HttpRequestWrapper(request) {
+        HttpRequest wrappedRequest = new HttpRequestWrapper(request) {
             @Override
             public HttpHeaders getHeaders() {
                 return signedHeaders;
             }
         };
 
-        return execution.execute(signedRequest, body);
+        return execution.execute(wrappedRequest, body);
     }
 }

@@ -14,7 +14,7 @@ public class HmacUtilTest {
         String token = HmacUtil.generateToken(data, secret);
         assertNotNull(token);
         assertFalse(token.isEmpty());
-        
+
         // Verification round-trip
         assertTrue(HmacUtil.verifyToken(data, token, secret));
     }
@@ -30,7 +30,7 @@ public class HmacUtilTest {
     void verifyTokenWithTamperedPayloadReturnsFalse() {
         String data = "original-payload-data";
         String token = HmacUtil.generateToken(data, secret);
-        
+
         // Attempting to verify with modified data should fail
         assertFalse(HmacUtil.verifyToken("modified-payload-data", token, secret));
     }
@@ -39,7 +39,7 @@ public class HmacUtilTest {
     void verifyTokenWithDifferentSecretReturnsFalse() {
         String data = "payload-data";
         String token = HmacUtil.generateToken(data, secret);
-        
+
         String wrongSecret = "wrong-hmac-sha-256-secret-key";
         assertFalse(HmacUtil.verifyToken(data, token, wrongSecret));
     }

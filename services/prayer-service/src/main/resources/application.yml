@@ -5,6 +5,10 @@ spring:
   application:
     name: prayer-service
 
+aws:
+  eventbridge:
+    bus: prayer-link-bus
+
 management:
   health:
     diskspace:
@@ -16,18 +20,4 @@ management:
   endpoint:
     health:
       show-details: always
----
-spring:
-  config:
-    activate:
-      on-profile: local
-
-aws:
-  dynamodb:
-    endpoint: http://localhost:8000
-    region: eu-west-1
-  eventbridge:
-    endpoint: http://localhost:4566
-    region: eu-west-1
-    bus: prayer-link-bus
 

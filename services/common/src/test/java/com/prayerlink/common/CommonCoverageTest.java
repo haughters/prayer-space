@@ -13,32 +13,33 @@ public class CommonCoverageTest {
 
     @Test
     void testDTOsAndEventsAndExceptions() {
+        java.util.UUID testUuid = java.util.UUID.randomUUID();
         // 1. DeviceDTO
         DeviceDTO device = DeviceDTO.builder()
-                .deviceId("device-123")
+                .deviceId(testUuid)
                 .createdAt(Instant.now())
                 .lastActiveAt(Instant.now())
                 .platform("web")
                 .build();
-        assertEquals("device-123", device.getDeviceId());
+        assertEquals(testUuid, device.getDeviceId());
         assertNotNull(device.getCreatedAt());
         assertNotNull(device.getLastActiveAt());
         assertEquals("web", device.getPlatform());
-        
+
         DeviceDTO device2 = new DeviceDTO();
-        device2.setDeviceId("device-456");
-        assertEquals("device-456", device2.getDeviceId());
+        device2.setDeviceId(testUuid);
+        assertEquals(testUuid, device2.getDeviceId());
 
         // 2. GroupDTO
         GroupDTO group = GroupDTO.builder()
-                .groupId("group-123")
+                .groupId(testUuid)
                 .name("Healing")
                 .description("Pray for healing")
                 .passcode("AAABBB")
                 .optOutGeneral(true)
                 .createdAt(Instant.now())
                 .build();
-        assertEquals("group-123", group.getGroupId());
+        assertEquals(testUuid, group.getGroupId());
         assertEquals("Healing", group.getName());
         assertEquals("Pray for healing", group.getDescription());
         assertEquals("AAABBB", group.getPasscode());
@@ -47,18 +48,18 @@ public class CommonCoverageTest {
 
         // 3. GroupMemberDTO
         GroupMemberDTO member = GroupMemberDTO.builder()
-                .groupId("group-123")
-                .memberId("member-123")
-                .deviceId("device-123")
+                .groupId(testUuid)
+                .memberId(testUuid)
+                .deviceId(testUuid)
                 .name("Alice")
                 .email("alice@example.com")
                 .role("MEMBER")
                 .bounced(false)
                 .joinedAt(Instant.now())
                 .build();
-        assertEquals("group-123", member.getGroupId());
-        assertEquals("member-123", member.getMemberId());
-        assertEquals("device-123", member.getDeviceId());
+        assertEquals(testUuid, member.getGroupId());
+        assertEquals(testUuid, member.getMemberId());
+        assertEquals(testUuid, member.getDeviceId());
         assertEquals("Alice", member.getName());
         assertEquals("alice@example.com", member.getEmail());
         assertEquals("MEMBER", member.getRole());
@@ -67,16 +68,16 @@ public class CommonCoverageTest {
 
         // 4. MemberDTO
         MemberDTO mDto = MemberDTO.builder()
-                .groupId("group-123")
-                .memberId("member-123")
-                .deviceId("device-123")
+                .groupId(testUuid)
+                .memberId(testUuid)
+                .deviceId(testUuid)
                 .email("alice@example.com")
                 .role("MEMBER")
                 .joinedAt(Instant.now())
                 .build();
-        assertEquals("group-123", mDto.getGroupId());
-        assertEquals("member-123", mDto.getMemberId());
-        assertEquals("device-123", mDto.getDeviceId());
+        assertEquals(testUuid, mDto.getGroupId());
+        assertEquals(testUuid, mDto.getMemberId());
+        assertEquals(testUuid, mDto.getDeviceId());
         assertEquals("alice@example.com", mDto.getEmail());
         assertEquals("MEMBER", mDto.getRole());
         assertNotNull(mDto.getJoinedAt());
@@ -90,62 +91,62 @@ public class CommonCoverageTest {
                 .updateText("Healed!")
                 .updatedAt(Instant.now())
                 .build();
-        assertEquals("Healed!", update.getUpdateText());
-        assertNotNull(update.getUpdatedAt());
+        assertEquals("Healed!", update.updateText());
+        assertNotNull(update.updatedAt());
 
         PrayerDTO prayer = PrayerDTO.builder()
-                .prayerId("p-123")
-                .deviceId("d-123")
+                .prayerId(testUuid)
+                .deviceId(testUuid)
                 .prayerText("Please pray")
-                .groupId("g-123")
-                .assignedGroupId("g-123")
-                .status("OPEN")
+                .groupId(testUuid)
+                .assignedGroupId(testUuid)
+                .status(com.prayerlink.common.enums.PrayerStatus.OPEN)
                 .prayedForCount(5)
                 .createdAt(Instant.now())
                 .updatedAt(Instant.now())
                 .hasPrayed(true)
                 .updates(List.of(update))
                 .build();
-        assertEquals("p-123", prayer.getPrayerId());
-        assertEquals("d-123", prayer.getDeviceId());
-        assertEquals("Please pray", prayer.getPrayerText());
-        assertEquals("g-123", prayer.getGroupId());
-        assertEquals("g-123", prayer.getAssignedGroupId());
-        assertEquals("OPEN", prayer.getStatus());
-        assertEquals(5, prayer.getPrayedForCount());
-        assertNotNull(prayer.getCreatedAt());
-        assertNotNull(prayer.getUpdatedAt());
-        assertTrue(prayer.getHasPrayed());
-        assertEquals(1, prayer.getUpdates().size());
+        assertEquals(testUuid, prayer.prayerId());
+        assertEquals(testUuid, prayer.deviceId());
+        assertEquals("Please pray", prayer.prayerText());
+        assertEquals(testUuid, prayer.groupId());
+        assertEquals(testUuid, prayer.assignedGroupId());
+        assertEquals(com.prayerlink.common.enums.PrayerStatus.OPEN, prayer.status());
+        assertEquals(5, prayer.prayedForCount());
+        assertNotNull(prayer.createdAt());
+        assertNotNull(prayer.updatedAt());
+        assertTrue(prayer.hasPrayed());
+        assertEquals(1, prayer.updates().size());
 
         // 6. Events
         MemberAddedEvent mae = MemberAddedEvent.builder()
-                .groupId("g-1")
-                .memberId("m-1")
+                .groupId(testUuid)
+                .memberId(testUuid)
                 .email("m@ex.com")
                 .name("Name")
                 .addedAt(Instant.now())
                 .build();
-        assertEquals("g-1", mae.getGroupId());
-        assertEquals("m-1", mae.getMemberId());
+        assertEquals(testUuid, mae.getGroupId());
+        assertEquals(testUuid, mae.getMemberId());
         assertEquals("m@ex.com", mae.getEmail());
         assertEquals("Name", mae.getName());
         assertNotNull(mae.getAddedAt());
 
         PrayerCreatedEvent pce = PrayerCreatedEvent.builder()
-                .prayerId("p-1")
+                .prayerId(testUuid)
                 .prayerText("text")
-                .assignedGroupId("g-1")
+                .assignedGroupId(testUuid)
                 .build();
-        assertEquals("p-1", pce.getPrayerId());
+        assertEquals(testUuid, pce.getPrayerId());
         assertEquals("text", pce.getPrayerText());
-        assertEquals("g-1", pce.getAssignedGroupId());
+        assertEquals(testUuid, pce.getAssignedGroupId());
 
         PrayerUpdatedEvent pue = PrayerUpdatedEvent.builder()
-                .prayerId("p-1")
+                .prayerId(testUuid)
                 .updateText("updated")
                 .build();
-        assertEquals("p-1", pue.getPrayerId());
+        assertEquals(testUuid, pue.getPrayerId());
         assertEquals("updated", pue.getUpdateText());
 
         // 7. Exceptions

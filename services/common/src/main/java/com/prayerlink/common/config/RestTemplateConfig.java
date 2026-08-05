@@ -1,14 +1,12 @@
 package com.prayerlink.common.config;
 
+import com.prayerlink.common.dto.*;
+import com.prayerlink.common.event.*;
+import com.prayerlink.common.exception.ErrorResponse;
+import org.springframework.aot.hint.annotation.RegisterReflectionForBinding;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.web.client.RestTemplate;
-
-import org.springframework.aot.hint.annotation.RegisterReflectionForBinding;
-import com.prayerlink.common.dto.*;
-import com.prayerlink.common.event.*;
-
-import com.prayerlink.common.exception.ErrorResponse;
 
 @RegisterReflectionForBinding({
     DeviceDTO.class,

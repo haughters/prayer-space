@@ -17,10 +17,13 @@ curl_and_check() {
 
   CURL_ARGS=(
     -s -o /tmp/curl.txt -w "%{http_code}"
+    -X "$method"
+  )
+
+  CURL_ARGS+=(
     --aws-sigv4 "aws:amz:${AWS_REGION}:lambda"
     --user "$AWS_ACCESS_KEY_ID:$AWS_SECRET_ACCESS_KEY"
     -H "x-amz-security-token:$AWS_SESSION_TOKEN"
-    -X "$method"
   )
   if [ -n "$body" ]; then
     CURL_ARGS+=(-H "Content-Type: application/json" -d "$body")

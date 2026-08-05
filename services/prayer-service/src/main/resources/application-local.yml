@@ -1,0 +1,19 @@
+spring:
+  main:
+    web-application-type: servlet
+  autoconfigure:
+    exclude:
+      - org.springframework.cloud.function.serverless.web.ServerlessAutoConfiguration
+
+services:
+  group-service:
+    url: http://localhost:8083
+
+aws:
+  dynamodb:
+    endpoint: http://localhost:8000
+    region: eu-west-1
+  eventbridge:
+    endpoint: http://localhost:4566
+    region: eu-west-1
+    bus: prayer-link-bus

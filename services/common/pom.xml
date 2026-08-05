@@ -57,6 +57,10 @@
             <groupId>software.amazon.awssdk</groupId>
             <artifactId>regions</artifactId>
         </dependency>
+        <dependency>
+            <groupId>software.amazon.awssdk</groupId>
+            <artifactId>http-auth-aws</artifactId>
+        </dependency>
     <dependency><groupId>software.amazon.awssdk</groupId><artifactId>url-connection-client</artifactId></dependency>
     <dependency>
         <groupId>jakarta.servlet</groupId>

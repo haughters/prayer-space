@@ -1,6 +1,7 @@
 package com.prayerlink.common.event;
 
 import java.time.Instant;
+import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -11,9 +12,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class MemberAddedEvent {
-  private String groupId;
-  private String memberId;
-  private String email;
-  private String name;
-  private Instant addedAt;
+    private UUID groupId;
+    private UUID memberId;
+    private String email;
+    private String name;
+    private Instant addedAt;
 }

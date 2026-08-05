@@ -5,7 +5,6 @@ import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-import tools.jackson.databind.ObjectMapper;
 import com.prayerlink.common.dto.GroupDTO;
 import com.prayerlink.common.dto.GroupMemberDTO;
 import com.prayerlink.group.model.Group;
@@ -16,22 +15,22 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import software.amazon.awssdk.services.eventbridge.EventBridgeClient;
 import software.amazon.awssdk.services.eventbridge.model.PutEventsRequest;
 import software.amazon.awssdk.services.eventbridge.model.PutEventsResponse;
+import tools.jackson.databind.ObjectMapper;
 
 @WebMvcTest(GroupController.class)
-@TestPropertySource(properties = {
-    "aws.eventbridge.bus=prayer-link-bus"
-})
+@TestPropertySource(properties = {"aws.eventbridge.bus=prayer-link-bus"})
 public class GroupControllerTest {
 
     @Autowired
@@ -51,7 +50,8 @@ public class GroupControllerTest {
 
     @BeforeEach
     void setUp() {
-        PutEventsResponse mockResponse = PutEventsResponse.builder().failedEntryCount(0).build();
+        PutEventsResponse mockResponse =
+                PutEventsResponse.builder().failedEntryCount(0).build();
         when(eventBridgeClient.putEvents(any(PutEventsRequest.class))).thenReturn(mockResponse);
     }
 
@@ -65,8 +65,8 @@ public class GroupControllerTest {
         when(groupRepository.findByPasscode("WELCOM")).thenReturn(Optional.empty());
 
         mockMvc.perform(post("/api/groups")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(inputDto)))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(inputDto)))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.name").value("Test Group"))
                 .andExpect(jsonPath("$.passcode").value("WELCOM"));
@@ -79,20 +79,20 @@ public class GroupControllerTest {
         inputDto.setPasscode("DUPCOD");
 
         Group existingGroup = new Group();
-        existingGroup.setGroupId("existing123");
+        existingGroup.setGroupId(UUID.fromString("00000000-0000-0000-0000-000000000123"));
         existingGroup.setPasscode("DUPCOD");
 
         when(groupRepository.findByPasscode("DUPCOD")).thenReturn(Optional.of(existingGroup));
 
         mockMvc.perform(post("/api/groups")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(inputDto)))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(inputDto)))
                 .andExpect(status().isConflict());
     }
 
     @Test
     void getGroupWhenExistsReturnsGroup() throws Exception {
-        String groupId = "group123";
+        UUID groupId = UUID.fromString("00000000-0000-0000-0000-000000000123");
         Group group = new Group();
         group.setGroupId(groupId);
         group.setName("Assigned Group");
@@ -101,31 +101,30 @@ public class GroupControllerTest {
 
         mockMvc.perform(get("/api/groups/" + groupId))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.groupId").value(groupId))
+                .andExpect(jsonPath("$.groupId").value(groupId.toString()))
                 .andExpect(jsonPath("$.name").value("Assigned Group"));
     }
 
     @Test
     void getGroupWhenNotFoundReturns404() throws Exception {
-        String groupId = "nonexistent";
+        UUID groupId = UUID.fromString("00000000-0000-0000-0000-000000000999");
         when(groupRepository.findById(groupId)).thenReturn(Optional.empty());
 
-        mockMvc.perform(get("/api/groups/" + groupId))
-                .andExpect(status().isNotFound());
+        mockMvc.perform(get("/api/groups/" + groupId)).andExpect(status().isNotFound());
     }
 
     @Test
     void validatePasscodeWithValidCodeReturnsGroup() throws Exception {
         String passcode = "AAABBB";
         Group group = new Group();
-        group.setGroupId("group123");
+        group.setGroupId(UUID.fromString("00000000-0000-0000-0000-000000000123"));
         group.setPasscode(passcode);
 
         when(groupRepository.findByPasscode(passcode)).thenReturn(Optional.of(group));
 
         mockMvc.perform(get("/api/groups/validate?passcode=" + passcode))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.groupId").value("group123"));
+                .andExpect(jsonPath("$.groupId").value("00000000-0000-0000-0000-000000000123"));
     }
 
     @Test
@@ -133,13 +132,12 @@ public class GroupControllerTest {
         String passcode = "CCCDDD";
         when(groupRepository.findByPasscode(passcode)).thenReturn(Optional.empty());
 
-        mockMvc.perform(get("/api/groups/validate?passcode=" + passcode))
-                .andExpect(status().isNotFound());
+        mockMvc.perform(get("/api/groups/validate?passcode=" + passcode)).andExpect(status().isNotFound());
     }
 
     @Test
     void addMemberWithValidEmailReturnsMember() throws Exception {
-        String groupId = "group123";
+        UUID groupId = UUID.fromString("00000000-0000-0000-0000-000000000123");
         GroupMemberDTO memberDto = new GroupMemberDTO();
         memberDto.setEmail("member@example.com");
         memberDto.setName("Member Name");
@@ -149,8 +147,8 @@ public class GroupControllerTest {
         when(groupRepository.findById(groupId)).thenReturn(Optional.of(group));
 
         mockMvc.perform(post("/api/groups/" + groupId + "/members")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(memberDto)))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(memberDto)))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.email").value("member@example.com"));
     }
@@ -158,11 +156,11 @@ public class GroupControllerTest {
     @Test
     void listGroupsReturnsAll() throws Exception {
         Group group1 = new Group();
-        group1.setGroupId("group1");
+        group1.setGroupId(UUID.fromString("00000000-0000-0000-0000-000000000001"));
         group1.setName("Group One");
 
         Group group2 = new Group();
-        group2.setGroupId("group2");
+        group2.setGroupId(UUID.fromString("00000000-0000-0000-0000-000000000002"));
         group2.setName("Group Two");
 
         when(groupRepository.findAll()).thenReturn(List.of(group1, group2));
@@ -170,13 +168,13 @@ public class GroupControllerTest {
         mockMvc.perform(get("/api/groups"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(2))
-                .andExpect(jsonPath("$[0].groupId").value("group1"))
-                .andExpect(jsonPath("$[1].groupId").value("group2"));
+                .andExpect(jsonPath("$[0].groupId").value("00000000-0000-0000-0000-000000000001"))
+                .andExpect(jsonPath("$[1].groupId").value("00000000-0000-0000-0000-000000000002"));
     }
 
     @Test
     void updateGroupWithValidInputUpdatesFields() throws Exception {
-        String groupId = "group123";
+        UUID groupId = UUID.fromString("00000000-0000-0000-0000-000000000123");
         Group existingGroup = new Group();
         existingGroup.setGroupId(groupId);
         existingGroup.setName("Old Name");
@@ -191,8 +189,8 @@ public class GroupControllerTest {
         when(groupRepository.findByPasscode("NEWCOD")).thenReturn(Optional.empty());
 
         mockMvc.perform(put("/api/groups/" + groupId)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(updateDto)))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(updateDto)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.name").value("New Name"))
                 .andExpect(jsonPath("$.description").value("New Description"))
@@ -203,32 +201,31 @@ public class GroupControllerTest {
 
     @Test
     void deleteGroupCascadesMembers() throws Exception {
-        String groupId = "group123";
+        UUID groupId = UUID.fromString("00000000-0000-0000-0000-000000000123");
         Group group = new Group();
         group.setGroupId(groupId);
 
         GroupMember member1 = new GroupMember();
         member1.setGroupId(groupId);
-        member1.setMemberId("member1");
+        member1.setMemberId(UUID.fromString("00000000-0000-0000-0000-000000000001"));
 
         GroupMember member2 = new GroupMember();
         member2.setGroupId(groupId);
-        member2.setMemberId("member2");
+        member2.setMemberId(UUID.fromString("00000000-0000-0000-0000-000000000002"));
 
         when(groupRepository.findById(groupId)).thenReturn(Optional.of(group));
         when(groupMemberRepository.findByGroupId(groupId)).thenReturn(List.of(member1, member2));
 
-        mockMvc.perform(delete("/api/groups/" + groupId))
-                .andExpect(status().isNoContent());
+        mockMvc.perform(delete("/api/groups/" + groupId)).andExpect(status().isNoContent());
 
-        verify(groupMemberRepository).delete(groupId, "member1");
-        verify(groupMemberRepository).delete(groupId, "member2");
+        verify(groupMemberRepository).delete(groupId, UUID.fromString("00000000-0000-0000-0000-000000000001"));
+        verify(groupMemberRepository).delete(groupId, UUID.fromString("00000000-0000-0000-0000-000000000002"));
         verify(groupRepository).delete(groupId);
     }
 
     @Test
     void addMemberWithDuplicateEmailReturns409() throws Exception {
-        String groupId = "group123";
+        UUID groupId = UUID.fromString("00000000-0000-0000-0000-000000000123");
         GroupMemberDTO memberDto = new GroupMemberDTO();
         memberDto.setEmail("duplicate@example.com");
         memberDto.setName("Duplicate Name");
@@ -244,20 +241,20 @@ public class GroupControllerTest {
         when(groupMemberRepository.findByGroupId(groupId)).thenReturn(List.of(existingMember));
 
         mockMvc.perform(post("/api/groups/" + groupId + "/members")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(memberDto)))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(memberDto)))
                 .andExpect(status().isConflict());
     }
 
     @Test
     void listMembersReturnsList() throws Exception {
-        String groupId = "group123";
+        UUID groupId = UUID.fromString("00000000-0000-0000-0000-000000000123");
         Group group = new Group();
         group.setGroupId(groupId);
 
         GroupMember member1 = new GroupMember();
         member1.setGroupId(groupId);
-        member1.setMemberId("member1");
+        member1.setMemberId(UUID.fromString("00000000-0000-0000-0000-000000000001"));
         member1.setEmail("member1@example.com");
 
         when(groupRepository.findById(groupId)).thenReturn(Optional.of(group));
@@ -266,14 +263,14 @@ public class GroupControllerTest {
         mockMvc.perform(get("/api/groups/" + groupId + "/members"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(1))
-                .andExpect(jsonPath("$[0].memberId").value("member1"))
+                .andExpect(jsonPath("$[0].memberId").value("00000000-0000-0000-0000-000000000001"))
                 .andExpect(jsonPath("$[0].email").value("member1@example.com"));
     }
 
     @Test
     void removeMemberWhenExistsReturns204() throws Exception {
-        String groupId = "group123";
-        String memberId = "member123";
+        UUID groupId = UUID.fromString("00000000-0000-0000-0000-000000000123");
+        UUID memberId = UUID.fromString("00000000-0000-0000-0000-000000000456");
         GroupMember member = new GroupMember();
         member.setGroupId(groupId);
         member.setMemberId(memberId);
@@ -288,8 +285,8 @@ public class GroupControllerTest {
 
     @Test
     void removeMemberWhenNotFoundReturns404() throws Exception {
-        String groupId = "group123";
-        String memberId = "nonexistent";
+        UUID groupId = UUID.fromString("00000000-0000-0000-0000-000000000123");
+        UUID memberId = UUID.fromString("00000000-0000-0000-0000-000000000999");
 
         when(groupMemberRepository.findById(groupId, memberId)).thenReturn(Optional.empty());
 
@@ -301,13 +298,13 @@ public class GroupControllerTest {
     void searchByEmailWhenFoundReturnsMemberships() throws Exception {
         String email = "search@example.com";
         GroupMember member1 = new GroupMember();
-        member1.setGroupId("group1");
-        member1.setMemberId("member1");
+        member1.setGroupId(UUID.fromString("00000000-0000-0000-0000-000000000001"));
+        member1.setMemberId(UUID.fromString("00000000-0000-0000-0000-000000000001"));
         member1.setEmail(email);
 
         GroupMember member2 = new GroupMember();
-        member2.setGroupId("group2");
-        member2.setMemberId("member2");
+        member2.setGroupId(UUID.fromString("00000000-0000-0000-0000-000000000002"));
+        member2.setMemberId(UUID.fromString("00000000-0000-0000-0000-000000000002"));
         member2.setEmail(email);
 
         when(groupMemberRepository.findByEmail(email)).thenReturn(List.of(member1, member2));
@@ -315,8 +312,8 @@ public class GroupControllerTest {
         mockMvc.perform(get("/api/groups/members/search?email=" + email))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(2))
-                .andExpect(jsonPath("$[0].groupId").value("group1"))
-                .andExpect(jsonPath("$[1].groupId").value("group2"));
+                .andExpect(jsonPath("$[0].groupId").value("00000000-0000-0000-0000-000000000001"))
+                .andExpect(jsonPath("$[1].groupId").value("00000000-0000-0000-0000-000000000002"));
     }
 
     @Test
@@ -333,16 +330,16 @@ public class GroupControllerTest {
     void markBounceUpdatesStatus() throws Exception {
         String email = "bounce@example.com";
         GroupMember member1 = new GroupMember();
-        member1.setGroupId("group1");
-        member1.setMemberId("member1");
+        member1.setGroupId(UUID.fromString("00000000-0000-0000-0000-000000000001"));
+        member1.setMemberId(UUID.fromString("00000000-0000-0000-0000-000000000001"));
         member1.setEmail(email);
         member1.setBounced(false);
 
         when(groupMemberRepository.findByEmail(email)).thenReturn(List.of(member1));
 
         mockMvc.perform(put("/api/groups/members/bounce")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(Map.of("email", email))))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(Map.of("email", email))))
                 .andExpect(status().isNoContent());
 
         verify(groupMemberRepository).save(argThat(m -> m.getBounced().equals(true)));
@@ -350,7 +347,7 @@ public class GroupControllerTest {
 
     @Test
     void regeneratePasscodeGeneratesNewCode() throws Exception {
-        String groupId = "group123";
+        UUID groupId = UUID.fromString("00000000-0000-0000-0000-000000000123");
         Group existingGroup = new Group();
         existingGroup.setGroupId(groupId);
         existingGroup.setName("Group Name");
@@ -363,8 +360,8 @@ public class GroupControllerTest {
         when(groupRepository.findByPasscode("NEWCOD")).thenReturn(Optional.empty());
 
         mockMvc.perform(put("/api/groups/" + groupId)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(updateDto)))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(updateDto)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.passcode").value("NEWCOD"));
 
