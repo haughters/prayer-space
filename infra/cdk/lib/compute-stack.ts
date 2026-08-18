@@ -2,6 +2,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as cdk from 'aws-cdk-lib';
 import * as lambda from 'aws-cdk-lib/aws-lambda';
+import * as lambdaEventSources from 'aws-cdk-lib/aws-lambda-event-sources';
 import * as dynamodb from 'aws-cdk-lib/aws-dynamodb';
 import * as events from 'aws-cdk-lib/aws-events';
 import * as sqs from 'aws-cdk-lib/aws-sqs';
@@ -144,6 +145,16 @@ export class ComputeStack extends cdk.Stack {
       actions: ['ses:SendEmail', 'ses:SendRawEmail'],
       resources: ['*'],
     }));
+    this.notificationServiceAlias.addEventSource(
+      new lambdaEventSources.SqsEventSource(props.notificationQueue, {
+        batchSize: 10,
+      })
+    );
+    this.notificationServiceAlias.addEventSource(
+      new lambdaEventSources.SqsEventSource(props.bounceQueue, {
+        batchSize: 10,
+      })
+    );
 
     // Link inter-service endpoints to avoid circular references during instantiation
     identitySvc.fn.addEnvironment('SERVICES_GROUP_SERVICE_URL', groupSvc.functionUrl!.url);
