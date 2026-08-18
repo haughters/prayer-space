@@ -394,7 +394,7 @@ public class AdminController {
         DecodedJWT auth = checkAuth(token, "APP_ADMIN", "GROUP_ADMIN");
 
         if ("GROUP_ADMIN".equals(auth.getClaim("role").asString())) {
-            if (!groupId.equals(auth.getClaim("groupId").asString())) {
+            if (!groupId.toString().equals(auth.getClaim("groupId").asString())) {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN)
                         .body(Map.of("error", "You do not have access to update this group."));
             }
@@ -439,7 +439,7 @@ public class AdminController {
         DecodedJWT auth = checkAuth(token, "APP_ADMIN", "GROUP_ADMIN");
 
         if ("GROUP_ADMIN".equals(auth.getClaim("role").asString())) {
-            if (!groupId.equals(auth.getClaim("groupId").asString())) {
+            if (!groupId.toString().equals(auth.getClaim("groupId").asString())) {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
             }
         }
@@ -471,7 +471,7 @@ public class AdminController {
         DecodedJWT auth = checkAuth(token, "APP_ADMIN", "GROUP_ADMIN");
 
         if ("GROUP_ADMIN".equals(auth.getClaim("role").asString())) {
-            if (!groupId.equals(auth.getClaim("groupId").asString())) {
+            if (!groupId.toString().equals(auth.getClaim("groupId").asString())) {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
             }
         }
@@ -499,7 +499,7 @@ public class AdminController {
         DecodedJWT auth = checkAuth(token, "APP_ADMIN", "GROUP_ADMIN");
 
         if ("GROUP_ADMIN".equals(auth.getClaim("role").asString())) {
-            if (!groupId.equals(auth.getClaim("groupId").asString())) {
+            if (!groupId.toString().equals(auth.getClaim("groupId").asString())) {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
             }
         }
@@ -528,7 +528,7 @@ public class AdminController {
         DecodedJWT auth = checkAuth(token, "APP_ADMIN", "GROUP_ADMIN");
 
         if ("GROUP_ADMIN".equals(auth.getClaim("role").asString())) {
-            if (!groupId.equals(auth.getClaim("groupId").asString())) {
+            if (!groupId.toString().equals(auth.getClaim("groupId").asString())) {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
             }
         }
@@ -593,7 +593,7 @@ public class AdminController {
         DecodedJWT auth = checkAuth(token, "APP_ADMIN", "GROUP_ADMIN");
 
         if ("GROUP_ADMIN".equals(auth.getClaim("role").asString())) {
-            if (!groupId.equals(auth.getClaim("groupId").asString())) {
+            if (!groupId.toString().equals(auth.getClaim("groupId").asString())) {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
             }
         }
