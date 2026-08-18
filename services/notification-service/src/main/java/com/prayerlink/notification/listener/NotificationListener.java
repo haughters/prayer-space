@@ -194,7 +194,8 @@ public class NotificationListener {
                 String token = signature + "|" + assignedGroupId + "|" + expiryTimestamp;
 
                 String scheme = appDomain.startsWith("localhost") ? "http://" : "https://";
-                String actionUrl = scheme + appDomain + "/pray/" + event.getPrayerId() + "/" + token;
+                String actionUrl = scheme + appDomain + "/pray.html?prayerId=" + event.getPrayerId() + "&token="
+                        + java.net.URLEncoder.encode(token, java.nio.charset.StandardCharsets.UTF_8);
 
                 sendCreatedEmail(member.getEmail(), group.getName(), event.getPrayerText(), actionUrl);
             } catch (Exception e) {
@@ -273,7 +274,7 @@ public class NotificationListener {
     private void sendCreatedEmail(String recipientEmail, String groupName, String prayerText, String actionUrl) {
         String subject = "Someone Needs Your Prayers";
         String scheme = appDomain.startsWith("localhost") ? "http://" : "https://";
-        String portalUrl = scheme + appDomain + "/intercessor.html#login";
+        String portalUrl = scheme + appDomain + "/portal.html#login";
 
         String htmlBody =
                 "<div style=\"max-width: 600px; margin: 0 auto; font-family: Inter, sans-serif; color: #1a1a2e;\">\n"
@@ -316,7 +317,7 @@ public class NotificationListener {
     private void sendUpdatedEmail(String recipientEmail, String groupName, String prayerText, String updateText) {
         String subject = "Prayer Update: An Answer to Share";
         String scheme = appDomain.startsWith("localhost") ? "http://" : "https://";
-        String portalUrl = scheme + appDomain + "/intercessor.html#login";
+        String portalUrl = scheme + appDomain + "/portal.html#login";
 
         String htmlBody =
                 "<div style=\"max-width: 600px; margin: 0 auto; font-family: Inter, sans-serif; color: #1a1a2e;\">\n"
@@ -401,8 +402,8 @@ public class NotificationListener {
             }
 
             String scheme = appDomain.startsWith("localhost") ? "http://" : "https://";
-            String actionUrl = scheme + appDomain + "/intercessor.html#register?email="
-                    + java.net.URLEncoder.encode(event.getEmail(), "UTF-8");
+            String actionUrl = scheme + appDomain + "/portal.html#register?email="
+                    + java.net.URLEncoder.encode(event.getEmail(), java.nio.charset.StandardCharsets.UTF_8);
 
             sendInvitationEmail(event.getEmail(), group.getName(), event.getName(), actionUrl);
         } catch (Exception e) {
