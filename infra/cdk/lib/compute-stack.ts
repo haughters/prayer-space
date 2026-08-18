@@ -159,6 +159,9 @@ export class ComputeStack extends cdk.Stack {
     // Pass Queue Names to Notification Listener SpEL
     notificationSvc.fn.addEnvironment('AWS_SQS_NOTIFICATION_QUEUE', props.notificationQueue.queueName);
     notificationSvc.fn.addEnvironment('AWS_SQS_BOUNCE_QUEUE', props.bounceQueue.queueName);
+    if (process.env.APP_MAIL_FROM) {
+      notificationSvc.fn.addEnvironment('APP_MAIL_FROM', process.env.APP_MAIL_FROM);
+    }
 
     // Grant inter-service Lambda invocation permissions
     // Each service needs both InvokeFunctionUrl and InvokeFunction on the services it calls.

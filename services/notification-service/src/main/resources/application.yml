@@ -39,7 +39,8 @@ services:
 
 app:
   domain: localhost:5173  # frontend local dev server
-  # In production, this would be the actual domain name
+  mail:
+    from: ${APP_MAIL_FROM:prayers@prayer-link.org}
 
 hmac:
   secret-key: default-secret-key-change-me-in-production

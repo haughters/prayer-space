@@ -43,6 +43,9 @@ public class NotificationListener {
     @Value("${app.domain:localhost:5173}")
     private String appDomain;
 
+    @Value("${app.mail.from:prayers@prayer-link.org}")
+    private String fromEmail;
+
     @Value("${hmac.secret-key:default-secret-key-change-me-in-production}")
     private String hmacSecretKey;
 
@@ -269,7 +272,6 @@ public class NotificationListener {
 
     private void sendCreatedEmail(String recipientEmail, String groupName, String prayerText, String actionUrl) {
         String subject = "Someone Needs Your Prayers";
-        String fromEmail = "prayers@prayer-link.org";
         String scheme = appDomain.startsWith("localhost") ? "http://" : "https://";
         String portalUrl = scheme + appDomain + "/intercessor.html#login";
 
@@ -308,12 +310,11 @@ public class NotificationListener {
                 + "You're receiving this because you're a member of "
                 + groupName + ".\n" + "To unsubscribe, contact your group administrator.";
 
-        sendEmail(recipientEmail, subject, htmlBody, textBody, fromEmail);
+        sendEmail(recipientEmail, subject, htmlBody, textBody, this.fromEmail);
     }
 
     private void sendUpdatedEmail(String recipientEmail, String groupName, String prayerText, String updateText) {
         String subject = "Prayer Update: An Answer to Share";
-        String fromEmail = "prayers@prayer-link.org";
         String scheme = appDomain.startsWith("localhost") ? "http://" : "https://";
         String portalUrl = scheme + appDomain + "/intercessor.html#login";
 
@@ -353,7 +354,7 @@ public class NotificationListener {
                 + "You're receiving this because you're a member of "
                 + groupName + ".\n" + "To unsubscribe, contact your group administrator.";
 
-        sendEmail(recipientEmail, subject, htmlBody, textBody, fromEmail);
+        sendEmail(recipientEmail, subject, htmlBody, textBody, this.fromEmail);
     }
 
     private void sendEmail(String recipientEmail, String subject, String htmlBody, String textBody, String fromEmail) {
@@ -412,7 +413,6 @@ public class NotificationListener {
     private void sendInvitationEmail(
             String recipientEmail, String groupName, String intercessorName, String actionUrl) {
         String subject = "You're Invited to Join Prayer Link";
-        String fromEmail = "prayers@prayer-link.org";
 
         String htmlBody =
                 "<div style=\"max-width: 600px; margin: 0 auto; font-family: Inter, sans-serif; color: #1a1a2e;\">\n"
@@ -443,7 +443,7 @@ public class NotificationListener {
                 + "\n\n" + "---\n"
                 + "If you didn't expect this invitation, you can ignore this email.";
 
-        sendEmail(recipientEmail, subject, htmlBody, textBody, fromEmail);
+        sendEmail(recipientEmail, subject, htmlBody, textBody, this.fromEmail);
     }
 
     private String computeHmac(String data, String secretKey) {

@@ -40,14 +40,14 @@ export class MessagingStack extends cdk.Stack {
       },
     });
 
-    // 4. EventBridge Rule: Route Prayer events to Notification Queue
+    // 4. EventBridge Rule: Route Prayer and Member events to Notification Queue
     const notificationRule = new events.Rule(this, 'NotificationRule', {
       eventBus: this.eventBus,
       ruleName: `${props.deployEnv}-prayer-events-to-notification-queue`,
-      description: 'Routes prayer created/updated events to the notification service queue',
+      description: 'Routes prayer created/updated and member added events to the notification service queue',
       eventPattern: {
-        source: ['com.prayerlink.prayer-service'],
-        detailType: ['PrayerCreated', 'PrayerUpdated'],
+        source: ['com.prayerlink.prayer-service', 'com.prayerlink.group-service'],
+        detailType: ['PrayerCreated', 'PrayerUpdated', 'MemberAdded'],
       },
     });
 

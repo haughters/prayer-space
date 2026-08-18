@@ -51,6 +51,7 @@ public class NotificationListenerTest {
         ReflectionTestUtils.setField(listener, "groupServiceUrl", "http://localhost:8083");
         ReflectionTestUtils.setField(listener, "prayerServiceUrl", "http://localhost:8082");
         ReflectionTestUtils.setField(listener, "appDomain", "localhost:5173");
+        ReflectionTestUtils.setField(listener, "fromEmail", "test-sender@example.com");
         ReflectionTestUtils.setField(listener, "hmacSecretKey", secretKey);
     }
 
