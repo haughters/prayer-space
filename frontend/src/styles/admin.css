@@ -276,6 +276,9 @@ h6 {
   flex-direction: column !important;
   gap: 0.5rem !important;
   margin-bottom: 1.2rem !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  box-sizing: border-box !important;
 }
 
 .admin-form-label {
@@ -288,7 +291,8 @@ h6 {
 .input,
 .textarea,
 select.input {
-  width: 100%;
+  width: 100% !important;
+  max-width: 100% !important;
   padding: 0.65rem 1rem !important;
   font-size: 0.95rem !important;
   line-height: 1.4 !important;
@@ -300,6 +304,8 @@ select.input {
   color: var(--offwhite) !important;
   outline: none !important;
   box-sizing: border-box !important;
+  -webkit-appearance: none;
+  appearance: none;
   transition:
     border-color 0.2s ease,
     box-shadow 0.2s ease !important;
@@ -316,8 +322,26 @@ select.input {
 }
 
 input[type="date"].input {
-  color-scheme: dark;
+  -webkit-appearance: none !important;
+  appearance: none !important;
+  color-scheme: dark !important;
   color: var(--offwhite) !important;
+  display: block !important;
+  max-width: 100% !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+input[type="date"].input::-webkit-date-and-time-value {
+  text-align: left !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+input[type="date"].input::-webkit-calendar-picker-indicator {
+  filter: invert(0.8) !important;
+  cursor: pointer !important;
+  opacity: 0.8;
 }
 
 .input:focus,
@@ -526,6 +550,60 @@ div:has(> .btn-toggle-password) > .input {
   align-items: center;
 }
 
+/* === Group Details / QR Section === */
+.group-qr-card {
+  padding: var(--space-6) !important;
+  margin-bottom: var(--space-6) !important;
+  display: flex !important;
+  gap: var(--space-6) !important;
+  align-items: center !important;
+  flex-wrap: wrap !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+  overflow: hidden !important;
+}
+
+.group-qr-wrapper {
+  background: #ffffff !important;
+  padding: 12px !important;
+  border-radius: 14px !important;
+  border: 1px solid rgba(0, 0, 0, 0.08) !important;
+  width: 180px !important;
+  height: 180px !important;
+  max-width: 100% !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  flex-shrink: 0 !important;
+}
+
+.group-qr-wrapper canvas {
+  width: 156px !important;
+  height: 156px !important;
+  max-width: 100% !important;
+  display: block !important;
+}
+
+.group-qr-info {
+  flex: 1 1 240px !important;
+  min-width: 0 !important;
+  max-width: 100% !important;
+}
+
+.group-qr-details {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: var(--space-2) !important;
+  font-size: var(--font-size-sm) !important;
+}
+
+.group-qr-actions {
+  display: flex !important;
+  gap: var(--space-3) !important;
+  margin-top: 1.25rem !important;
+  flex-wrap: wrap !important;
+}
+
 @media (max-width: 768px) {
   .admin-section-header {
     flex-direction: column !important;
@@ -698,8 +776,16 @@ div:has(> .btn-toggle-password) > .input {
   }
 
   #filter-prayers-form {
-    grid-template-columns: 1fr !important;
-    gap: 0.75rem !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 0.85rem !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  #filter-prayers-form .admin-form-group {
+    width: 100% !important;
+    margin-bottom: 0 !important;
   }
 
   .filter-actions-group {
@@ -717,8 +803,30 @@ div:has(> .btn-toggle-password) > .input {
     justify-content: center !important;
   }
 
-  #member-group-qr-canvas-wrapper {
-    margin: 0 auto !important;
+  .group-qr-card {
+    padding: 1.25rem 1rem !important;
+    gap: 1.25rem !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    text-align: center !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  .group-qr-info {
+    width: 100% !important;
+    text-align: left !important;
+  }
+
+  .group-qr-actions {
+    width: 100% !important;
+    flex-direction: column !important;
+    gap: 0.6rem !important;
+  }
+
+  .group-qr-actions button {
+    width: 100% !important;
+    justify-content: center !important;
   }
 }
 

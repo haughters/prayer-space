@@ -725,37 +725,16 @@
           </div>
 
           <!-- Group Details Card / QR Section -->
-          <div
-            class="card"
-            style="
-              padding: var(--space-6);
-              margin-bottom: var(--space-6);
-              display: flex;
-              gap: var(--space-8);
-              align-items: center;
-              flex-wrap: wrap;
-            "
-          >
+          <div class="card group-qr-card">
             <div
               id="member-group-qr-canvas-wrapper"
-              style="
-                background: white;
-                padding: var(--space-3);
-                border-radius: var(--radius-sm);
-                border: 1px solid rgba(0, 0, 0, 0.06);
-                width: 220px;
-                height: 220px;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-              "
+              class="group-qr-wrapper"
             >
               <canvas
                 id="group-qr-canvas"
-                style="width: 200px; height: 200px"
               ></canvas>
             </div>
-            <div style="flex: 1; min-width: 250px">
+            <div class="group-qr-info">
               <h3
                 class="font-display mb-2"
                 style="font-size: var(--font-size-lg)"
@@ -770,14 +749,7 @@
                 directly to this private circle. Share the passcode to validate
                 intercessors.
               </p>
-              <div
-                style="
-                  display: flex;
-                  flex-direction: column;
-                  gap: var(--space-2);
-                  font-size: var(--font-size-sm);
-                "
-              >
+              <div class="group-qr-details">
                 <div>
                   <strong>Circle Passcode:</strong>
                   <code
@@ -804,16 +776,18 @@
                   >
                 </div>
               </div>
-              <button class="btn-secondary mt-6" id="btn-download-qr">
-                Download QR Code (.PNG)
-              </button>
-              <button
-                class="btn-secondary mt-6"
-                id="btn-edit-my-group"
-                style="display: none"
-              >
-                Circle Settings
-              </button>
+              <div class="group-qr-actions">
+                <button class="btn-secondary" id="btn-download-qr">
+                  Download QR Code (.PNG)
+                </button>
+                <button
+                  class="btn-secondary"
+                  id="btn-edit-my-group"
+                  style="display: none"
+                >
+                  Circle Settings
+                </button>
+              </div>
             </div>
           </div>
 
