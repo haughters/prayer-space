@@ -540,6 +540,7 @@ body.view-mine .pill-wrap {
   font-size: 1.02rem;
   line-height: 1.45;
   word-break: break-word;
+  text-align: left;
 }
 .pcard-status {
   font-size: 0.78rem;
@@ -573,6 +574,7 @@ body.view-mine .pill-wrap {
   color: var(--offwhite);
   font-size: 0.95rem;
   line-height: 1.45;
+  text-align: left;
 }
 .pcard-answer-label {
   display: block;
@@ -581,6 +583,7 @@ body.view-mine .pill-wrap {
   text-transform: uppercase;
   color: var(--orb-amber);
   margin-bottom: 0.35rem;
+  text-align: left;
 }
 
 .badge-prayer {
@@ -596,8 +599,8 @@ body.view-mine .pill-wrap {
 .cards-empty {
   color: var(--muted);
   font-size: 1rem;
-  padding: 2rem 0;
-  text-align: center;
+  padding: 1.5rem 0;
+  text-align: left;
 }
 
 .pill-wrap {
