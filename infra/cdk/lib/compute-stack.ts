@@ -128,6 +128,8 @@ export class ComputeStack extends cdk.Stack {
     props.intercessorAccountsTable.grantReadWriteData(this.adminServiceAlias);
     props.groupsTable.grantReadWriteData(this.adminServiceAlias);
     props.groupMembersTable.grantReadWriteData(this.adminServiceAlias);
+    props.prayersTable.grantReadWriteData(this.adminServiceAlias);
+    props.prayerUpdatesTable.grantReadWriteData(this.adminServiceAlias);
 
     // 5. notification-service
     const notificationSvc = createLambda('notification-service', {
