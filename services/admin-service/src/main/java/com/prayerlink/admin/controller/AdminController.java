@@ -9,6 +9,7 @@ import com.prayerlink.admin.repository.PrayerRepository;
 import com.prayerlink.admin.util.JwtUtil;
 import com.prayerlink.common.dto.GroupDTO;
 import com.prayerlink.common.dto.GroupMemberDTO;
+import com.prayerlink.common.util.UrlUtils;
 import jakarta.servlet.http.HttpServletResponse;
 import java.security.SecureRandom;
 import java.time.Instant;
@@ -48,6 +49,14 @@ public class AdminController {
 
     @Value("${cookie.secure:true}")
     private boolean cookieSecure;
+
+    private String getGroupServiceUrl() {
+        return UrlUtils.cleanBaseUrl(groupServiceUrl);
+    }
+
+    private String getPrayerServiceUrl() {
+        return UrlUtils.cleanBaseUrl(prayerServiceUrl);
+    }
 
     public AdminController(
             AdminRepository adminRepository,
@@ -319,7 +328,7 @@ public class AdminController {
 
         try {
             ResponseEntity<List<GroupDTO>> response = restTemplate.exchange(
-                    groupServiceUrl + "/api/groups",
+                    getGroupServiceUrl() + "/api/groups",
                     HttpMethod.GET,
                     null,
                     new ParameterizedTypeReference<List<GroupDTO>>() {});
@@ -339,7 +348,7 @@ public class AdminController {
                     int memberCount = 0;
                     try {
                         ResponseEntity<List<GroupMemberDTO>> memRes = restTemplate.exchange(
-                                groupServiceUrl + "/api/groups/" + g.getGroupId() + "/members",
+                                getGroupServiceUrl() + "/api/groups/" + g.getGroupId() + "/members",
                                 HttpMethod.GET,
                                 null,
                                 new ParameterizedTypeReference<List<GroupMemberDTO>>() {});
@@ -367,7 +376,7 @@ public class AdminController {
 
         try {
             ResponseEntity<GroupDTO> response =
-                    restTemplate.postForEntity(groupServiceUrl + "/api/groups", dto, GroupDTO.class);
+                    restTemplate.postForEntity(getGroupServiceUrl() + "/api/groups", dto, GroupDTO.class);
             return ResponseEntity.status(response.getStatusCode()).body(response.getBody());
         } catch (HttpStatusCodeException e) {
             return ResponseEntity.status(e.getStatusCode()).body(e.getResponseBodyAsString());
@@ -398,7 +407,7 @@ public class AdminController {
             headers.setContentType(MediaType.APPLICATION_JSON);
             HttpEntity<GroupDTO> requestEntity = new HttpEntity<>(dto, headers);
             ResponseEntity<GroupDTO> response = restTemplate.exchange(
-                    groupServiceUrl + "/api/groups/" + groupId, HttpMethod.PUT, requestEntity, GroupDTO.class);
+                    getGroupServiceUrl() + "/api/groups/" + groupId, HttpMethod.PUT, requestEntity, GroupDTO.class);
             return ResponseEntity.status(response.getStatusCode()).body(response.getBody());
         } catch (HttpStatusCodeException e) {
             return ResponseEntity.status(e.getStatusCode()).body(e.getResponseBodyAsString());
@@ -414,7 +423,7 @@ public class AdminController {
         checkAuth(token, "APP_ADMIN");
 
         try {
-            restTemplate.delete(groupServiceUrl + "/api/groups/" + groupId);
+            restTemplate.delete(getGroupServiceUrl() + "/api/groups/" + groupId);
             return ResponseEntity.noContent().build();
         } catch (HttpStatusCodeException e) {
             return ResponseEntity.status(e.getStatusCode()).body(e.getResponseBodyAsString());
@@ -444,7 +453,7 @@ public class AdminController {
             headers.setContentType(MediaType.APPLICATION_JSON);
             HttpEntity<GroupDTO> requestEntity = new HttpEntity<>(dto, headers);
             restTemplate.exchange(
-                    groupServiceUrl + "/api/groups/" + groupId, HttpMethod.PUT, requestEntity, GroupDTO.class);
+                    getGroupServiceUrl() + "/api/groups/" + groupId, HttpMethod.PUT, requestEntity, GroupDTO.class);
             return ResponseEntity.ok(Map.of("passcode", newPasscode));
         } catch (HttpStatusCodeException e) {
             return ResponseEntity.status(e.getStatusCode()).body(e.getResponseBodyAsString());
@@ -469,7 +478,7 @@ public class AdminController {
 
         try {
             ResponseEntity<List<GroupMemberDTO>> response = restTemplate.exchange(
-                    groupServiceUrl + "/api/groups/" + groupId + "/members",
+                    getGroupServiceUrl() + "/api/groups/" + groupId + "/members",
                     HttpMethod.GET,
                     null,
                     new ParameterizedTypeReference<List<GroupMemberDTO>>() {});
@@ -501,7 +510,7 @@ public class AdminController {
 
         try {
             ResponseEntity<GroupMemberDTO> response = restTemplate.postForEntity(
-                    groupServiceUrl + "/api/groups/" + groupId + "/members", dto, GroupMemberDTO.class);
+                    getGroupServiceUrl() + "/api/groups/" + groupId + "/members", dto, GroupMemberDTO.class);
             return ResponseEntity.status(response.getStatusCode()).body(response.getBody());
         } catch (HttpStatusCodeException e) {
             return ResponseEntity.status(e.getStatusCode()).body(e.getResponseBodyAsString());
@@ -561,7 +570,7 @@ public class AdminController {
                         .email(email.trim())
                         .build();
                 restTemplate.postForEntity(
-                        groupServiceUrl + "/api/groups/" + groupId + "/members", dto, GroupMemberDTO.class);
+                        getGroupServiceUrl() + "/api/groups/" + groupId + "/members", dto, GroupMemberDTO.class);
                 added++;
             } catch (HttpStatusCodeException e) {
                 errors.add(Map.of("name", name, "email", email, "reason", "Backend returned: " + e.getStatusCode()));
@@ -590,7 +599,7 @@ public class AdminController {
         }
 
         try {
-            restTemplate.delete(groupServiceUrl + "/api/groups/" + groupId + "/members/" + memberId);
+            restTemplate.delete(getGroupServiceUrl() + "/api/groups/" + groupId + "/members/" + memberId);
             return ResponseEntity.noContent().build();
         } catch (HttpStatusCodeException e) {
             return ResponseEntity.status(e.getStatusCode()).body(e.getResponseBodyAsString());

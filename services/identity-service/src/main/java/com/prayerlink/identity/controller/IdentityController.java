@@ -4,6 +4,7 @@ import com.auth0.jwt.interfaces.DecodedJWT;
 import com.prayerlink.common.dto.DeviceDTO;
 import com.prayerlink.common.dto.GroupDTO;
 import com.prayerlink.common.dto.GroupMemberDTO;
+import com.prayerlink.common.util.UrlUtils;
 import com.prayerlink.identity.model.Device;
 import com.prayerlink.identity.model.IntercessorAccount;
 import com.prayerlink.identity.repository.DeviceRepository;
@@ -47,6 +48,10 @@ public class IdentityController {
 
     @Value("${cookie.secure:true}")
     private boolean cookieSecure;
+
+    private String getGroupServiceUrl() {
+        return UrlUtils.cleanBaseUrl(groupServiceUrl);
+    }
 
     public IdentityController(
             DeviceRepository deviceRepository,
@@ -170,7 +175,7 @@ public class IdentityController {
         GroupDTO group = null;
         try {
             ResponseEntity<GroupDTO> groupRes = restTemplate.getForEntity(
-                    groupServiceUrl + "/api/groups/validate?passcode=" + cleanInviteCode, GroupDTO.class);
+                    getGroupServiceUrl() + "/api/groups/validate?passcode=" + cleanInviteCode, GroupDTO.class);
             if (groupRes.getStatusCode() == HttpStatus.OK) {
                 group = groupRes.getBody();
             }
@@ -186,7 +191,7 @@ public class IdentityController {
         List<GroupMemberDTO> members = null;
         try {
             ResponseEntity<List<GroupMemberDTO>> searchRes = restTemplate.exchange(
-                    groupServiceUrl + "/api/groups/members/search?email=" + cleanEmail,
+                    getGroupServiceUrl() + "/api/groups/members/search?email=" + cleanEmail,
                     HttpMethod.GET,
                     null,
                     new ParameterizedTypeReference<List<GroupMemberDTO>>() {});
@@ -289,7 +294,7 @@ public class IdentityController {
             List<GroupMemberDTO> members = List.of();
             try {
                 ResponseEntity<List<GroupMemberDTO>> searchRes = restTemplate.exchange(
-                        groupServiceUrl + "/api/groups/members/search?email=" + email,
+                        getGroupServiceUrl() + "/api/groups/members/search?email=" + email,
                         HttpMethod.GET,
                         null,
                         new ParameterizedTypeReference<List<GroupMemberDTO>>() {});
@@ -304,7 +309,7 @@ public class IdentityController {
             for (GroupMemberDTO member : members) {
                 try {
                     GroupDTO group = restTemplate.getForObject(
-                            groupServiceUrl + "/api/groups/" + member.getGroupId(), GroupDTO.class);
+                            getGroupServiceUrl() + "/api/groups/" + member.getGroupId(), GroupDTO.class);
                     if (group != null) {
                         groups.add(Map.of(
                                 "groupId", group.getGroupId().toString(),

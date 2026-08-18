@@ -8,6 +8,7 @@ import com.prayerlink.admin.repository.IntercessorAccountRepository;
 import com.prayerlink.admin.util.JwtUtil;
 import com.prayerlink.common.dto.GroupDTO;
 import com.prayerlink.common.dto.GroupMemberDTO;
+import com.prayerlink.common.util.UrlUtils;
 import jakarta.servlet.http.HttpServletResponse;
 import java.util.*;
 import org.slf4j.Logger;
@@ -41,6 +42,10 @@ public class AuthController {
 
     @Value("${cookie.secure:true}")
     private boolean cookieSecure;
+
+    private String getGroupServiceUrl() {
+        return UrlUtils.cleanBaseUrl(groupServiceUrl);
+    }
 
     public AuthController(
             AdminRepository adminRepository,
@@ -90,7 +95,7 @@ public class AuthController {
                     List<GroupMemberDTO> members = List.of();
                     try {
                         ResponseEntity<List<GroupMemberDTO>> searchRes = restTemplate.exchange(
-                                groupServiceUrl + "/api/groups/members/search?email=" + email,
+                                getGroupServiceUrl() + "/api/groups/members/search?email=" + email,
                                 HttpMethod.GET,
                                 null,
                                 new ParameterizedTypeReference<List<GroupMemberDTO>>() {});
@@ -105,7 +110,7 @@ public class AuthController {
                     for (GroupMemberDTO member : members) {
                         try {
                             GroupDTO group = restTemplate.getForObject(
-                                    groupServiceUrl + "/api/groups/" + member.getGroupId(), GroupDTO.class);
+                                    getGroupServiceUrl() + "/api/groups/" + member.getGroupId(), GroupDTO.class);
                             if (group != null) {
                                 groups.add(Map.of(
                                         "groupId", group.getGroupId().toString(),
