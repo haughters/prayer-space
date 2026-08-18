@@ -3,6 +3,11 @@ set -euo pipefail
 
 # This script smoke tests a deployed Lambda using its Function URL.
 
+# Export credentials if running from AWS CLI SSO / session profile
+if [ -z "${AWS_ACCESS_KEY_ID:-}" ]; then
+  eval "$(aws configure export-credentials --format env 2>/dev/null || true)"
+fi
+
 if [ -z "${SERVICE_URL:-}" ] || [ "$SERVICE_URL" = "None" ]; then
   echo "No Function URL configured, skipping."
   exit 0
@@ -21,10 +26,12 @@ curl_and_check() {
   )
 
   CURL_ARGS+=(
-    --aws-sigv4 "aws:amz:${AWS_REGION}:lambda"
-    --user "$AWS_ACCESS_KEY_ID:$AWS_SECRET_ACCESS_KEY"
-    -H "x-amz-security-token:$AWS_SESSION_TOKEN"
+    --aws-sigv4 "aws:amz:${AWS_REGION:-eu-west-1}:lambda"
+    --user "${AWS_ACCESS_KEY_ID}:${AWS_SECRET_ACCESS_KEY}"
   )
+  if [ -n "${AWS_SESSION_TOKEN:-}" ]; then
+    CURL_ARGS+=(-H "x-amz-security-token:${AWS_SESSION_TOKEN}")
+  fi
   if [ -n "$body" ]; then
     CURL_ARGS+=(-H "Content-Type: application/json" -d "$body")
   fi
@@ -34,6 +41,7 @@ curl_and_check() {
     echo "  ✅ Passed (HTTP $STATUS)"
   else
     echo "  ❌ FAILED — expected $expected, got $STATUS"
+    echo "  Response body: $(cat /tmp/curl.txt 2>/dev/null || echo 'No response body')"
     return 1
   fi
 }
