@@ -34,7 +34,12 @@ public class AwsSigV4Interceptor implements ClientHttpRequestInterceptor {
     private final Region region;
 
     public AwsSigV4Interceptor(String region) {
+        this(region, null);
+    }
+
+    public AwsSigV4Interceptor(String region, AwsCredentialsProvider credentialsProvider) {
         this.region = Region.of(region);
+        this.credentialsProvider = credentialsProvider;
     }
 
     @Override
@@ -52,12 +57,19 @@ public class AwsSigV4Interceptor implements ClientHttpRequestInterceptor {
         // Lazy initialization to avoid GraalVM startup reflection crashes
         if (this.signer == null) {
             this.signer = AwsV4HttpSigner.create();
-            this.credentialsProvider = EnvironmentVariableCredentialsProvider.create();
+            if (this.credentialsProvider == null) {
+                this.credentialsProvider = EnvironmentVariableCredentialsProvider.create();
+            }
         }
+
+        // Clean duplicate slashes in path to prevent AWS SigV4 Canonical URI signature mismatches
+        String rawUri = uri.toString();
+        String cleanedUriString = rawUri.replaceAll("(?<!:)//+", "/");
+        URI normalizedUri = URI.create(cleanedUriString);
 
         // Convert Spring HttpRequest → AWS SDK SdkHttpFullRequest
         SdkHttpFullRequest.Builder sdkBuilder = SdkHttpFullRequest.builder()
-                .uri(uri)
+                .uri(normalizedUri)
                 .method(SdkHttpMethod.fromValue(request.getMethod().name()));
 
         request.getHeaders().forEach((name, values) -> {
@@ -82,6 +94,11 @@ public class AwsSigV4Interceptor implements ClientHttpRequestInterceptor {
         signed.headers().forEach((name, values) -> signedHeaders.addAll(name, new ArrayList<>(values)));
 
         HttpRequest wrappedRequest = new HttpRequestWrapper(request) {
+            @Override
+            public URI getURI() {
+                return normalizedUri;
+            }
+
             @Override
             public HttpHeaders getHeaders() {
                 return signedHeaders;
