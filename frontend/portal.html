@@ -2,14 +2,23 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-    <meta name="theme-color" content="#141416">
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+    />
+    <meta name="theme-color" content="#141416" />
     <title>Prayer Link - Portal</title>
-    <meta name="description" content="Access the Prayer Link portal to manage prayer circles or support community requests." />
+    <meta
+      name="description"
+      content="Access the Prayer Link portal to manage prayer circles or support community requests."
+    />
 
     <!-- Google Fonts & Fontshare -->
     <link rel="preconnect" href="https://api.fontshare.com" crossorigin />
-    <link rel="stylesheet" href="https://api.fontshare.com/v2/css?f[]=clash-display@600,700&f[]=hanken-grotesk@400,500&display=swap" />
+    <link
+      rel="stylesheet"
+      href="https://api.fontshare.com/v2/css?f[]=clash-display@600,700&f[]=hanken-grotesk@400,500&display=swap"
+    />
 
     <!-- Stylesheets -->
     <link rel="stylesheet" href="./src/styles/home.css" />
@@ -45,99 +54,359 @@
     </div>
 
     <!-- === AUTHENTICATION CONTAINER === -->
-    <main class="page-main" id="auth-container" style="display: flex;">
+    <main class="page-main" id="auth-container" style="display: flex">
       <div class="content-narrow">
         <header class="text-center mb-8">
-          <h1 class="font-display" style="font-size: var(--font-size-3xl);">
+          <h1 class="font-display" style="font-size: var(--font-size-3xl)">
             Prayer Space
           </h1>
-          <p class="color-text-secondary mt-2" style="font-weight: 300;">Access your dashboard</p>
+          <p class="color-text-secondary mt-2" style="font-weight: 300">
+            Access your dashboard
+          </p>
         </header>
 
         <!-- Unified Login Form -->
-        <section class="card" id="login-card" style="border-radius: var(--radius-md); padding: var(--space-8);">
-          <h2 class="font-display mb-6 text-center" style="font-size: var(--font-size-xl);">Log In</h2>
+        <section
+          class="card"
+          id="login-card"
+          style="border-radius: var(--radius-md); padding: var(--space-8)"
+        >
+          <h2
+            class="font-display mb-6 text-center"
+            style="font-size: var(--font-size-xl)"
+          >
+            Log In
+          </h2>
           <form id="login-form" class="flex flex-col gap-4">
             <div class="flex flex-col gap-1">
-              <label for="login-identifier" style="font-size: var(--font-size-sm); font-weight: 500;">Username or Email</label>
-              <input type="text" id="login-identifier" class="input" placeholder="Enter username or email" required autocomplete="username" />
+              <label
+                for="login-identifier"
+                style="font-size: var(--font-size-sm); font-weight: 500"
+                >Username or Email</label
+              >
+              <input
+                type="text"
+                id="login-identifier"
+                class="input"
+                placeholder="Enter username or email"
+                required
+                autocomplete="username"
+              />
             </div>
             <div class="flex flex-col gap-1">
-              <label for="login-password" style="font-size: var(--font-size-sm); font-weight: 500;">Password</label>
-              <div style="position: relative; display: flex; align-items: center">
-                <input type="password" id="login-password" class="input" placeholder="••••••••" required autocomplete="current-password" style="width: 100%" />
-                <button type="button" class="btn-toggle-password" aria-label="Toggle Password Visibility">
-                  <svg class="icon-eye" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width: 20px; height: 20px; display: block;"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
-                  <svg class="icon-eye-off" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width: 20px; height: 20px; display: none;"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>
+              <label
+                for="login-password"
+                style="font-size: var(--font-size-sm); font-weight: 500"
+                >Password</label
+              >
+              <div
+                style="position: relative; display: flex; align-items: center"
+              >
+                <input
+                  type="password"
+                  id="login-password"
+                  class="input"
+                  placeholder="••••••••"
+                  required
+                  autocomplete="current-password"
+                  style="width: 100%"
+                />
+                <button
+                  type="button"
+                  class="btn-toggle-password"
+                  aria-label="Toggle Password Visibility"
+                >
+                  <svg
+                    class="icon-eye"
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2.5"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    style="width: 20px; height: 20px; display: block"
+                  >
+                    <path
+                      d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"
+                    ></path>
+                    <circle cx="12" cy="12" r="3"></circle>
+                  </svg>
+                  <svg
+                    class="icon-eye-off"
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2.5"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    style="width: 20px; height: 20px; display: none"
+                  >
+                    <path
+                      d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"
+                    ></path>
+                    <line x1="1" y1="1" x2="23" y2="23"></line>
+                  </svg>
                 </button>
               </div>
             </div>
-            <button type="submit" class="btn-primary w-full mt-2" style="min-height: 44px;">Log In</button>
+            <button
+              type="submit"
+              class="btn-primary w-full mt-2"
+              style="min-height: 44px"
+            >
+              Log In
+            </button>
           </form>
-          <div class="text-center mt-6" style="font-size: var(--font-size-sm);">
-            <span class="color-text-secondary">Are you an invited intercessor?</span>
-            <a href="#register" id="go-to-register" style="color: var(--color-accent); font-weight: 500; text-decoration: none; margin-left: var(--space-1);">Create an Account</a>
+          <div class="text-center mt-6" style="font-size: var(--font-size-sm)">
+            <span class="color-text-secondary"
+              >Are you an invited intercessor?</span
+            >
+            <a
+              href="#register"
+              id="go-to-register"
+              style="
+                color: var(--color-accent);
+                font-weight: 500;
+                text-decoration: none;
+                margin-left: var(--space-1);
+              "
+              >Create an Account</a
+            >
           </div>
         </section>
 
         <!-- Register Form (Intercessor Accounts only) -->
-        <section class="card" id="register-card" style="border-radius: var(--radius-md); padding: var(--space-8); display: none;">
-          <h2 class="font-display mb-6 text-center" style="font-size: var(--font-size-xl);">Create Account</h2>
+        <section
+          class="card"
+          id="register-card"
+          style="
+            border-radius: var(--radius-md);
+            padding: var(--space-8);
+            display: none;
+          "
+        >
+          <h2
+            class="font-display mb-6 text-center"
+            style="font-size: var(--font-size-xl)"
+          >
+            Create Account
+          </h2>
           <form id="register-form" class="flex flex-col gap-4">
             <div class="flex flex-col gap-1">
-              <label for="register-name" style="font-size: var(--font-size-sm); font-weight: 500;">Full Name</label>
-              <input type="text" id="register-name" class="input" placeholder="Jane Doe" required />
+              <label
+                for="register-name"
+                style="font-size: var(--font-size-sm); font-weight: 500"
+                >Full Name</label
+              >
+              <input
+                type="text"
+                id="register-name"
+                class="input"
+                placeholder="Jane Doe"
+                required
+              />
             </div>
             <div class="flex flex-col gap-1">
-              <label for="register-email" style="font-size: var(--font-size-sm); font-weight: 500;">Email Address</label>
-              <input type="email" id="register-email" class="input" placeholder="you@example.com" required />
+              <label
+                for="register-email"
+                style="font-size: var(--font-size-sm); font-weight: 500"
+                >Email Address</label
+              >
+              <input
+                type="email"
+                id="register-email"
+                class="input"
+                placeholder="you@example.com"
+                required
+              />
             </div>
             <div class="flex flex-col gap-1">
-              <label for="register-invite-code" style="font-size: var(--font-size-sm); font-weight: 500;">Invite Code</label>
-              <input type="text" id="register-invite-code" class="input" placeholder="Enter circle passcode" required />
+              <label
+                for="register-invite-code"
+                style="font-size: var(--font-size-sm); font-weight: 500"
+                >Invite Code</label
+              >
+              <input
+                type="text"
+                id="register-invite-code"
+                class="input"
+                placeholder="Enter circle passcode"
+                required
+              />
             </div>
             <div class="flex flex-col gap-1">
-              <label for="register-password" style="font-size: var(--font-size-sm); font-weight: 500;">Password</label>
-              <input type="password" id="register-password" class="input" placeholder="Min 8 characters" required />
+              <label
+                for="register-password"
+                style="font-size: var(--font-size-sm); font-weight: 500"
+                >Password</label
+              >
+              <input
+                type="password"
+                id="register-password"
+                class="input"
+                placeholder="Min 8 characters"
+                required
+              />
             </div>
             <div class="flex flex-col gap-1">
-              <label for="register-confirm-password" style="font-size: var(--font-size-sm); font-weight: 500;">Confirm Password</label>
-              <input type="password" id="register-confirm-password" class="input" placeholder="Re-enter password" required />
+              <label
+                for="register-confirm-password"
+                style="font-size: var(--font-size-sm); font-weight: 500"
+                >Confirm Password</label
+              >
+              <input
+                type="password"
+                id="register-confirm-password"
+                class="input"
+                placeholder="Re-enter password"
+                required
+              />
             </div>
-            <button type="submit" class="btn-primary w-full mt-2" style="min-height: 44px;">Create Account</button>
+            <button
+              type="submit"
+              class="btn-primary w-full mt-2"
+              style="min-height: 44px"
+            >
+              Create Account
+            </button>
           </form>
-          <div class="text-center mt-6" style="font-size: var(--font-size-sm);">
+          <div class="text-center mt-6" style="font-size: var(--font-size-sm)">
             <span class="color-text-secondary">Already have an account?</span>
-            <a href="#login" id="go-to-login" style="color: var(--color-accent); font-weight: 500; text-decoration: none; margin-left: var(--space-1);">Log In</a>
+            <a
+              href="#login"
+              id="go-to-login"
+              style="
+                color: var(--color-accent);
+                font-weight: 500;
+                text-decoration: none;
+                margin-left: var(--space-1);
+              "
+              >Log In</a
+            >
           </div>
         </section>
 
         <!-- 1. Setup Admin Account Form (First-time setup only) -->
-        <section class="card" id="setup-view" style="border-radius: var(--radius-md); padding: var(--space-8); display: none;">
-          <h2 class="font-display mb-2 text-center" style="font-size: var(--font-size-xl);">Platform Setup</h2>
-          <p class="color-text-secondary text-center mb-6" style="font-size: var(--font-size-sm);">
+        <section
+          class="card"
+          id="setup-view"
+          style="
+            border-radius: var(--radius-md);
+            padding: var(--space-8);
+            display: none;
+          "
+        >
+          <h2
+            class="font-display mb-2 text-center"
+            style="font-size: var(--font-size-xl)"
+          >
+            Platform Setup
+          </h2>
+          <p
+            class="color-text-secondary text-center mb-6"
+            style="font-size: var(--font-size-sm)"
+          >
             Create the initial application administrator account to get started.
           </p>
           <form id="admin-setup-form" class="flex flex-col gap-4">
             <div class="flex flex-col gap-1">
-              <label for="setup-username" style="font-size: var(--font-size-sm); font-weight: 500;">Username *</label>
-              <input type="text" id="setup-username" class="input" placeholder="Alphanumeric + underscores" required minlength="3" maxlength="50" pattern="^[a-zA-Z0-9_]+$" />
+              <label
+                for="setup-username"
+                style="font-size: var(--font-size-sm); font-weight: 500"
+                >Username *</label
+              >
+              <input
+                type="text"
+                id="setup-username"
+                class="input"
+                placeholder="Alphanumeric + underscores"
+                required
+                minlength="3"
+                maxlength="50"
+                pattern="^[a-zA-Z0-9_]+$"
+              />
             </div>
             <div class="flex flex-col gap-1">
-              <label for="setup-password" style="font-size: var(--font-size-sm); font-weight: 500;">Password *</label>
-              <div style="position: relative; display: flex; align-items: center">
-                <input type="password" id="setup-password" class="input" placeholder="Minimum 8 characters" required minlength="8" style="width: 100%" />
-                <button type="button" class="btn-toggle-password" aria-label="Toggle Password Visibility">
-                  <svg class="icon-eye" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width: 20px; height: 20px; display: block;"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
-                  <svg class="icon-eye-off" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width: 20px; height: 20px; display: none;"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>
+              <label
+                for="setup-password"
+                style="font-size: var(--font-size-sm); font-weight: 500"
+                >Password *</label
+              >
+              <div
+                style="position: relative; display: flex; align-items: center"
+              >
+                <input
+                  type="password"
+                  id="setup-password"
+                  class="input"
+                  placeholder="Minimum 8 characters"
+                  required
+                  minlength="8"
+                  style="width: 100%"
+                />
+                <button
+                  type="button"
+                  class="btn-toggle-password"
+                  aria-label="Toggle Password Visibility"
+                >
+                  <svg
+                    class="icon-eye"
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2.5"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    style="width: 20px; height: 20px; display: block"
+                  >
+                    <path
+                      d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"
+                    ></path>
+                    <circle cx="12" cy="12" r="3"></circle>
+                  </svg>
+                  <svg
+                    class="icon-eye-off"
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2.5"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    style="width: 20px; height: 20px; display: none"
+                  >
+                    <path
+                      d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"
+                    ></path>
+                    <line x1="1" y1="1" x2="23" y2="23"></line>
+                  </svg>
                 </button>
               </div>
             </div>
             <div class="flex flex-col gap-1">
-              <label for="setup-confirm-password" style="font-size: var(--font-size-sm); font-weight: 500;">Confirm Password *</label>
-              <input type="password" id="setup-confirm-password" class="input" placeholder="Re-type password" required minlength="8" />
+              <label
+                for="setup-confirm-password"
+                style="font-size: var(--font-size-sm); font-weight: 500"
+                >Confirm Password *</label
+              >
+              <input
+                type="password"
+                id="setup-confirm-password"
+                class="input"
+                placeholder="Re-type password"
+                required
+                minlength="8"
+              />
             </div>
-            <button class="btn-primary w-full mt-2" type="submit" id="btn-setup-submit" style="min-height: 44px;">
+            <button
+              class="btn-primary w-full mt-2"
+              type="submit"
+              id="btn-setup-submit"
+              style="min-height: 44px"
+            >
               Initialize Admin
             </button>
           </form>
@@ -150,18 +419,36 @@
       <!-- Mobile Bar -->
       <div class="mobile-bar">
         <button class="menu-toggle" aria-label="Open Menu">
-          <svg class="icon-bars" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
-            <path d="M4 7h16M4 12h16M4 17h16"/>
+          <svg
+            class="icon-bars"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2.2"
+            stroke-linecap="round"
+          >
+            <path d="M4 7h16M4 12h16M4 17h16" />
           </svg>
         </button>
         <span class="mobile-bar-title">Admin Console</span>
       </div>
       <!-- Sidebar navigation -->
       <aside class="admin-sidebar" id="sidebar-nav-container">
-        <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+        <div
+          style="
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+          "
+        >
           <div>
             <div class="admin-sidebar__title">Prayer Link Admin</div>
-            <div class="color-text-secondary" style="font-size: var(--font-size-xs)" id="sidebar-user-badge">
+            <div
+              class="color-text-secondary"
+              style="font-size: var(--font-size-xs)"
+              id="sidebar-user-badge"
+            >
               Management console
             </div>
           </div>
@@ -169,7 +456,15 @@
           <button
             id="btn-sidebar-mobile-toggle"
             aria-label="Toggle Menu"
-            style="display: none; background: transparent; border: none; font-size: 24px; color: var(--color-admin-sidebar-text); cursor: pointer; padding: var(--space-1);"
+            style="
+              display: none;
+              background: transparent;
+              border: none;
+              font-size: 24px;
+              color: var(--color-admin-sidebar-text);
+              cursor: pointer;
+              padding: var(--space-1);
+            "
           >
             ☰
           </button>
@@ -192,38 +487,88 @@
           </p>
 
           <!-- Filter Panel -->
-          <div class="card" style="padding: var(--space-4); margin-bottom: var(--space-6)">
+          <div
+            class="card"
+            style="padding: var(--space-4); margin-bottom: var(--space-6)"
+          >
             <form
               id="filter-prayers-form"
-              style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: var(--space-4); align-items: flex-end;"
+              style="
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+                gap: var(--space-4);
+                align-items: flex-end;
+              "
             >
               <div class="admin-form-group" style="margin-bottom: 0">
-                <label class="admin-form-label" for="filter-status">Status</label>
+                <label class="admin-form-label" for="filter-status"
+                  >Status</label
+                >
                 <select id="filter-status" class="input" style="height: 42px">
                   <option value="all">All Statuses</option>
                   <option value="OPEN">Open</option>
                   <option value="CLOSED">Closed</option>
                 </select>
               </div>
-              <div class="admin-form-group" id="filter-group-wrapper" style="margin-bottom: 0">
-                <label class="admin-form-label" for="filter-group">Group Circle</label>
+              <div
+                class="admin-form-group"
+                id="filter-group-wrapper"
+                style="margin-bottom: 0"
+              >
+                <label class="admin-form-label" for="filter-group"
+                  >Group Circle</label
+                >
                 <select id="filter-group" class="input" style="height: 42px">
                   <option value="all">All Groups</option>
                 </select>
               </div>
               <div class="admin-form-group" style="margin-bottom: 0">
-                <label class="admin-form-label" for="filter-from-date">From Date</label>
-                <input type="date" id="filter-from-date" class="input" style="height: 42px" />
+                <label class="admin-form-label" for="filter-from-date"
+                  >From Date</label
+                >
+                <input
+                  type="date"
+                  id="filter-from-date"
+                  class="input"
+                  style="height: 42px"
+                />
               </div>
               <div class="admin-form-group" style="margin-bottom: 0">
-                <label class="admin-form-label" for="filter-to-date">To Date</label>
-                <input type="date" id="filter-to-date" class="input" style="height: 42px" />
+                <label class="admin-form-label" for="filter-to-date"
+                  >To Date</label
+                >
+                <input
+                  type="date"
+                  id="filter-to-date"
+                  class="input"
+                  style="height: 42px"
+                />
               </div>
               <div style="display: flex; gap: var(--space-2)">
-                <button type="submit" class="btn-primary" style="flex: 1; height: 42px; display: flex; align-items: center; justify-content: center;">
+                <button
+                  type="submit"
+                  class="btn-primary"
+                  style="
+                    flex: 1;
+                    height: 42px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                  "
+                >
                   Apply
                 </button>
-                <button type="button" id="btn-reset-filters" class="btn-secondary" style="height: 42px; display: flex; align-items: center; justify-content: center;">
+                <button
+                  type="button"
+                  id="btn-reset-filters"
+                  class="btn-secondary"
+                  style="
+                    height: 42px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                  "
+                >
                   Reset
                 </button>
               </div>
@@ -234,11 +579,25 @@
             <table class="admin-table">
               <thead>
                 <tr>
-                  <th style="cursor: pointer" id="th-prayer-text">Request Preview</th>
-                  <th style="cursor: pointer" id="th-prayer-group">Assigned Circle</th>
+                  <th style="cursor: pointer" id="th-prayer-text">
+                    Request Preview
+                  </th>
+                  <th style="cursor: pointer" id="th-prayer-group">
+                    Assigned Circle
+                  </th>
                   <th style="cursor: pointer" id="th-prayer-status">Status</th>
-                  <th style="cursor: pointer; text-align: right" id="th-prayer-count">Prayers</th>
-                  <th style="cursor: pointer; text-align: right" id="th-prayer-date">Date Submitted</th>
+                  <th
+                    style="cursor: pointer; text-align: right"
+                    id="th-prayer-count"
+                  >
+                    Prayers
+                  </th>
+                  <th
+                    style="cursor: pointer; text-align: right"
+                    id="th-prayer-date"
+                  >
+                    Date Submitted
+                  </th>
                 </tr>
               </thead>
               <tbody id="dashboard-prayers-table-body">
@@ -248,29 +607,57 @@
           </div>
 
           <!-- Pagination -->
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-top: var(--space-6);">
-            <div class="color-text-secondary" style="font-size: var(--font-size-sm)" id="prayers-page-info">
+          <div
+            style="
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+              margin-top: var(--space-6);
+            "
+          >
+            <div
+              class="color-text-secondary"
+              style="font-size: var(--font-size-sm)"
+              id="prayers-page-info"
+            >
               Showing 0-0 of 0 requests
             </div>
             <div style="display: flex; gap: var(--space-2)">
-              <button class="btn-secondary" id="btn-prayers-prev" disabled>Previous</button>
-              <button class="btn-secondary" id="btn-prayers-next" disabled>Next</button>
+              <button class="btn-secondary" id="btn-prayers-prev" disabled>
+                Previous
+              </button>
+              <button class="btn-secondary" id="btn-prayers-next" disabled>
+                Next
+              </button>
             </div>
           </div>
         </section>
 
         <!-- 3. Groups Management View -->
         <section id="groups-view" style="display: none">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-6);">
+          <div
+            style="
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+              margin-bottom: var(--space-6);
+            "
+          >
             <div>
-              <h2 class="font-display mb-2" style="font-size: var(--font-size-2xl)">
+              <h2
+                class="font-display mb-2"
+                style="font-size: var(--font-size-2xl)"
+              >
                 Prayer Circles
               </h2>
               <p class="color-text-secondary">
-                Organize congregations, church groups, and assign private circle codes.
+                Organize congregations, church groups, and assign private circle
+                codes.
               </p>
             </div>
-            <button class="btn-primary" id="btn-create-group-trigger">+ Create Circle</button>
+            <button class="btn-primary" id="btn-create-group-trigger">
+              + Create Circle
+            </button>
           </div>
 
           <div class="admin-table-container">
@@ -295,50 +682,155 @@
         <!-- 4. Member Management View -->
         <section id="members-view" style="display: none">
           <div style="margin-bottom: var(--space-6)">
-            <nav style="display: flex; gap: var(--space-2); align-items: center; font-size: var(--font-size-sm); margin-bottom: var(--space-4);" aria-label="Breadcrumb">
-              <a href="#groups" class="color-accent" id="breadcrumb-groups-link" style="text-decoration: none; font-weight: 500">Circles</a>
+            <nav
+              style="
+                display: flex;
+                gap: var(--space-2);
+                align-items: center;
+                font-size: var(--font-size-sm);
+                margin-bottom: var(--space-4);
+              "
+              aria-label="Breadcrumb"
+            >
+              <a
+                href="#groups"
+                class="color-accent"
+                id="breadcrumb-groups-link"
+                style="text-decoration: none; font-weight: 500"
+                >Circles</a
+              >
               <span class="color-text-muted">/</span>
-              <span id="breadcrumb-group-name" class="color-text-secondary">Group Details</span>
+              <span id="breadcrumb-group-name" class="color-text-secondary"
+                >Group Details</span
+              >
               <span class="color-text-muted">/</span>
-              <span class="color-text-primary" style="font-weight: 600">Intercessors</span>
+              <span class="color-text-primary" style="font-weight: 600"
+                >Intercessors</span
+              >
             </nav>
 
-            <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: var(--space-4);">
+            <div
+              style="
+                display: flex;
+                justify-content: space-between;
+                align-items: flex-start;
+                flex-wrap: wrap;
+                gap: var(--space-4);
+              "
+            >
               <div>
-                <h2 class="font-display mb-2" id="member-group-title" style="font-size: var(--font-size-2xl)">Circle Members</h2>
+                <h2
+                  class="font-display mb-2"
+                  id="member-group-title"
+                  style="font-size: var(--font-size-2xl)"
+                >
+                  Circle Members
+                </h2>
                 <p class="color-text-secondary" id="member-group-subtitle">
                   Intercessors registered to pray for this group's needs.
                 </p>
               </div>
               <div style="display: flex; gap: var(--space-2)">
-                <button class="btn-secondary" id="btn-bulk-add-trigger">Bulk CSV Import</button>
-                <button class="btn-primary" id="btn-add-member-trigger">+ Add Single Member</button>
+                <button class="btn-secondary" id="btn-bulk-add-trigger">
+                  Bulk CSV Import
+                </button>
+                <button class="btn-primary" id="btn-add-member-trigger">
+                  + Add Single Member
+                </button>
               </div>
             </div>
           </div>
 
           <!-- Group Details Card / QR Section -->
-          <div class="card" style="padding: var(--space-6); margin-bottom: var(--space-6); display: flex; gap: var(--space-8); align-items: center; flex-wrap: wrap;">
-            <div id="member-group-qr-canvas-wrapper" style="background: white; padding: var(--space-3); border-radius: var(--radius-sm); border: 1px solid rgba(0, 0, 0, 0.06); width: 220px; height: 220px; display: flex; align-items: center; justify-content: center;">
-              <canvas id="group-qr-canvas" style="width: 200px; height: 200px"></canvas>
+          <div
+            class="card"
+            style="
+              padding: var(--space-6);
+              margin-bottom: var(--space-6);
+              display: flex;
+              gap: var(--space-8);
+              align-items: center;
+              flex-wrap: wrap;
+            "
+          >
+            <div
+              id="member-group-qr-canvas-wrapper"
+              style="
+                background: white;
+                padding: var(--space-3);
+                border-radius: var(--radius-sm);
+                border: 1px solid rgba(0, 0, 0, 0.06);
+                width: 220px;
+                height: 220px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+              "
+            >
+              <canvas
+                id="group-qr-canvas"
+                style="width: 200px; height: 200px"
+              ></canvas>
             </div>
             <div style="flex: 1; min-width: 250px">
-              <h3 class="font-display mb-2" style="font-size: var(--font-size-lg)">Congregation Share Details</h3>
-              <p class="color-text-secondary mb-4" style="font-size: var(--font-size-sm)">
-                Members can use this QR code or direct URL to submit requests directly to this private circle. Share the passcode to validate intercessors.
+              <h3
+                class="font-display mb-2"
+                style="font-size: var(--font-size-lg)"
+              >
+                Congregation Share Details
+              </h3>
+              <p
+                class="color-text-secondary mb-4"
+                style="font-size: var(--font-size-sm)"
+              >
+                Members can use this QR code or direct URL to submit requests
+                directly to this private circle. Share the passcode to validate
+                intercessors.
               </p>
-              <div style="display: flex; flex-direction: column; gap: var(--space-2); font-size: var(--font-size-sm);">
+              <div
+                style="
+                  display: flex;
+                  flex-direction: column;
+                  gap: var(--space-2);
+                  font-size: var(--font-size-sm);
+                "
+              >
                 <div>
                   <strong>Circle Passcode:</strong>
-                  <code id="lbl-group-passcode" style="background: rgba(0, 0, 0, 0.04); padding: 2px 6px; border-radius: 4px; font-weight: bold; letter-spacing: 1px;">-</code>
+                  <code
+                    id="lbl-group-passcode"
+                    style="
+                      background: rgba(0, 0, 0, 0.04);
+                      padding: 2px 6px;
+                      border-radius: 4px;
+                      font-weight: bold;
+                      letter-spacing: 1px;
+                    "
+                    >-</code
+                  >
                 </div>
                 <div>
                   <strong>Submission Link:</strong>
-                  <a id="lnk-group-share" href="#" target="_blank" class="color-accent" style="word-break: break-all">-</a>
+                  <a
+                    id="lnk-group-share"
+                    href="#"
+                    target="_blank"
+                    class="color-accent"
+                    style="word-break: break-all"
+                    >-</a
+                  >
                 </div>
               </div>
-              <button class="btn-secondary mt-6" id="btn-download-qr">Download QR Code (.PNG)</button>
-              <button class="btn-secondary mt-6" id="btn-edit-my-group" style="display: none">Circle Settings</button>
+              <button class="btn-secondary mt-6" id="btn-download-qr">
+                Download QR Code (.PNG)
+              </button>
+              <button
+                class="btn-secondary mt-6"
+                id="btn-edit-my-group"
+                style="display: none"
+              >
+                Circle Settings
+              </button>
             </div>
           </div>
 
@@ -362,14 +854,29 @@
 
         <!-- 5. Admin Account Management View (APP_ADMIN only) -->
         <section id="admins-view" style="display: none">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-6);">
+          <div
+            style="
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+              margin-bottom: var(--space-6);
+            "
+          >
             <div>
-              <h2 class="font-display mb-2" style="font-size: var(--font-size-2xl)">Console Administrators</h2>
+              <h2
+                class="font-display mb-2"
+                style="font-size: var(--font-size-2xl)"
+              >
+                Console Administrators
+              </h2>
               <p class="color-text-secondary">
-                Add and manage application administrators and group administrators.
+                Add and manage application administrators and group
+                administrators.
               </p>
             </div>
-            <button class="btn-primary" id="btn-create-admin-trigger">+ Create Admin Account</button>
+            <button class="btn-primary" id="btn-create-admin-trigger">
+              + Create Admin Account
+            </button>
           </div>
 
           <div class="admin-table-container">
@@ -393,12 +900,19 @@
     </div>
 
     <!-- === INTERCESSOR DASHBOARD CONTAINER === -->
-    <div class="admin-layout" id="intercessor-root" style="display: none;">
+    <div class="admin-layout" id="intercessor-root" style="display: none">
       <!-- Mobile Bar -->
       <div class="mobile-bar">
         <button class="menu-toggle" aria-label="Open Menu">
-          <svg class="icon-bars" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
-            <path d="M4 7h16M4 12h16M4 17h16"/>
+          <svg
+            class="icon-bars"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2.2"
+            stroke-linecap="round"
+          >
+            <path d="M4 7h16M4 12h16M4 17h16" />
           </svg>
         </button>
         <span class="mobile-bar-title">Intercessor Console</span>
@@ -407,19 +921,48 @@
       <aside class="admin-sidebar" id="intercessor-sidebar-nav-container">
         <div>
           <div class="admin-sidebar__title">Prayer Link Portal</div>
-          <div class="color-text-secondary" style="font-size: var(--font-size-xs)" id="sidebar-user-name">Loading...</div>
+          <div
+            class="color-text-secondary"
+            style="font-size: var(--font-size-xs)"
+            id="sidebar-user-name"
+          >
+            Loading...
+          </div>
         </div>
 
-        <nav class="admin-sidebar__nav" style="margin-top: var(--space-6);">
-          <div class="color-text-muted mb-2" style="font-size: var(--font-size-xs); text-transform: uppercase; font-weight: 600; padding: 0 var(--space-3);">
+        <nav class="admin-sidebar__nav" style="margin-top: var(--space-6)">
+          <div
+            class="color-text-muted mb-2"
+            style="
+              font-size: var(--font-size-xs);
+              text-transform: uppercase;
+              font-weight: 600;
+              padding: 0 var(--space-3);
+            "
+          >
             My Groups
           </div>
           <div id="sidebar-groups-list" class="flex flex-col gap-1">
             <!-- Dynamically populated -->
           </div>
 
-          <div style="margin-top: auto; border-top: 1px solid rgba(18, 44, 38, 0.05); padding-top: var(--space-4);">
-            <button id="btn-intercessor-logout" class="admin-sidebar__link text-left w-full" style="background: none; border: none; cursor: pointer; color: var(--color-error);">
+          <div
+            style="
+              margin-top: auto;
+              border-top: 1px solid rgba(18, 44, 38, 0.05);
+              padding-top: var(--space-4);
+            "
+          >
+            <button
+              id="btn-intercessor-logout"
+              class="admin-sidebar__link text-left w-full"
+              style="
+                background: none;
+                border: none;
+                cursor: pointer;
+                color: var(--color-error);
+              "
+            >
               Log Out
             </button>
           </div>
@@ -431,15 +974,59 @@
         <!-- Dashboard Toolbar -->
         <header class="admin-header flex justify-between items-center mb-6">
           <div>
-            <h1 class="admin-header__title font-display" id="main-group-title" style="font-size: var(--font-size-2xl);">Select a Group</h1>
-            <p class="admin-header__subtitle color-text-secondary" id="main-group-subtitle">Choose a prayer circle from the sidebar to view active prayer requests.</p>
+            <h1
+              class="admin-header__title font-display"
+              id="main-group-title"
+              style="font-size: var(--font-size-2xl)"
+            >
+              Select a Group
+            </h1>
+            <p
+              class="admin-header__subtitle color-text-secondary"
+              id="main-group-subtitle"
+            >
+              Choose a prayer circle from the sidebar to view active prayer
+              requests.
+            </p>
           </div>
-          <div id="filter-toolbar" style="display: none;">
-            <div class="flex gap-2" style="background: rgba(18, 44, 38, 0.03); padding: 2px; border-radius: var(--radius-sm);">
-              <button class="btn-secondary active-filter-btn" id="filter-open" style="border: none; padding: 0.4rem 1rem; font-size: var(--font-size-xs); background: var(--color-surface-solid); border-radius: var(--radius-sm); font-weight: 600; box-shadow: var(--shadow-sm); cursor: pointer;">
+          <div id="filter-toolbar" style="display: none">
+            <div
+              class="flex gap-2"
+              style="
+                background: rgba(18, 44, 38, 0.03);
+                padding: 2px;
+                border-radius: var(--radius-sm);
+              "
+            >
+              <button
+                class="btn-secondary active-filter-btn"
+                id="filter-open"
+                style="
+                  border: none;
+                  padding: 0.4rem 1rem;
+                  font-size: var(--font-size-xs);
+                  background: var(--color-surface-solid);
+                  border-radius: var(--radius-sm);
+                  font-weight: 600;
+                  box-shadow: var(--shadow-sm);
+                  cursor: pointer;
+                "
+              >
                 Active Prayers
               </button>
-              <button class="btn-secondary active-filter-btn" id="filter-closed" style="border: none; padding: 0.4rem 1rem; font-size: var(--font-size-xs); background: transparent; border-radius: var(--radius-sm); font-weight: 500; cursor: pointer;">
+              <button
+                class="btn-secondary active-filter-btn"
+                id="filter-closed"
+                style="
+                  border: none;
+                  padding: 0.4rem 1rem;
+                  font-size: var(--font-size-xs);
+                  background: transparent;
+                  border-radius: var(--radius-sm);
+                  font-weight: 500;
+                  cursor: pointer;
+                "
+              >
                 Answered/Closed
               </button>
             </div>
@@ -449,12 +1036,23 @@
         <!-- Dynamic Content Area -->
         <section id="portal-content-canvas">
           <div id="empty-state" class="text-center py-8">
-            <span style="font-size: var(--font-size-3xl);">🕊️</span>
-            <h3 class="font-display mt-4 mb-2" style="font-size: var(--font-size-lg);">Welcome, Intercessor</h3>
-            <p class="color-text-secondary" style="font-weight: 300;">Please select a prayer circle from the sidebar list to view details.</p>
+            <h3
+              class="font-display mb-2"
+              style="font-size: var(--font-size-lg)"
+            >
+              Welcome, Intercessor
+            </h3>
+            <p class="color-text-secondary" style="font-weight: 300">
+              Please select a prayer circle from the sidebar list to view
+              details.
+            </p>
           </div>
 
-          <div id="prayers-list-container" class="grid grid-cols-3 gap-6" style="display: none;">
+          <div
+            id="prayers-list-container"
+            class="grid grid-cols-3 gap-6"
+            style="display: none"
+          >
             <!-- Dynamically populated -->
           </div>
         </section>
@@ -464,75 +1062,252 @@
     <!-- === MODALS === -->
 
     <!-- A. Group Create/Edit Modal -->
-    <div class="modal-backdrop" id="modal-group-backdrop" style="display: none"></div>
-    <div class="modal card" id="modal-group" style="display: none; padding: var(--space-8); max-width: 480px">
-      <button class="modal-close-x" id="btn-modal-group-close" aria-label="Close">×</button>
-      <h3 class="font-display mb-4" id="group-modal-title" style="font-size: var(--font-size-xl)">Create Circle</h3>
+    <div
+      class="modal-backdrop"
+      id="modal-group-backdrop"
+      style="display: none"
+    ></div>
+    <div
+      class="modal card"
+      id="modal-group"
+      style="display: none; padding: var(--space-8); max-width: 480px"
+    >
+      <button
+        class="modal-close-x"
+        id="btn-modal-group-close"
+        aria-label="Close"
+      >
+        ×
+      </button>
+      <h3
+        class="font-display mb-4"
+        id="group-modal-title"
+        style="font-size: var(--font-size-xl)"
+      >
+        Create Circle
+      </h3>
       <form id="group-form">
         <input type="hidden" id="group-form-id" />
         <div class="admin-form-group">
-          <label class="admin-form-label" for="group-form-name">Circle Name *</label>
-          <input type="text" class="input" id="group-form-name" required placeholder="E.g. Grace Fellowship" maxlength="100" />
+          <label class="admin-form-label" for="group-form-name"
+            >Circle Name *</label
+          >
+          <input
+            type="text"
+            class="input"
+            id="group-form-name"
+            required
+            placeholder="E.g. Grace Fellowship"
+            maxlength="100"
+          />
         </div>
         <div class="admin-form-group">
-          <label class="admin-form-label" for="group-form-passcode">Circle Passcode (6-char alphanumeric) *</label>
+          <label class="admin-form-label" for="group-form-passcode"
+            >Circle Passcode (6-char alphanumeric) *</label
+          >
           <div style="display: flex; gap: var(--space-2)">
-            <input type="text" class="input" id="group-form-passcode" required maxlength="6" minlength="6" placeholder="E.G. GRACE1" style="text-transform: uppercase; letter-spacing: 2px" />
-            <button type="button" class="btn-secondary" id="btn-group-passcode-generate" style="min-width: 100px">Generate</button>
+            <input
+              type="text"
+              class="input"
+              id="group-form-passcode"
+              required
+              maxlength="6"
+              minlength="6"
+              placeholder="E.G. GRACE1"
+              style="text-transform: uppercase; letter-spacing: 2px"
+            />
+            <button
+              type="button"
+              class="btn-secondary"
+              id="btn-group-passcode-generate"
+              style="min-width: 100px"
+            >
+              Generate
+            </button>
           </div>
-          <p id="group-form-passcode-feedback" style="font-size: var(--font-size-xs); display: none; color: var(--color-error); margin-top: 4px;"></p>
+          <p
+            id="group-form-passcode-feedback"
+            style="
+              font-size: var(--font-size-xs);
+              display: none;
+              color: var(--color-error);
+              margin-top: 4px;
+            "
+          ></p>
         </div>
-        <div class="mb-6 mt-4" style="display: flex; gap: var(--space-2); align-items: center">
-          <input type="checkbox" id="group-form-optout" style="width: 18px; height: 18px; cursor: pointer" />
-          <label for="group-form-optout" class="admin-form-label" style="margin-bottom: 0; cursor: pointer">Exclude this group from receiving unassigned general prayers</label>
+        <div
+          class="mb-6 mt-4"
+          style="display: flex; gap: var(--space-2); align-items: center"
+        >
+          <input
+            type="checkbox"
+            id="group-form-optout"
+            style="width: 18px; height: 18px; cursor: pointer"
+          />
+          <label
+            for="group-form-optout"
+            class="admin-form-label"
+            style="margin-bottom: 0; cursor: pointer"
+            >Exclude this group from receiving unassigned general prayers</label
+          >
         </div>
-        <div class="flex justify-end gap-3" style="border-top: 1px solid rgba(0, 0, 0, 0.06); padding-top: var(--space-4);">
-          <button type="button" class="btn-secondary" id="btn-group-form-cancel">Cancel</button>
-          <button type="submit" class="btn-primary" id="btn-group-form-submit">Save Circle</button>
+        <div
+          class="flex justify-end gap-3"
+          style="
+            border-top: 1px solid rgba(0, 0, 0, 0.06);
+            padding-top: var(--space-4);
+          "
+        >
+          <button
+            type="button"
+            class="btn-secondary"
+            id="btn-group-form-cancel"
+          >
+            Cancel
+          </button>
+          <button type="submit" class="btn-primary" id="btn-group-form-submit">
+            Save Circle
+          </button>
         </div>
       </form>
     </div>
 
     <!-- B. Single Member Add Modal -->
-    <div class="modal-backdrop" id="modal-member-backdrop" style="display: none"></div>
-    <div class="modal card" id="modal-member" style="display: none; padding: var(--space-8); max-width: 440px">
-      <button class="modal-close-x" id="btn-modal-member-close" aria-label="Close">×</button>
-      <h3 class="font-display mb-4" style="font-size: var(--font-size-xl)">Add Intercessor</h3>
+    <div
+      class="modal-backdrop"
+      id="modal-member-backdrop"
+      style="display: none"
+    ></div>
+    <div
+      class="modal card"
+      id="modal-member"
+      style="display: none; padding: var(--space-8); max-width: 440px"
+    >
+      <button
+        class="modal-close-x"
+        id="btn-modal-member-close"
+        aria-label="Close"
+      >
+        ×
+      </button>
+      <h3 class="font-display mb-4" style="font-size: var(--font-size-xl)">
+        Add Intercessor
+      </h3>
       <form id="member-form">
         <div class="admin-form-group">
-          <label class="admin-form-label" for="member-form-name">Intercessor Name *</label>
-          <input type="text" class="input" id="member-form-name" required placeholder="E.g. John Doe" maxlength="100" />
+          <label class="admin-form-label" for="member-form-name"
+            >Intercessor Name *</label
+          >
+          <input
+            type="text"
+            class="input"
+            id="member-form-name"
+            required
+            placeholder="E.g. John Doe"
+            maxlength="100"
+          />
         </div>
         <div class="admin-form-group">
-          <label class="admin-form-label" for="member-form-email">Email Address *</label>
-          <input type="email" class="input" id="member-form-email" required placeholder="john.doe@example.com" />
+          <label class="admin-form-label" for="member-form-email"
+            >Email Address *</label
+          >
+          <input
+            type="email"
+            class="input"
+            id="member-form-email"
+            required
+            placeholder="john.doe@example.com"
+          />
         </div>
-        <div class="flex justify-end gap-3 mt-6" style="border-top: 1px solid rgba(0, 0, 0, 0.06); padding-top: var(--space-4);">
-          <button type="button" class="btn-secondary" id="btn-member-form-cancel">Cancel</button>
-          <button type="submit" class="btn-primary" id="btn-member-form-submit">Add Intercessor</button>
+        <div
+          class="flex justify-end gap-3 mt-6"
+          style="
+            border-top: 1px solid rgba(0, 0, 0, 0.06);
+            padding-top: var(--space-4);
+          "
+        >
+          <button
+            type="button"
+            class="btn-secondary"
+            id="btn-member-form-cancel"
+          >
+            Cancel
+          </button>
+          <button type="submit" class="btn-primary" id="btn-member-form-submit">
+            Add Intercessor
+          </button>
         </div>
       </form>
     </div>
 
     <!-- C. Bulk Member Import Modal -->
-    <div class="modal-backdrop" id="modal-member-bulk-backdrop" style="display: none"></div>
-    <div class="modal card" id="modal-member-bulk" style="display: none; padding: var(--space-8); max-width: 580px; width: 90%;">
-      <button class="modal-close-x" id="btn-modal-member-bulk-close" aria-label="Close">×</button>
-      <h3 class="font-display mb-2" style="font-size: var(--font-size-xl)">Bulk CSV Import</h3>
-      <p class="color-text-secondary mb-4" style="font-size: var(--font-size-sm)">
-        Paste CSV records below. Format: <code>Name, Email</code> (one record per line).
+    <div
+      class="modal-backdrop"
+      id="modal-member-bulk-backdrop"
+      style="display: none"
+    ></div>
+    <div
+      class="modal card"
+      id="modal-member-bulk"
+      style="
+        display: none;
+        padding: var(--space-8);
+        max-width: 580px;
+        width: 90%;
+      "
+    >
+      <button
+        class="modal-close-x"
+        id="btn-modal-member-bulk-close"
+        aria-label="Close"
+      >
+        ×
+      </button>
+      <h3 class="font-display mb-2" style="font-size: var(--font-size-xl)">
+        Bulk CSV Import
+      </h3>
+      <p
+        class="color-text-secondary mb-4"
+        style="font-size: var(--font-size-sm)"
+      >
+        Paste CSV records below. Format: <code>Name, Email</code> (one record
+        per line).
       </p>
       <form id="member-bulk-form">
         <div class="admin-form-group">
-          <label class="admin-form-label" for="member-bulk-textarea">CSV Records</label>
-          <textarea id="member-bulk-textarea" class="textarea" rows="8" placeholder="John Smith,john@example.com&#10;Sarah Jenkins,sjenkins@church.org" style="font-family: monospace; font-size: var(--font-size-sm)" required></textarea>
+          <label class="admin-form-label" for="member-bulk-textarea"
+            >CSV Records</label
+          >
+          <textarea
+            id="member-bulk-textarea"
+            class="textarea"
+            rows="8"
+            placeholder="John Smith,john@example.com&#10;Sarah Jenkins,sjenkins@church.org"
+            style="font-family: monospace; font-size: var(--font-size-sm)"
+            required
+          ></textarea>
         </div>
 
         <!-- Validation preview screen -->
-        <div id="bulk-preview-section" style="display: none; margin-bottom: var(--space-4)">
-          <h4 class="font-display mb-2" style="font-size: var(--font-size-sm)">Validation Summary</h4>
-          <div style="max-height: 180px; overflow-y: auto; border: 1px solid rgba(0, 0, 0, 0.06); border-radius: var(--radius-sm);">
-            <table class="admin-table" style="margin-top: 0; font-size: var(--font-size-xs)">
+        <div
+          id="bulk-preview-section"
+          style="display: none; margin-bottom: var(--space-4)"
+        >
+          <h4 class="font-display mb-2" style="font-size: var(--font-size-sm)">
+            Validation Summary
+          </h4>
+          <div
+            style="
+              max-height: 180px;
+              overflow-y: auto;
+              border: 1px solid rgba(0, 0, 0, 0.06);
+              border-radius: var(--radius-sm);
+            "
+          >
+            <table
+              class="admin-table"
+              style="margin-top: 0; font-size: var(--font-size-xs)"
+            >
               <thead>
                 <tr>
                   <th>Status</th>
@@ -548,25 +1323,74 @@
           </div>
         </div>
 
-        <div class="flex justify-between items-center mt-6" style="border-top: 1px solid rgba(0, 0, 0, 0.06); padding-top: var(--space-4);">
-          <div id="bulk-summary-status" class="color-text-secondary" style="font-size: var(--font-size-xs)">Ready to parse</div>
+        <div
+          class="flex justify-between items-center mt-6"
+          style="
+            border-top: 1px solid rgba(0, 0, 0, 0.06);
+            padding-top: var(--space-4);
+          "
+        >
+          <div
+            id="bulk-summary-status"
+            class="color-text-secondary"
+            style="font-size: var(--font-size-xs)"
+          >
+            Ready to parse
+          </div>
           <div class="flex gap-3">
-            <button type="button" class="btn-secondary" id="btn-member-bulk-cancel">Cancel</button>
-            <button type="button" class="btn-secondary" id="btn-member-bulk-validate">Validate CSV</button>
-            <button type="submit" class="btn-primary" id="btn-member-bulk-submit" disabled>Import Valid Rows</button>
+            <button
+              type="button"
+              class="btn-secondary"
+              id="btn-member-bulk-cancel"
+            >
+              Cancel
+            </button>
+            <button
+              type="button"
+              class="btn-secondary"
+              id="btn-member-bulk-validate"
+            >
+              Validate CSV
+            </button>
+            <button
+              type="submit"
+              class="btn-primary"
+              id="btn-member-bulk-submit"
+              disabled
+            >
+              Import Valid Rows
+            </button>
           </div>
         </div>
       </form>
     </div>
 
     <!-- D. Admin Create Modal -->
-    <div class="modal-backdrop" id="modal-admin-backdrop" style="display: none"></div>
-    <div class="modal card" id="modal-admin" style="display: none; padding: var(--space-8); max-width: 440px">
-      <button class="modal-close-x" id="btn-modal-admin-close" aria-label="Close">×</button>
-      <h3 class="font-display mb-4" style="font-size: var(--font-size-xl)">Create Console Account</h3>
+    <div
+      class="modal-backdrop"
+      id="modal-admin-backdrop"
+      style="display: none"
+    ></div>
+    <div
+      class="modal card"
+      id="modal-admin"
+      style="display: none; padding: var(--space-8); max-width: 440px"
+    >
+      <button
+        class="modal-close-x"
+        id="btn-modal-admin-close"
+        aria-label="Close"
+      >
+        ×
+      </button>
+      <h3 class="font-display mb-4" style="font-size: var(--font-size-xl)">
+        Create Console Account
+      </h3>
       <form id="admin-account-form">
         <div class="admin-form-group">
-          <label class="admin-form-label" for="admin-form-username">Username *</label>
+          <label class="admin-form-label" for="admin-form-username"
+            >Username *</label
+          >
           <input
             type="text"
             class="input"
@@ -579,46 +1403,137 @@
           />
         </div>
         <div class="admin-form-group">
-          <label class="admin-form-label" for="admin-form-password">Password *</label>
-          <input type="password" class="input" id="admin-form-password" required placeholder="Minimum 8 characters" minlength="8" />
+          <label class="admin-form-label" for="admin-form-password"
+            >Password *</label
+          >
+          <input
+            type="password"
+            class="input"
+            id="admin-form-password"
+            required
+            placeholder="Minimum 8 characters"
+            minlength="8"
+          />
         </div>
         <div class="admin-form-group">
-          <label class="admin-form-label" for="admin-form-role">Console Role *</label>
-          <select id="admin-form-role" class="input" style="height: 42px" required>
+          <label class="admin-form-label" for="admin-form-role"
+            >Console Role *</label
+          >
+          <select
+            id="admin-form-role"
+            class="input"
+            style="height: 42px"
+            required
+          >
             <option value="APP_ADMIN">App Admin (Full Access)</option>
             <option value="GROUP_ADMIN">Group Admin (Single Circle)</option>
           </select>
         </div>
-        <div class="admin-form-group" id="admin-form-group-select-wrapper" style="display: none">
-          <label class="admin-form-label" for="admin-form-group-select">Assigned Circle *</label>
-          <select id="admin-form-group-select" class="input" style="height: 42px">
+        <div
+          class="admin-form-group"
+          id="admin-form-group-select-wrapper"
+          style="display: none"
+        >
+          <label class="admin-form-label" for="admin-form-group-select"
+            >Assigned Circle *</label
+          >
+          <select
+            id="admin-form-group-select"
+            class="input"
+            style="height: 42px"
+          >
             <!-- Loaded dynamically -->
           </select>
         </div>
-        <div class="flex justify-end gap-3 mt-6" style="border-top: 1px solid rgba(0, 0, 0, 0.06); padding-top: var(--space-4);">
-          <button type="button" class="btn-secondary" id="btn-admin-form-cancel">Cancel</button>
-          <button type="submit" class="btn-primary" id="btn-admin-form-submit">Create Console Account</button>
+        <div
+          class="flex justify-end gap-3 mt-6"
+          style="
+            border-top: 1px solid rgba(0, 0, 0, 0.06);
+            padding-top: var(--space-4);
+          "
+        >
+          <button
+            type="button"
+            class="btn-secondary"
+            id="btn-admin-form-cancel"
+          >
+            Cancel
+          </button>
+          <button type="submit" class="btn-primary" id="btn-admin-form-submit">
+            Create Console Account
+          </button>
         </div>
       </form>
     </div>
 
     <!-- E. Prayer Details View Modal -->
-    <div class="modal-backdrop" id="modal-prayer-backdrop" style="display: none"></div>
-    <div class="modal card" id="modal-prayer" style="display: none; padding: var(--space-8); max-width: 580px; width: 90%;">
-      <button class="modal-close-x" id="btn-modal-prayer-close" aria-label="Close">×</button>
+    <div
+      class="modal-backdrop"
+      id="modal-prayer-backdrop"
+      style="display: none"
+    ></div>
+    <div
+      class="modal card"
+      id="modal-prayer"
+      style="
+        display: none;
+        padding: var(--space-8);
+        max-width: 580px;
+        width: 90%;
+      "
+    >
+      <button
+        class="modal-close-x"
+        id="btn-modal-prayer-close"
+        aria-label="Close"
+      >
+        ×
+      </button>
       <div class="text-center" id="prayer-detail-content">
         <!-- Loaded dynamically -->
       </div>
     </div>
 
     <!-- F. Confirmation Modal -->
-    <div class="modal-backdrop" id="modal-confirm-backdrop" style="display: none; z-index: 1050"></div>
-    <div class="modal card" id="modal-confirm" style="display: none; padding: var(--space-6); max-width: 400px; z-index: 1060;">
-      <h3 class="font-display mb-2" id="confirm-title" style="font-size: var(--font-size-lg)">Are you sure?</h3>
-      <p class="color-text-secondary mb-6" id="confirm-message" style="font-size: var(--font-size-sm); line-height: 1.4"></p>
+    <div
+      class="modal-backdrop"
+      id="modal-confirm-backdrop"
+      style="display: none; z-index: 1050"
+    ></div>
+    <div
+      class="modal card"
+      id="modal-confirm"
+      style="
+        display: none;
+        padding: var(--space-6);
+        max-width: 400px;
+        z-index: 1060;
+      "
+    >
+      <h3
+        class="font-display mb-2"
+        id="confirm-title"
+        style="font-size: var(--font-size-lg)"
+      >
+        Are you sure?
+      </h3>
+      <p
+        class="color-text-secondary mb-6"
+        id="confirm-message"
+        style="font-size: var(--font-size-sm); line-height: 1.4"
+      ></p>
       <div class="flex justify-end gap-3">
-        <button type="button" class="btn-secondary" id="btn-confirm-cancel">Cancel</button>
-        <button type="button" class="btn-primary" id="btn-confirm-action" style="background-color: var(--color-error)">Delete</button>
+        <button type="button" class="btn-secondary" id="btn-confirm-cancel">
+          Cancel
+        </button>
+        <button
+          type="button"
+          class="btn-primary"
+          id="btn-confirm-action"
+          style="background-color: var(--color-error)"
+        >
+          Delete
+        </button>
       </div>
     </div>
 
@@ -632,11 +1547,13 @@
     <script>
       document.addEventListener('DOMContentLoaded', () => {
         const backdrop = document.getElementById('drawerBackdrop');
-        
+
         document.querySelectorAll('.mobile-bar .menu-toggle').forEach((btn) => {
           btn.addEventListener('click', (e) => {
             e.stopPropagation();
-            const sidebar = btn.closest('.admin-layout').querySelector('.admin-sidebar');
+            const sidebar = btn
+              .closest('.admin-layout')
+              .querySelector('.admin-sidebar');
             if (sidebar) {
               sidebar.classList.add('open');
               backdrop.classList.add('show');
@@ -653,7 +1570,10 @@
 
         // Close sidebar drawer on link clicks
         document.addEventListener('click', (e) => {
-          if (e.target.closest('.admin-sidebar__link') || e.target.closest('a')) {
+          if (
+            e.target.closest('.admin-sidebar__link') ||
+            e.target.closest('a')
+          ) {
             document.querySelectorAll('.admin-sidebar').forEach((sb) => {
               sb.classList.remove('open');
             });

@@ -33,12 +33,18 @@
   --color-admin-bg: transparent;
   --color-admin-table-alt: rgba(255, 255, 255, 0.02);
 
-  --font-body: 'Hanken Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-body:
+    'Hanken Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   --font-display: 'Clash Display', Georgia, serif;
 }
 
 html {
-  background: radial-gradient(120% 120% at 70% 20%, #232429 0%, var(--charcoal) 45%, var(--charcoal-deep) 100%) !important;
+  background: radial-gradient(
+    120% 120% at 70% 20%,
+    #232429 0%,
+    var(--charcoal) 45%,
+    var(--charcoal-deep) 100%
+  ) !important;
   background-color: #141416 !important; /* Deep charcoal matching page theme */
 }
 
@@ -46,7 +52,7 @@ body {
   background: transparent !important;
   background-color: transparent !important;
   color: var(--offwhite) !important;
-  font-family: "Hanken Grotesk", sans-serif !important;
+  font-family: 'Hanken Grotesk', sans-serif !important;
   min-height: 100vh;
   position: relative;
   overflow: auto !important; /* Enable scrolling */
@@ -54,7 +60,11 @@ body {
 
 @media (max-width: 768px) {
   html {
-    background: radial-gradient(100% 100% at 50% 50%, var(--charcoal) 0%, var(--charcoal-deep) 100%) !important;
+    background: radial-gradient(
+      100% 100% at 50% 50%,
+      var(--charcoal) 0%,
+      var(--charcoal-deep) 100%
+    ) !important;
     background-color: #141416 !important;
   }
   body {
@@ -92,8 +102,8 @@ body {
   backdrop-filter: blur(28px) saturate(170%) !important;
   -webkit-backdrop-filter: blur(28px) saturate(170%) !important;
   box-shadow:
-    inset 0 1px 0 rgba(255,255,255,0.12),
-    0 30px 70px -28px rgba(0,0,0,0.7) !important;
+    inset 0 1px 0 rgba(255, 255, 255, 0.12),
+    0 30px 70px -28px rgba(0, 0, 0, 0.7) !important;
   padding: 2rem 1.5rem !important;
   display: flex !important;
   flex-direction: column !important;
@@ -110,7 +120,7 @@ body {
     width: min(300px, 84vw) !important;
     border-radius: 0 26px 26px 0 !important;
     transform: translateX(-110%) !important;
-    transition: transform 0.35s cubic-bezier(.16,.84,.3,1) !important;
+    transition: transform 0.35s cubic-bezier(0.16, 0.84, 0.3, 1) !important;
     z-index: 600 !important;
   }
   .admin-sidebar.open {
@@ -119,7 +129,7 @@ body {
 }
 
 .admin-sidebar__title {
-  font-family: "Clash Display", sans-serif !important;
+  font-family: 'Clash Display', sans-serif !important;
   font-size: 1.3rem !important;
   font-weight: 600 !important;
   color: var(--offwhite) !important;
@@ -147,7 +157,10 @@ body {
   border: 1px solid transparent !important;
   border-radius: 12px !important;
   cursor: pointer !important;
-  transition: background 0.18s ease, border-color 0.18s ease, color 0.18s ease !important;
+  transition:
+    background 0.18s ease,
+    border-color 0.18s ease,
+    color 0.18s ease !important;
   text-decoration: none !important;
 }
 
@@ -176,13 +189,15 @@ body {
 }
 
 /* Main Content Area */
-.admin-content, .admin-main {
+.admin-content,
+.admin-main {
   background: rgba(20, 21, 25, 0.62) !important;
   border: 1px solid rgba(244, 241, 234, 0.1) !important;
   backdrop-filter: blur(20px) saturate(130%) !important;
   -webkit-backdrop-filter: blur(20px) saturate(130%) !important;
-  box-shadow: inset 0 1px 0 rgba(255,255,255,0.08),
-  0 30px 70px -28px rgba(0,0,0,0.6) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    0 30px 70px -28px rgba(0, 0, 0, 0.6) !important;
   min-height: calc(100vh - 3rem) !important;
   margin: 0 !important;
   padding: 2.2rem clamp(1.4rem, 3vw, 2.6rem) !important;
@@ -190,7 +205,8 @@ body {
 }
 
 @media (max-width: 768px) {
-  .admin-content, .admin-main {
+  .admin-content,
+  .admin-main {
     min-height: auto !important;
     margin: 1rem 0 0 0 !important;
     padding: 1.5rem 1.2rem !important;
@@ -198,8 +214,13 @@ body {
 }
 
 /* === Typography Overrides === */
-h1, h2, h3, h4, h5, h6 {
-  font-family: "Clash Display", sans-serif !important;
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: 'Clash Display', sans-serif !important;
   font-weight: 600 !important;
   color: var(--offwhite) !important;
   letter-spacing: 0.02em;
@@ -239,7 +260,7 @@ h1, h2, h3, h4, h5, h6 {
   background: var(--panel) !important;
   border: 1px solid var(--line) !important;
   border-radius: 18px !important;
-  box-shadow: 0 30px 80px -30px rgba(0,0,0,0.85) !important;
+  box-shadow: 0 30px 80px -30px rgba(0, 0, 0, 0.85) !important;
   backdrop-filter: blur(28px) saturate(170%);
   -webkit-backdrop-filter: blur(28px) saturate(170%);
   padding: 2rem !important;
@@ -260,7 +281,9 @@ h1, h2, h3, h4, h5, h6 {
   opacity: 0.9;
 }
 
-.input, .textarea, select.input {
+.input,
+.textarea,
+select.input {
   width: 100%;
   padding: 0.85rem 1.1rem !important;
   font-size: 1rem !important;
@@ -270,15 +293,20 @@ h1, h2, h3, h4, h5, h6 {
   background: rgba(244, 241, 234, 0.05) !important;
   color: var(--offwhite) !important;
   outline: none !important;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease !important;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease !important;
 }
 
-.input:focus, .textarea:focus, select.input:focus {
+.input:focus,
+.textarea:focus,
+select.input:focus {
   border-color: rgba(56, 182, 196, 0.6) !important;
   box-shadow: 0 0 0 3px rgba(56, 182, 196, 0.15) !important;
 }
 
-.input::placeholder, .textarea::placeholder {
+.input::placeholder,
+.textarea::placeholder {
   color: var(--muted) !important;
   opacity: 0.6;
 }
@@ -317,7 +345,10 @@ div:has(> .btn-toggle-password) > .input {
   cursor: pointer !important;
   background: var(--offwhite) !important;
   color: var(--charcoal-deep) !important;
-  transition: transform 0.15s ease, filter 0.2s ease, opacity 0.2s ease !important;
+  transition:
+    transform 0.15s ease,
+    filter 0.2s ease,
+    opacity 0.2s ease !important;
   text-decoration: none !important;
 }
 
@@ -349,7 +380,11 @@ div:has(> .btn-toggle-password) > .input {
   cursor: pointer !important;
   background: rgba(244, 241, 234, 0.04) !important;
   color: var(--offwhite) !important;
-  transition: transform 0.15s ease, background 0.2s ease, border-color 0.2s ease, color 0.2s ease !important;
+  transition:
+    transform 0.15s ease,
+    background 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease !important;
   text-decoration: none !important;
 }
 
@@ -402,13 +437,24 @@ div:has(> .btn-toggle-password) > .input {
 .admin-table th {
   background: rgba(244, 241, 234, 0.03) !important;
   color: var(--muted) !important;
-  font-family: "Clash Display", sans-serif !important;
+  font-family: 'Clash Display', sans-serif !important;
   font-weight: 600 !important;
   padding: 1rem 1.2rem !important;
   border-bottom: 1px solid var(--line) !important;
   text-transform: uppercase;
   font-size: 0.78rem;
   letter-spacing: 0.05em;
+  text-align: left;
+}
+
+.admin-table th[style*='text-align: right'],
+.admin-table th.text-right {
+  text-align: right !important;
+}
+
+.admin-table th[style*='text-align: center'],
+.admin-table th.text-center {
+  text-align: center !important;
 }
 
 .admin-table td {
@@ -416,10 +462,161 @@ div:has(> .btn-toggle-password) > .input {
   border-bottom: 1px solid var(--line) !important;
   color: var(--offwhite) !important;
   font-size: 0.95rem;
+  text-align: left;
+}
+
+.admin-table td[style*='text-align: right'],
+.admin-table td.text-right {
+  text-align: right !important;
+}
+
+.admin-table td[style*='text-align: center'],
+.admin-table td.text-center {
+  text-align: center !important;
 }
 
 .admin-table tr:hover {
   background: rgba(244, 241, 234, 0.04) !important;
+}
+
+@media (max-width: 768px) {
+  .admin-table-container {
+    background: transparent !important;
+    border: none !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    margin-top: 1rem !important;
+    overflow: visible !important;
+  }
+
+  .admin-table {
+    display: block !important;
+    width: 100% !important;
+  }
+
+  .admin-table thead {
+    display: none !important;
+  }
+
+  .admin-table tbody {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 0.75rem !important;
+    width: 100% !important;
+  }
+
+  .admin-table tr {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 0.45rem !important;
+    background: rgba(28, 29, 33, 0.65) !important;
+    border: 1px solid var(--line) !important;
+    border-radius: 16px !important;
+    padding: 1.1rem !important;
+    box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5) !important;
+    backdrop-filter: blur(16px) !important;
+    -webkit-backdrop-filter: blur(16px) !important;
+    transition:
+      transform 0.15s ease,
+      border-color 0.15s ease,
+      background 0.15s ease !important;
+  }
+
+  .admin-table tr:hover {
+    background: rgba(35, 36, 42, 0.8) !important;
+    border-color: rgba(244, 241, 234, 0.22) !important;
+  }
+
+  .admin-table td {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    padding: 0.4rem 0 !important;
+    border-bottom: 1px solid rgba(244, 241, 234, 0.06) !important;
+    text-align: right !important;
+    font-size: 0.9rem !important;
+    color: var(--offwhite) !important;
+    word-break: break-word !important;
+  }
+
+  .admin-table td:last-child {
+    border-bottom: none !important;
+    padding-bottom: 0 !important;
+  }
+
+  .admin-table td[data-label]::before {
+    content: attr(data-label);
+    font-family: 'Clash Display', sans-serif !important;
+    font-weight: 600 !important;
+    font-size: 0.75rem !important;
+    color: var(--muted) !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.05em !important;
+    margin-right: 0.75rem !important;
+    text-align: left !important;
+    flex-shrink: 0 !important;
+  }
+
+  .admin-table td.table-cell-title {
+    display: block !important;
+    text-align: left !important;
+    padding-bottom: 0.6rem !important;
+    margin-bottom: 0.2rem !important;
+    border-bottom: 1px solid rgba(244, 241, 234, 0.12) !important;
+  }
+
+  .admin-table td.table-cell-title::before {
+    display: block !important;
+    margin-bottom: 0.25rem !important;
+  }
+
+  .admin-table td.table-cell-actions {
+    display: flex !important;
+    justify-content: flex-end !important;
+    padding-top: 0.6rem !important;
+    margin-top: 0.2rem !important;
+    border-top: 1px solid rgba(244, 241, 234, 0.08) !important;
+    border-bottom: none !important;
+  }
+
+  .admin-table td.table-cell-actions::before {
+    display: none !important;
+  }
+
+  .admin-table td.table-cell-actions > div {
+    width: 100% !important;
+    justify-content: flex-end !important;
+    flex-wrap: wrap !important;
+    gap: 0.4rem !important;
+  }
+
+  .admin-table td.table-cell-actions .btn-sm {
+    padding: 0.45rem 0.85rem !important;
+    font-size: 0.82rem !important;
+  }
+
+  /* Empty state rows */
+  .admin-table td[colspan] {
+    display: block !important;
+    text-align: center !important;
+    justify-content: center !important;
+    border: none !important;
+    padding: 2rem 1rem !important;
+    color: var(--color-text-muted) !important;
+  }
+
+  .admin-table td[colspan]::before {
+    display: none !important;
+  }
+
+  #filter-prayers-form {
+    grid-template-columns: 1fr !important;
+    gap: 0.75rem !important;
+  }
+
+  #member-group-qr-canvas-wrapper {
+    margin: 0 auto !important;
+  }
 }
 
 /* === Code styling === */
@@ -434,25 +631,28 @@ code {
 
 /* === Badges & Statuses === */
 .status-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-  padding: 0.2rem 0.6rem;
-  font-size: 0.75rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  border-radius: 999px;
-  background: rgba(244, 241, 234, 0.08);
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 0.4rem !important;
+  padding: 0.25rem 0.65rem !important;
+  font-size: 0.75rem !important;
+  font-weight: 600 !important;
+  text-transform: uppercase !important;
+  border-radius: 999px !important;
+  background: rgba(244, 241, 234, 0.08) !important;
+  letter-spacing: 0.03em !important;
 }
 
 .status-badge.open {
-  color: var(--cyan);
-  background: rgba(56, 182, 196, 0.1);
+  color: var(--cyan) !important;
+  background: rgba(56, 182, 196, 0.12) !important;
+  border: 1px solid rgba(56, 182, 196, 0.3) !important;
 }
 
 .status-badge.closed {
-  color: var(--muted);
-  background: rgba(255, 255, 255, 0.05);
+  color: var(--muted) !important;
+  background: rgba(255, 255, 255, 0.05) !important;
+  border: 1px solid rgba(244, 241, 234, 0.1) !important;
 }
 
 /* === Modals === */
@@ -499,16 +699,16 @@ code {
   gap: 0.8rem;
   padding: 0.6rem 1.2rem;
   border-radius: 16px;
-  background: rgba(28,29,33,0.55);
-  border: 1px solid rgba(244,241,234,0.14);
+  background: rgba(28, 29, 33, 0.55);
+  border: 1px solid rgba(244, 241, 234, 0.14);
   backdrop-filter: blur(22px) saturate(160%);
   -webkit-backdrop-filter: blur(22px) saturate(160%);
-  box-shadow: 0 18px 50px -28px rgba(0,0,0,0.7);
+  box-shadow: 0 18px 50px -28px rgba(0, 0, 0, 0.7);
   margin-bottom: 1rem;
 }
 
 .mobile-bar-title {
-  font-family: "Clash Display", sans-serif;
+  font-family: 'Clash Display', sans-serif;
   font-weight: 600;
   font-size: 1.15rem;
   color: var(--offwhite);
@@ -521,7 +721,7 @@ code {
   width: 40px;
   height: 40px;
   border-radius: 10px;
-  background: rgba(244,241,234,0.06);
+  background: rgba(244, 241, 234, 0.06);
   border: 1px solid var(--line);
   color: var(--offwhite);
   cursor: pointer;
@@ -537,7 +737,7 @@ code {
   position: fixed;
   inset: 0;
   z-index: 550;
-  background: rgba(10,10,12,0.5);
+  background: rgba(10, 10, 12, 0.5);
   backdrop-filter: blur(2px);
   -webkit-backdrop-filter: blur(2px);
   opacity: 0;
@@ -571,7 +771,8 @@ code {
     transform: translate(var(--drift-x), -30px) scale(1.2) rotate(var(--rotate));
   }
   100% {
-    transform: translate(var(--drift-x-end), -160px) scale(0.8) rotate(var(--rotate-end));
+    transform: translate(var(--drift-x-end), -160px) scale(0.8)
+      rotate(var(--rotate-end));
     opacity: 0;
   }
 }

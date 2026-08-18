@@ -25,11 +25,11 @@ async function getCredentials() {
     method: 'POST',
     headers: {
       'Content-Type': 'application/x-amz-json-1.1',
-      'X-Amz-Target': 'AWSCognitoIdentityService.GetId'
+      'X-Amz-Target': 'AWSCognitoIdentityService.GetId',
     },
-    body: JSON.stringify({ IdentityPoolId: IDENTITY_POOL_ID })
+    body: JSON.stringify({ IdentityPoolId: IDENTITY_POOL_ID }),
   });
-  
+
   if (!idResponse.ok) throw new Error('Failed to fetch IdentityId');
   const { IdentityId } = await idResponse.json();
 
@@ -37,23 +37,26 @@ async function getCredentials() {
     method: 'POST',
     headers: {
       'Content-Type': 'application/x-amz-json-1.1',
-      'X-Amz-Target': 'AWSCognitoIdentityService.GetCredentialsForIdentity'
+      'X-Amz-Target': 'AWSCognitoIdentityService.GetCredentialsForIdentity',
     },
-    body: JSON.stringify({ IdentityId })
+    body: JSON.stringify({ IdentityId }),
   });
 
   if (!credResponse.ok) throw new Error('Failed to fetch Credentials');
   const data = await credResponse.json();
-  
+
   cachedCredentials = data.Credentials;
   credentialsExpiration = data.Credentials.Expiration * 1000;
-  
+
   return cachedCredentials;
 }
 
 export async function fetchSecureData(path, options = {}) {
   // If running in local development mode or without Cognito Identity Pool, bypass AWS SigV4 and use native fetch via Vite proxy
-  const isLocalDev = import.meta.env.DEV || import.meta.env.VITE_USE_LOCAL_API === 'true' || !IDENTITY_POOL_ID;
+  const isLocalDev =
+    import.meta.env.DEV ||
+    import.meta.env.VITE_USE_LOCAL_API === 'true' ||
+    !IDENTITY_POOL_ID;
 
   if (isLocalDev) {
     const headers = {
@@ -98,7 +101,8 @@ export async function fetchSecureData(path, options = {}) {
   if (path.startsWith('/api/identity')) baseUrl = URLS.identity;
   else if (path.startsWith('/api/prayers')) baseUrl = URLS.prayers;
   else if (path.startsWith('/api/groups')) baseUrl = URLS.groups;
-  else if (path.startsWith('/api/admin') || path.startsWith('/api/auth')) baseUrl = URLS.admin;
+  else if (path.startsWith('/api/admin') || path.startsWith('/api/auth'))
+    baseUrl = URLS.admin;
   else throw new Error(`Unknown API path: ${path}`);
 
   // Base URL from CDK already has a trailing slash usually, but URL constructor handles it
@@ -129,9 +133,19 @@ export async function fetchSecureData(path, options = {}) {
 }
 
 // Globally intercept fetch to automatically upgrade /api/ requests to SigV4 in production
-if (typeof window !== 'undefined' && typeof window.vitest === 'undefined' && !window.__vitest_environment__) {
-  const isVitest = typeof process !== 'undefined' && process.env && process.env.NODE_ENV === 'test';
-  const isLocalDev = import.meta.env.DEV || import.meta.env.VITE_USE_LOCAL_API === 'true' || !IDENTITY_POOL_ID;
+if (
+  typeof window !== 'undefined' &&
+  typeof window.vitest === 'undefined' &&
+  !window.__vitest_environment__
+) {
+  const isVitest =
+    typeof process !== 'undefined' &&
+    process.env &&
+    process.env.NODE_ENV === 'test';
+  const isLocalDev =
+    import.meta.env.DEV ||
+    import.meta.env.VITE_USE_LOCAL_API === 'true' ||
+    !IDENTITY_POOL_ID;
 
   if (!isVitest && !isLocalDev) {
     const originalFetch = window.fetch;
@@ -161,12 +175,16 @@ if (typeof window !== 'undefined' && typeof window.vitest === 'undefined' && !wi
           try {
             // aws4fetch converts the URL to absolute AWS endpoint, we MUST NOT intercept it
             const parsedUrl = new URL(input.url);
-            shouldIntercept = parsedUrl.origin === window.location.origin && parsedUrl.pathname.startsWith('/api/');
+            shouldIntercept =
+              parsedUrl.origin === window.location.origin &&
+              parsedUrl.pathname.startsWith('/api/');
           } catch (e) {
             shouldIntercept = false;
           }
         } else if (input instanceof URL) {
-          shouldIntercept = input.origin === window.location.origin && input.pathname.startsWith('/api/');
+          shouldIntercept =
+            input.origin === window.location.origin &&
+            input.pathname.startsWith('/api/');
         }
       }
 

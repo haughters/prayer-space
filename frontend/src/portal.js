@@ -76,12 +76,17 @@ async function checkAuthStatus() {
       showAuthCard('setup');
     } else if (!currentUser.authenticated) {
       // Not logged in, route to auth forms
-      showAuthCard(window.location.hash.startsWith('#register') ? 'register' : 'login');
+      showAuthCard(
+        window.location.hash.startsWith('#register') ? 'register' : 'login'
+      );
     } else {
       // Authenticated! Render appropriate dashboard
       hideAuthView();
 
-      if (currentUser.role === 'APP_ADMIN' || currentUser.role === 'GROUP_ADMIN') {
+      if (
+        currentUser.role === 'APP_ADMIN' ||
+        currentUser.role === 'GROUP_ADMIN'
+      ) {
         initAdminView();
       } else if (currentUser.role === 'INTERCESSOR') {
         initIntercessorView();
@@ -89,7 +94,10 @@ async function checkAuthStatus() {
     }
   } catch (err) {
     console.error('Auth check error:', err);
-    showToast('Failed to connect to authentication service. Please try again.', 'error');
+    showToast(
+      'Failed to connect to authentication service. Please try again.',
+      'error'
+    );
   }
 }
 
@@ -107,7 +115,10 @@ function renderLayout() {
   } else {
     authContainer.style.display = 'none';
 
-    if (currentUser.role === 'APP_ADMIN' || currentUser.role === 'GROUP_ADMIN') {
+    if (
+      currentUser.role === 'APP_ADMIN' ||
+      currentUser.role === 'GROUP_ADMIN'
+    ) {
       adminRoot.style.display = 'grid';
       intercessorRoot.style.display = 'none';
     } else if (currentUser.role === 'INTERCESSOR') {
@@ -291,7 +302,8 @@ function renderIntercessorDashboard() {
 
       selectedGroupId = group.groupId;
       document.getElementById('main-group-title').textContent = group.name;
-      document.getElementById('main-group-subtitle').textContent = `Browse and pray for requests in ${group.name}.`;
+      document.getElementById('main-group-subtitle').textContent =
+        `Browse and pray for requests in ${group.name}.`;
 
       loadGroupPrayers(group.groupId);
     });
@@ -305,7 +317,8 @@ async function loadDashboardData() {
   await populateGroupFilterDropdown();
 
   const statusFilter = filterStatus !== 'all' ? `&status=${filterStatus}` : '';
-  const groupFilter = filterGroupId !== 'all' ? `&groupId=${filterGroupId}` : '';
+  const groupFilter =
+    filterGroupId !== 'all' ? `&groupId=${filterGroupId}` : '';
   const fromFilter = filterFromDate ? `&fromDate=${filterFromDate}` : '';
   const toFilter = filterToDate ? `&toDate=${filterToDate}` : '';
 
@@ -408,9 +421,12 @@ async function loadGroupMembersData(groupId) {
     passcode: '-',
   };
 
-  document.getElementById('breadcrumb-group-name').textContent = currentGroupDetails.name;
-  document.getElementById('member-group-title').textContent = currentGroupDetails.name;
-  document.getElementById('lbl-group-passcode').textContent = currentGroupDetails.passcode;
+  document.getElementById('breadcrumb-group-name').textContent =
+    currentGroupDetails.name;
+  document.getElementById('member-group-title').textContent =
+    currentGroupDetails.name;
+  document.getElementById('lbl-group-passcode').textContent =
+    currentGroupDetails.passcode;
 
   const directLink = `${window.location.origin}/?groupId=${groupId}`;
   const lnkShare = document.getElementById('lnk-group-share');
@@ -426,7 +442,8 @@ async function loadGroupMembersData(groupId) {
 
   const editBtn = document.getElementById('btn-edit-my-group');
   if (editBtn) {
-    editBtn.style.display = currentUser.role === 'GROUP_ADMIN' ? 'inline-block' : 'none';
+    editBtn.style.display =
+      currentUser.role === 'GROUP_ADMIN' ? 'inline-block' : 'none';
   }
 
   try {
@@ -443,7 +460,9 @@ async function loadGroupMembersData(groupId) {
 // === INTERCESSOR CORE API CALLS ===
 function loadGroupPrayers(groupId) {
   const emptyState = document.getElementById('empty-state');
-  const prayersListContainer = document.getElementById('prayers-list-container');
+  const prayersListContainer = document.getElementById(
+    'prayers-list-container'
+  );
   const filterToolbar = document.getElementById('filter-toolbar');
 
   emptyState.style.display = 'none';
@@ -496,14 +515,14 @@ function renderPrayersTable() {
         : '';
 
     tr.innerHTML = `
-      <td>
+      <td data-label="Request Preview" class="table-cell-title">
         <div style="font-weight: 500;">"${escapeHtml(truncateString(p.prayerText, 70))}"</div>
         ${updatesText}
       </td>
-      <td>${escapeHtml(groupName)}</td>
-      <td><span class="status-badge ${p.status.toLowerCase()}">${p.status}</span></td>
-      <td style="text-align: right; font-weight: 600;">🙏 ${p.prayedForCount || 0}</td>
-      <td style="text-align: right; color: var(--color-text-muted);">${dateStr}</td>
+      <td data-label="Assigned Circle">${escapeHtml(groupName)}</td>
+      <td data-label="Status"><span class="status-badge ${p.status.toLowerCase()}">${p.status}</span></td>
+      <td data-label="Prayers" style="text-align: right; font-weight: 600;">🙏 ${p.prayedForCount || 0}</td>
+      <td data-label="Date Submitted" style="text-align: right; color: var(--color-text-muted);">${dateStr}</td>
     `;
     tbody.appendChild(tr);
   });
@@ -531,21 +550,26 @@ function renderGroupsTable() {
   groupsCache.forEach((g) => {
     const tr = document.createElement('tr');
     const dateStr = new Date(g.createdAt).toLocaleDateString();
+    const optOutBadge = g.optOutGeneral
+      ? '<span class="status-badge closed">Excluded</span>'
+      : '<span class="status-badge open">Included</span>';
 
     tr.innerHTML = `
-      <td>
+      <td data-label="Circle Name" class="table-cell-title">
         <div style="font-weight: 600; color: var(--color-text-primary);">${escapeHtml(g.name)}</div>
-        <div style="font-size: var(--font-size-xs); color: var(--color-text-muted);">${escapeHtml(g.description || '')}</div>
+        ${g.description ? `<div style="font-size: var(--font-size-xs); color: var(--color-text-muted);">${escapeHtml(g.description)}</div>` : ''}
       </td>
-      <td style="text-align: right; font-weight: 600;">👥 ${g.memberCount || 0}</td>
-      <td><code style="background: rgba(0,0,0,0.04); padding: 2px 6px; border-radius: 4px; font-weight: 700;">${g.passcode}</code></td>
-      <td>${g.optOutGeneral ? '🔴 Excluded' : '🟢 Included'}</td>
-      <td style="color: var(--color-text-muted);">${dateStr}</td>
-      <td style="text-align: right; white-space: nowrap;">
+      <td data-label="Intercessors" style="text-align: right; font-weight: 600;">${g.memberCount || 0}</td>
+      <td data-label="Passcode"><code style="background: rgba(0,0,0,0.04); padding: 2px 6px; border-radius: 4px; font-weight: 700;">${g.passcode}</code></td>
+      <td data-label="General Prayers">${optOutBadge}</td>
+      <td data-label="Created Date" style="color: var(--color-text-muted);">${dateStr}</td>
+      <td class="table-cell-actions" style="text-align: right; white-space: nowrap;">
         <div style="display: flex; gap: var(--space-2); justify-content: flex-end;">
           <button class="btn-secondary btn-sm" onclick="window.location.hash = '#members?groupId=${g.groupId}'">Members</button>
           <button class="btn-secondary btn-sm btn-edit-group" data-id="${g.groupId}">Edit</button>
-          <button class="btn-secondary btn-sm btn-regen-code" data-id="${g.groupId}" title="Regenerate Passcode">🔑</button>
+          <button class="btn-secondary btn-sm btn-regen-code" data-id="${g.groupId}" title="Regenerate Passcode" aria-label="Regenerate Passcode">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display: inline-block; vertical-align: middle;"><path d="M21 2l-2 2m-1.5 1.5L14 9l-3 3-2-2-4 4 3 3 1.5-1.5L11 14l3-3 3.5-3.5M20 7l2-2-2-2-2 2 2 2z"></path></svg>
+          </button>
           <button class="btn-secondary btn-sm btn-delete-group" data-id="${g.groupId}" style="color: var(--color-error)">Delete</button>
         </div>
       </td>
@@ -557,7 +581,9 @@ function renderGroupsTable() {
   tbody.querySelectorAll('.btn-edit-group').forEach((btn) => {
     btn.addEventListener('click', (e) => {
       e.stopPropagation();
-      const group = groupsCache.find((g) => g.groupId === btn.getAttribute('data-id'));
+      const group = groupsCache.find(
+        (g) => g.groupId === btn.getAttribute('data-id')
+      );
       openGroupModal(group);
     });
   });
@@ -572,7 +598,10 @@ function renderGroupsTable() {
         `Generating a new passcode for '${group.name}' will immediately revoke the current passcode '${group.passcode}'. Members trying to join with the old passcode will be blocked.`,
         async () => {
           try {
-            const res = await fetch(`/api/admin/groups/${groupId}/regenerate-passcode`, { method: 'POST' });
+            const res = await fetch(
+              `/api/admin/groups/${groupId}/regenerate-passcode`,
+              { method: 'POST' }
+            );
             if (res.ok) {
               const data = await res.json();
               showToast(`New passcode generated: ${data.passcode}`, 'success');
@@ -598,7 +627,9 @@ function renderGroupsTable() {
         `Are you sure you want to delete '${group.name}'? This will permanently remove all of its ${group.memberCount || 0} intercessor members. Existing prayers assigned to this circle will remain. This action cannot be undone.`,
         async () => {
           try {
-            const res = await fetch(`/api/admin/groups/${groupId}`, { method: 'DELETE' });
+            const res = await fetch(`/api/admin/groups/${groupId}`, {
+              method: 'DELETE',
+            });
             if (res.ok || res.status === 204) {
               showToast('Group deleted successfully.', 'success');
               loadGroupsData();
@@ -634,16 +665,16 @@ function renderMembersTable(members) {
   members.forEach((m) => {
     const tr = document.createElement('tr');
     const dateStr = new Date(m.joinedAt).toLocaleDateString();
-    const statusIcon = m.bounced
-      ? '<span title="Bouncing/Delivery Failure">🔴 Bounced</span>'
-      : '<span title="Delivery Healthy">🟢 Active</span>';
+    const statusBadge = m.bounced
+      ? '<span class="status-badge closed" title="Bouncing/Delivery Failure">Bounced</span>'
+      : '<span class="status-badge open" title="Delivery Healthy">Active</span>';
 
     tr.innerHTML = `
-      <td><strong>${escapeHtml(m.name || '')}</strong></td>
-      <td>${escapeHtml(m.email)}</td>
-      <td>${statusIcon}</td>
-      <td style="color: var(--color-text-muted);">${dateStr}</td>
-      <td style="text-align: right;">
+      <td data-label="Intercessor Name" class="table-cell-title"><strong>${escapeHtml(m.name || '')}</strong></td>
+      <td data-label="Email Address">${escapeHtml(m.email)}</td>
+      <td data-label="Delivery Status">${statusBadge}</td>
+      <td data-label="Date Joined" style="color: var(--color-text-muted);">${dateStr}</td>
+      <td class="table-cell-actions" style="text-align: right;">
         <button class="btn-secondary btn-sm btn-remove-member" data-id="${m.memberId}" style="color: var(--color-error)">Remove</button>
       </td>
     `;
@@ -659,9 +690,12 @@ function renderMembersTable(members) {
         `Remove ${member.name || member.email} from the circle '${currentGroupDetails.name}'? They will no longer receive prayer requests for this group.`,
         async () => {
           try {
-            const res = await fetch(`/api/admin/groups/${currentGroupDetails.groupId}/members/${memberId}`, {
-              method: 'DELETE',
-            });
+            const res = await fetch(
+              `/api/admin/groups/${currentGroupDetails.groupId}/members/${memberId}`,
+              {
+                method: 'DELETE',
+              }
+            );
             if (res.ok || res.status === 204) {
               showToast('Intercessor removed.', 'success');
               loadGroupMembersData(currentGroupDetails.groupId);
@@ -687,14 +721,16 @@ function renderAdminsTable() {
     const tr = document.createElement('tr');
     const dateStr = new Date(a.createdAt).toLocaleDateString();
     const isSelf = a.username === currentUser.username;
-    const groupName = a.groupId ? getGroupNameCached(a.groupId) : 'All Circles (Full Access)';
+    const groupName = a.groupId
+      ? getGroupNameCached(a.groupId)
+      : 'All Circles (Full Access)';
 
     tr.innerHTML = `
-      <td><strong>${escapeHtml(a.username)}</strong> ${isSelf ? '<span class="status-badge open">You</span>' : ''}</td>
-      <td><span class="status-badge ${a.role === 'APP_ADMIN' ? 'closed' : 'open'}">${a.role === 'APP_ADMIN' ? 'App Admin' : 'Group Admin'}</span></td>
-      <td>${escapeHtml(groupName)}</td>
-      <td style="color: var(--color-text-muted);">${dateStr}</td>
-      <td style="text-align: right;">
+      <td data-label="Username" class="table-cell-title"><strong>${escapeHtml(a.username)}</strong> ${isSelf ? '<span class="status-badge open">You</span>' : ''}</td>
+      <td data-label="System Role"><span class="status-badge ${a.role === 'APP_ADMIN' ? 'closed' : 'open'}">${a.role === 'APP_ADMIN' ? 'App Admin' : 'Group Admin'}</span></td>
+      <td data-label="Assigned Circle">${escapeHtml(groupName)}</td>
+      <td data-label="Date Created" style="color: var(--color-text-muted);">${dateStr}</td>
+      <td class="table-cell-actions" style="text-align: right;">
         <button class="btn-secondary btn-sm btn-delete-admin" data-id="${a.adminId}" ${isSelf ? 'disabled title="You cannot delete yourself."' : ''} style="color: var(--color-error)">Delete</button>
       </td>
     `;
@@ -710,7 +746,9 @@ function renderAdminsTable() {
         `Are you sure you want to delete administrator '${admin.username}'? They will immediately lose access to the console.`,
         async () => {
           try {
-            const res = await fetch(`/api/admin/admins/${adminId}`, { method: 'DELETE' });
+            const res = await fetch(`/api/admin/admins/${adminId}`, {
+              method: 'DELETE',
+            });
             if (res.ok || res.status === 204) {
               showToast('Console account deleted.', 'success');
               loadAdminsData();
@@ -738,25 +776,32 @@ function updatePaginationControls() {
   prevBtn.disabled = currentPrayersPage <= 0;
   nextBtn.disabled = currentPrayersPage >= totalPages - 1 || totalPages === 0;
 
-  const startIdx = totalPrayersCount === 0 ? 0 : currentPrayersPage * prayersPageSize + 1;
-  const endIdx = Math.min((currentPrayersPage + 1) * prayersPageSize, totalPrayersCount);
+  const startIdx =
+    totalPrayersCount === 0 ? 0 : currentPrayersPage * prayersPageSize + 1;
+  const endIdx = Math.min(
+    (currentPrayersPage + 1) * prayersPageSize,
+    totalPrayersCount
+  );
 
   infoLabel.textContent = `Showing ${startIdx}-${endIdx} of ${totalPrayersCount} requests (Page ${currentPrayersPage + 1} of ${totalPages || 1})`;
 }
 
 // === RENDER PRAYERS (INTERCESSOR) ===
 function renderIntercessorPrayersList() {
-  const prayersListContainer = document.getElementById('prayers-list-container');
+  const prayersListContainer = document.getElementById(
+    'prayers-list-container'
+  );
   if (!prayersListContainer) return;
 
   prayersListContainer.innerHTML = '';
-  const filtered = intercessorCachedPrayers.filter((p) => p.status === intercessorActiveFilter);
+  const filtered = intercessorCachedPrayers.filter(
+    (p) => p.status === intercessorActiveFilter
+  );
 
   if (filtered.length === 0) {
     prayersListContainer.style.display = 'block';
     prayersListContainer.innerHTML = `
       <div class="text-center py-8 card w-full">
-        <span style="font-size: var(--font-size-2xl);">🕊️</span>
         <p class="color-text-secondary mt-2">No ${intercessorActiveFilter === 'OPEN' ? 'active' : 'answered'} prayer requests in this circle.</p>
       </div>
     `;
@@ -782,7 +827,7 @@ function renderIntercessorPrayersList() {
     if (prayer.status === 'CLOSED') {
       actionBtnHtml = `
         <div style="font-size: var(--font-size-xs); font-weight: 600; color: var(--color-success); display: flex; align-items: center; gap: var(--space-1);">
-          🎉 Answered / Closed
+          ✓ Answered / Closed
         </div>
       `;
     } else if (prayer.hasPrayed) {
@@ -824,7 +869,10 @@ function renderIntercessorPrayersList() {
         fetch(`/api/prayers/${prayerId}/prayed/auth`, { method: 'POST' })
           .then((res) => {
             if (res.status === 409) {
-              showToast("You've already recorded your prayer for this request.", 'info');
+              showToast(
+                "You've already recorded your prayer for this request.",
+                'info'
+              );
               prayBtn.textContent = '✓ Offered';
               prayBtn.className = 'btn-success w-full';
               prayBtn.disabled = true;
@@ -834,7 +882,9 @@ function renderIntercessorPrayersList() {
             return res.json();
           })
           .then((data) => {
-            const badgeCount = card.querySelector(`#badge-${prayerId} .badge-count`);
+            const badgeCount = card.querySelector(
+              `#badge-${prayerId} .badge-count`
+            );
             if (badgeCount) badgeCount.textContent = data.prayedForCount;
 
             triggerEmojiBurst(e, prayBtn);
@@ -843,7 +893,9 @@ function renderIntercessorPrayersList() {
             prayBtn.className = 'btn-success w-full';
             prayBtn.disabled = true;
 
-            const cachedP = intercessorCachedPrayers.find((p) => p.prayerId === prayerId);
+            const cachedP = intercessorCachedPrayers.find(
+              (p) => p.prayerId === prayerId
+            );
             if (cachedP) {
               cachedP.hasPrayed = true;
               cachedP.prayedForCount = data.prayedForCount;
@@ -867,11 +919,16 @@ function renderIntercessorPrayersList() {
 function setupGlobalListeners() {
   window.addEventListener('hashchange', () => {
     if (currentUser.authenticated) {
-      if (currentUser.role === 'APP_ADMIN' || currentUser.role === 'GROUP_ADMIN') {
+      if (
+        currentUser.role === 'APP_ADMIN' ||
+        currentUser.role === 'GROUP_ADMIN'
+      ) {
         handleAdminHashRouting();
       }
     } else {
-      showAuthCard(window.location.hash.startsWith('#register') ? 'register' : 'login');
+      showAuthCard(
+        window.location.hash.startsWith('#register') ? 'register' : 'login'
+      );
     }
   });
 
@@ -901,7 +958,9 @@ function setupGlobalListeners() {
       e.preventDefault();
       const username = document.getElementById('setup-username').value;
       const password = document.getElementById('setup-password').value;
-      const confirmPass = document.getElementById('setup-confirm-password').value;
+      const confirmPass = document.getElementById(
+        'setup-confirm-password'
+      ).value;
 
       if (password !== confirmPass) {
         showToast('Passwords do not match.', 'error');
@@ -987,7 +1046,9 @@ function setupGlobalListeners() {
       const name = document.getElementById('register-name').value;
       const email = document.getElementById('register-email').value;
       const password = document.getElementById('register-password').value;
-      const confirmPassword = document.getElementById('register-confirm-password').value;
+      const confirmPassword = document.getElementById(
+        'register-confirm-password'
+      ).value;
       const inviteCode = document.getElementById('register-invite-code').value;
 
       if (password.length < 8) {
@@ -1007,7 +1068,9 @@ function setupGlobalListeners() {
       })
         .then(async (res) => {
           if (res.status === 409) {
-            throw new Error('An account already exists for this email address.');
+            throw new Error(
+              'An account already exists for this email address.'
+            );
           }
           if (!res.ok) {
             try {
@@ -1051,7 +1114,9 @@ function setupGlobalListeners() {
   }
 
   // Intercessor Logout triggers
-  const intercessorLogoutBtn = document.getElementById('btn-intercessor-logout');
+  const intercessorLogoutBtn = document.getElementById(
+    'btn-intercessor-logout'
+  );
   if (intercessorLogoutBtn) {
     intercessorLogoutBtn.addEventListener('click', handleLogout);
   }
@@ -1071,20 +1136,22 @@ function setupGlobalListeners() {
       loadDashboardData();
     });
 
-    document.getElementById('btn-reset-filters').addEventListener('click', () => {
-      document.getElementById('filter-status').value = 'all';
-      if (document.getElementById('filter-group')) {
-        document.getElementById('filter-group').value = 'all';
-      }
-      document.getElementById('filter-from-date').value = '';
-      document.getElementById('filter-to-date').value = '';
-      filterStatus = 'all';
-      filterGroupId = currentUser.groupId || 'all';
-      filterFromDate = '';
-      filterToDate = '';
-      currentPrayersPage = 0;
-      loadDashboardData();
-    });
+    document
+      .getElementById('btn-reset-filters')
+      .addEventListener('click', () => {
+        document.getElementById('filter-status').value = 'all';
+        if (document.getElementById('filter-group')) {
+          document.getElementById('filter-group').value = 'all';
+        }
+        document.getElementById('filter-from-date').value = '';
+        document.getElementById('filter-to-date').value = '';
+        filterStatus = 'all';
+        filterGroupId = currentUser.groupId || 'all';
+        filterFromDate = '';
+        filterToDate = '';
+        currentPrayersPage = 0;
+        loadDashboardData();
+      });
   }
 
   document.getElementById('btn-prayers-prev').addEventListener('click', () => {
@@ -1100,11 +1167,21 @@ function setupGlobalListeners() {
   });
 
   // Sorting triggers
-  document.getElementById('th-prayer-text').addEventListener('click', () => toggleSort('prayerText'));
-  document.getElementById('th-prayer-group').addEventListener('click', () => toggleSort('assignedGroupId'));
-  document.getElementById('th-prayer-status').addEventListener('click', () => toggleSort('status'));
-  document.getElementById('th-prayer-count').addEventListener('click', () => toggleSort('prayedForCount'));
-  document.getElementById('th-prayer-date').addEventListener('click', () => toggleSort('createdAt'));
+  document
+    .getElementById('th-prayer-text')
+    .addEventListener('click', () => toggleSort('prayerText'));
+  document
+    .getElementById('th-prayer-group')
+    .addEventListener('click', () => toggleSort('assignedGroupId'));
+  document
+    .getElementById('th-prayer-status')
+    .addEventListener('click', () => toggleSort('status'));
+  document
+    .getElementById('th-prayer-count')
+    .addEventListener('click', () => toggleSort('prayedForCount'));
+  document
+    .getElementById('th-prayer-date')
+    .addEventListener('click', () => toggleSort('createdAt'));
 
   const editMyGroupBtn = document.getElementById('btn-edit-my-group');
   if (editMyGroupBtn) {
@@ -1123,28 +1200,39 @@ function setupGlobalListeners() {
     });
   }
 
-  document.getElementById('btn-create-group-trigger').addEventListener('click', () => {
-    openGroupModal();
-  });
+  document
+    .getElementById('btn-create-group-trigger')
+    .addEventListener('click', () => {
+      openGroupModal();
+    });
 
-  document.getElementById('btn-group-passcode-generate').addEventListener('click', () => {
-    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-    let code = '';
-    for (let i = 0; i < 6; i++) {
-      code += chars.charAt(Math.floor(Math.random() * chars.length));
-    }
-    document.getElementById('group-form-passcode').value = code;
-  });
+  document
+    .getElementById('btn-group-passcode-generate')
+    .addEventListener('click', () => {
+      const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+      let code = '';
+      for (let i = 0; i < 6; i++) {
+        code += chars.charAt(Math.floor(Math.random() * chars.length));
+      }
+      document.getElementById('group-form-passcode').value = code;
+    });
 
-  document.getElementById('btn-modal-group-close').addEventListener('click', closeGroupModal);
-  document.getElementById('btn-group-form-cancel').addEventListener('click', closeGroupModal);
+  document
+    .getElementById('btn-modal-group-close')
+    .addEventListener('click', closeGroupModal);
+  document
+    .getElementById('btn-group-form-cancel')
+    .addEventListener('click', closeGroupModal);
 
   const groupForm = document.getElementById('group-form');
   groupForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     const id = document.getElementById('group-form-id').value;
     const name = document.getElementById('group-form-name').value;
-    const passcode = document.getElementById('group-form-passcode').value.toUpperCase().trim();
+    const passcode = document
+      .getElementById('group-form-passcode')
+      .value.toUpperCase()
+      .trim();
     const optOutGeneral = document.getElementById('group-form-optout').checked;
 
     if (passcode.length !== 6) {
@@ -1168,7 +1256,9 @@ function setupGlobalListeners() {
         closeGroupModal();
         loadGroupsData();
       } else if (res.status === 409) {
-        const feedback = document.getElementById('group-form-passcode-feedback');
+        const feedback = document.getElementById(
+          'group-form-passcode-feedback'
+        );
         feedback.textContent = 'Passcode is already in use by another circle.';
         feedback.style.display = 'block';
       } else {
@@ -1179,136 +1269,179 @@ function setupGlobalListeners() {
     }
   });
 
-  document.getElementById('btn-add-member-trigger').addEventListener('click', () => {
-    openMemberModal();
-  });
-  document.getElementById('btn-modal-member-close').addEventListener('click', closeMemberModal);
-  document.getElementById('btn-member-form-cancel').addEventListener('click', closeMemberModal);
+  document
+    .getElementById('btn-add-member-trigger')
+    .addEventListener('click', () => {
+      openMemberModal();
+    });
+  document
+    .getElementById('btn-modal-member-close')
+    .addEventListener('click', closeMemberModal);
+  document
+    .getElementById('btn-member-form-cancel')
+    .addEventListener('click', closeMemberModal);
 
-  document.getElementById('member-form').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const name = document.getElementById('member-form-name').value.trim();
-    const email = document.getElementById('member-form-email').value.trim();
+  document
+    .getElementById('member-form')
+    .addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const name = document.getElementById('member-form-name').value.trim();
+      const email = document.getElementById('member-form-email').value.trim();
 
-    try {
-      const res = await fetch(`/api/admin/groups/${currentGroupDetails.groupId}/members`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, email }),
-      });
+      try {
+        const res = await fetch(
+          `/api/admin/groups/${currentGroupDetails.groupId}/members`,
+          {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name, email }),
+          }
+        );
 
-      if (res.status === 201 || res.ok) {
-        showToast('Intercessor added successfully.', 'success');
-        closeMemberModal();
-        loadGroupMembersData(currentGroupDetails.groupId);
-      } else {
-        const err = await res.json();
-        showToast(err.error || 'Failed to add intercessor.', 'error');
+        if (res.status === 201 || res.ok) {
+          showToast('Intercessor added successfully.', 'success');
+          closeMemberModal();
+          loadGroupMembersData(currentGroupDetails.groupId);
+        } else {
+          const err = await res.json();
+          showToast(err.error || 'Failed to add intercessor.', 'error');
+        }
+      } catch {
+        showToast('Network error while adding member.', 'error');
       }
-    } catch {
-      showToast('Network error while adding member.', 'error');
-    }
-  });
+    });
 
-  document.getElementById('btn-bulk-add-trigger').addEventListener('click', () => {
-    openBulkModal();
-  });
-  document.getElementById('btn-modal-member-bulk-close').addEventListener('click', closeBulkModal);
-  document.getElementById('btn-member-bulk-cancel').addEventListener('click', closeBulkModal);
+  document
+    .getElementById('btn-bulk-add-trigger')
+    .addEventListener('click', () => {
+      openBulkModal();
+    });
+  document
+    .getElementById('btn-modal-member-bulk-close')
+    .addEventListener('click', closeBulkModal);
+  document
+    .getElementById('btn-member-bulk-cancel')
+    .addEventListener('click', closeBulkModal);
 
-  document.getElementById('btn-member-bulk-validate').addEventListener('click', () => {
-    const csvContent = document.getElementById('member-bulk-textarea').value;
-    const parsed = parseCSVRecords(csvContent);
-    renderBulkPreview(parsed);
-  });
+  document
+    .getElementById('btn-member-bulk-validate')
+    .addEventListener('click', () => {
+      const csvContent = document.getElementById('member-bulk-textarea').value;
+      const parsed = parseCSVRecords(csvContent);
+      renderBulkPreview(parsed);
+    });
 
-  document.getElementById('member-bulk-form').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const csvContent = document.getElementById('member-bulk-textarea').value;
-    const parsed = parseCSVRecords(csvContent);
-    const validRows = parsed
-      .filter((row) => row.valid)
-      .map((row) => ({ name: row.name, email: row.email }));
+  document
+    .getElementById('member-bulk-form')
+    .addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const csvContent = document.getElementById('member-bulk-textarea').value;
+      const parsed = parseCSVRecords(csvContent);
+      const validRows = parsed
+        .filter((row) => row.valid)
+        .map((row) => ({ name: row.name, email: row.email }));
 
-    if (validRows.length === 0) {
-      showToast('No valid rows to import.', 'error');
-      return;
-    }
+      if (validRows.length === 0) {
+        showToast('No valid rows to import.', 'error');
+        return;
+      }
 
-    const submitBtn = document.getElementById('btn-member-bulk-submit');
-    submitBtn.disabled = true;
-    submitBtn.textContent = 'Importing...';
+      const submitBtn = document.getElementById('btn-member-bulk-submit');
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Importing...';
 
-    try {
-      const res = await fetch(`/api/admin/groups/${currentGroupDetails.groupId}/members/bulk`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ members: validRows }),
-      });
+      try {
+        const res = await fetch(
+          `/api/admin/groups/${currentGroupDetails.groupId}/members/bulk`,
+          {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ members: validRows }),
+          }
+        );
 
-      if (res.ok) {
-        const result = await res.json();
-        showToast(`Bulk import finished. Added: ${result.added}, Failures: ${result.errors.length}`, 'info');
-        closeBulkModal();
-        loadGroupMembersData(currentGroupDetails.groupId);
-      } else {
-        showToast('Failed to execute bulk import.', 'error');
+        if (res.ok) {
+          const result = await res.json();
+          showToast(
+            `Bulk import finished. Added: ${result.added}, Failures: ${result.errors.length}`,
+            'info'
+          );
+          closeBulkModal();
+          loadGroupMembersData(currentGroupDetails.groupId);
+        } else {
+          showToast('Failed to execute bulk import.', 'error');
+          submitBtn.disabled = false;
+          submitBtn.textContent = 'Import Valid Rows';
+        }
+      } catch {
+        showToast('Bulk import network request failed.', 'error');
         submitBtn.disabled = false;
         submitBtn.textContent = 'Import Valid Rows';
       }
-    } catch {
-      showToast('Bulk import network request failed.', 'error');
-      submitBtn.disabled = false;
-      submitBtn.textContent = 'Import Valid Rows';
-    }
-  });
+    });
 
-  document.getElementById('btn-create-admin-trigger').addEventListener('click', () => {
-    openAdminModal();
-  });
-  document.getElementById('btn-modal-admin-close').addEventListener('click', closeAdminModal);
-  document.getElementById('btn-admin-form-cancel').addEventListener('click', closeAdminModal);
+  document
+    .getElementById('btn-create-admin-trigger')
+    .addEventListener('click', () => {
+      openAdminModal();
+    });
+  document
+    .getElementById('btn-modal-admin-close')
+    .addEventListener('click', closeAdminModal);
+  document
+    .getElementById('btn-admin-form-cancel')
+    .addEventListener('click', closeAdminModal);
 
   const adminRoleSelect = document.getElementById('admin-form-role');
   adminRoleSelect.addEventListener('change', () => {
     const isGroup = adminRoleSelect.value === 'GROUP_ADMIN';
-    document.getElementById('admin-form-group-select-wrapper').style.display = isGroup ? 'block' : 'none';
+    document.getElementById('admin-form-group-select-wrapper').style.display =
+      isGroup ? 'block' : 'none';
   });
 
-  document.getElementById('admin-account-form').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const username = document.getElementById('admin-form-username').value.trim();
-    const password = document.getElementById('admin-form-password').value;
-    const role = document.getElementById('admin-form-role').value;
-    const groupId = role === 'GROUP_ADMIN' ? document.getElementById('admin-form-group-select').value : '';
+  document
+    .getElementById('admin-account-form')
+    .addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const username = document
+        .getElementById('admin-form-username')
+        .value.trim();
+      const password = document.getElementById('admin-form-password').value;
+      const role = document.getElementById('admin-form-role').value;
+      const groupId =
+        role === 'GROUP_ADMIN'
+          ? document.getElementById('admin-form-group-select').value
+          : '';
 
-    if (role === 'GROUP_ADMIN' && !groupId) {
-      showToast('You must select a circle group for GROUP_ADMIN.', 'error');
-      return;
-    }
-
-    try {
-      const res = await fetch('/api/admin/admins', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username, password, role, groupId }),
-      });
-
-      if (res.status === 201 || res.ok) {
-        showToast('Console account created successfully.', 'success');
-        closeAdminModal();
-        loadAdminsData();
-      } else if (res.status === 409) {
-        showToast('Username already exists.', 'error');
-      } else {
-        showToast('Failed to create admin.', 'error');
+      if (role === 'GROUP_ADMIN' && !groupId) {
+        showToast('You must select a circle group for GROUP_ADMIN.', 'error');
+        return;
       }
-    } catch {
-      showToast('Network error creating admin.', 'error');
-    }
-  });
 
-  document.getElementById('btn-modal-prayer-close').addEventListener('click', closePrayerDetailModal);
+      try {
+        const res = await fetch('/api/admin/admins', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, password, role, groupId }),
+        });
+
+        if (res.status === 201 || res.ok) {
+          showToast('Console account created successfully.', 'success');
+          closeAdminModal();
+          loadAdminsData();
+        } else if (res.status === 409) {
+          showToast('Username already exists.', 'error');
+        } else {
+          showToast('Failed to create admin.', 'error');
+        }
+      } catch {
+        showToast('Network error creating admin.', 'error');
+      }
+    });
+
+  document
+    .getElementById('btn-modal-prayer-close')
+    .addEventListener('click', closePrayerDetailModal);
 
   document.getElementById('btn-download-qr').addEventListener('click', () => {
     const canvas = document.getElementById('group-qr-canvas');
@@ -1383,12 +1516,19 @@ async function handleLogout() {
 
 // === Modal Controllers ===
 function openGroupModal(group = null) {
-  document.getElementById('group-modal-title').textContent = group ? 'Edit Circle Details' : 'Create Circle';
+  document.getElementById('group-modal-title').textContent = group
+    ? 'Edit Circle Details'
+    : 'Create Circle';
   document.getElementById('group-form-id').value = group ? group.groupId : '';
   document.getElementById('group-form-name').value = group ? group.name : '';
-  document.getElementById('group-form-passcode').value = group ? group.passcode : '';
-  document.getElementById('group-form-optout').checked = group ? group.optOutGeneral : false;
-  document.getElementById('group-form-passcode-feedback').style.display = 'none';
+  document.getElementById('group-form-passcode').value = group
+    ? group.passcode
+    : '';
+  document.getElementById('group-form-optout').checked = group
+    ? group.optOutGeneral
+    : false;
+  document.getElementById('group-form-passcode-feedback').style.display =
+    'none';
 
   const nameInput = document.getElementById('group-form-name');
   if (nameInput) {
@@ -1441,7 +1581,8 @@ async function openAdminModal() {
   document.getElementById('admin-form-username').value = '';
   document.getElementById('admin-form-password').value = '';
   document.getElementById('admin-form-role').value = 'APP_ADMIN';
-  document.getElementById('admin-form-group-select-wrapper').style.display = 'none';
+  document.getElementById('admin-form-group-select-wrapper').style.display =
+    'none';
 
   const select = document.getElementById('admin-form-group-select');
   if (select) {
@@ -1597,11 +1738,15 @@ function renderBulkPreview(records) {
     const tr = document.createElement('tr');
     if (r.valid) validCount++;
 
+    const statusBadge = r.valid
+      ? '<span class="status-badge open">Valid</span>'
+      : '<span class="status-badge closed" style="color: var(--color-error)">Error</span>';
+
     tr.innerHTML = `
-      <td>${r.valid ? '✅ Valid' : '❌ Error'}</td>
-      <td>${escapeHtml(r.name)}</td>
-      <td>${escapeHtml(r.email)}</td>
-      <td style="color: var(--color-error);">${escapeHtml(r.reason)}</td>
+      <td data-label="Status">${statusBadge}</td>
+      <td data-label="Name">${escapeHtml(r.name)}</td>
+      <td data-label="Email">${escapeHtml(r.email)}</td>
+      <td data-label="Issue" style="color: var(--color-error);">${escapeHtml(r.reason)}</td>
     `;
     tbody.appendChild(tr);
   });
@@ -1619,10 +1764,9 @@ function showToast(message, type = 'info') {
   const toast = document.createElement('div');
   toast.className = `toast ${type}`;
 
-  let icon = 'ℹ️';
-  if (type === 'success') icon = '🙏';
-  if (type === 'error') icon = '⚠️';
-  toast.textContent = `${icon} ${message}`;
+  let prefix = '';
+  if (type === 'success') prefix = '🙏 ';
+  toast.textContent = `${prefix}${message}`;
 
   container.appendChild(toast);
 
@@ -1704,7 +1848,9 @@ function sortAndRenderPrayers() {
     if (valB === undefined || valB === null) valB = '';
 
     if (typeof valA === 'string') {
-      return sortAscending ? valA.localeCompare(valB) : valB.localeCompare(valA);
+      return sortAscending
+        ? valA.localeCompare(valB)
+        : valB.localeCompare(valA);
     } else {
       return sortAscending
         ? valA < valB
@@ -1729,7 +1875,7 @@ function triggerEmojiBurst(event, anchorElement) {
     return;
   }
   const burstCount = 6;
-  const emojis = ['🙏', '✨', '🤍', '🕊️', '🌸'];
+  const emojis = ['🙏'];
 
   for (let i = 0; i < burstCount; i++) {
     const floating = document.createElement('span');
