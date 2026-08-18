@@ -215,18 +215,19 @@ function renderCards() {
   const visiblePrayers = prayersList.slice(0, visibleCount);
 
   visiblePrayers.forEach((p, i) => {
+    const isClosed = p.status === 'CLOSED';
     const card = document.createElement('article');
-    card.className = 'pcard';
-    if (p._isNewSubmission) {
-      card.classList.add('just-added');
-      delete p._isNewSubmission;
+    card.className = `pcard${isClosed ? ' answered' : ''}`;
+    if (p._isNewArrival) {
+      card.classList.add('card-arrival');
+      delete p._isNewArrival;
+    } else {
+      card.style.setProperty('--d', i * 0.04 + 's');
     }
-    card.style.setProperty('--d', i * 0.06 + 's');
 
     const targetGroupId = p.groupId || p.assignedGroupId;
     const isSpecific = !!p.groupId;
     const relativeTime = getRelativeTime(new Date(p.createdAt));
-    const isClosed = p.status === 'CLOSED';
     const answerText =
       p.updates && p.updates.length > 0 ? p.updates[0].updateText : '';
 
@@ -287,6 +288,7 @@ function buildPray() {
   CONFIG.managementWord.split('').forEach((ch, i) => {
     const ltr = document.createElement('span');
     ltr.className = 'ltr';
+    ltr.dataset.char = ch;
     ltr.style.setProperty('--i', i);
     const glyph = document.createElement('span');
     glyph.className = 'glyph';
@@ -634,7 +636,45 @@ function initEventListeners() {
     }
   });
 
+  function adjustTextareaHeight() {
+    if (!promptInput) return;
+    promptInput.style.height = 'auto';
+    const newHeight = Math.max(28, promptInput.scrollHeight);
+    promptInput.style.height = `${Math.min(newHeight, 220)}px`;
+    promptInput.style.overflowY = newHeight > 220 ? 'auto' : 'hidden';
+
+    const text = promptInput.value;
+    const isParagraphMode = text.length > 30 || text.includes('\n');
+    const isTall = newHeight > 65 || text.split('\n').length >= 3;
+
+    document.body.classList.toggle('writing-mode', isParagraphMode);
+    pill.classList.toggle('writing-mode', isParagraphMode);
+    document.body.classList.toggle('tall-text', isTall);
+  }
+
   promptInput.addEventListener('focus', () => pill.classList.add('expanded'));
+  promptInput.addEventListener('input', adjustTextareaHeight);
+  promptInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      if (e.metaKey || e.ctrlKey) {
+        e.preventDefault();
+        promptForm.requestSubmit
+          ? promptForm.requestSubmit()
+          : promptForm.dispatchEvent(new Event('submit'));
+      } else if (
+        !e.shiftKey &&
+        promptInput.value.length < 60 &&
+        !promptInput.value.includes('\n')
+      ) {
+        // Allow single-line submissions on enter
+        e.preventDefault();
+        promptForm.requestSubmit
+          ? promptForm.requestSubmit()
+          : promptForm.dispatchEvent(new Event('submit'));
+      }
+    }
+  });
+
   promptInput.addEventListener('blur', () => {
     if (circleModal.classList.contains('open')) return;
     if (
@@ -642,6 +682,9 @@ function initEventListeners() {
       !circleSelect.classList.contains('specific')
     ) {
       pill.classList.remove('expanded');
+      document.body.classList.remove('writing-mode', 'tall-text');
+      pill.classList.remove('writing-mode');
+      promptInput.style.height = '';
     }
   });
 
@@ -684,114 +727,44 @@ function initEventListeners() {
     const sendBtn = promptForm.querySelector('.send-btn');
     sendBtn.disabled = true;
 
-    // 1. Slow glow phase on the full bar
-    pill.classList.add('glowing-bar');
-
-    // Start API request in background
-    const apiPromise = fetch('/api/prayers', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-Device-ID': currentDeviceId,
-      },
-      body: JSON.stringify({
-        deviceId: currentDeviceId,
-        prayerText: text,
-        groupId: selectedGroupId,
-      }),
-    });
-
     try {
-      // Wait 800ms for the slow glow phase to run
-      await sleep(800);
-
-      // 2. Collapse glowing bar into circular orb
-      pill.classList.remove('glowing-bar');
-      pill.classList.add('submitting');
-      const collapseStart = Date.now();
-
-      const res = await apiPromise;
+      const res = await fetch('/api/prayers', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Device-ID': currentDeviceId,
+        },
+        body: JSON.stringify({
+          deviceId: currentDeviceId,
+          prayerText: text,
+          groupId: selectedGroupId,
+        }),
+      });
 
       if (res.ok) {
         const prayer = await res.json();
-
-        // Set flag to render it hidden (.just-added)
-        prayer._isNewSubmission = true;
+        prayer._isNewArrival = true;
         prayersList.unshift(prayer);
 
-        // Ensure the collapse transition completes (minimum 450ms)
-        const elapsedCollapse = Date.now() - collapseStart;
-        if (elapsedCollapse < 450) {
-          await sleep(450 - elapsedCollapse);
-        }
-
-        // 2. Switch view to "My Prayers" which renders cards
-        showView('mine');
-
-        // Get the newly rendered card at the top
-        const firstCard = cardsEl.querySelector('.pcard.just-added');
-        if (firstCard) {
-          // 3. Measure pill and card positions to calculate vector
-          const cardRect = firstCard.getBoundingClientRect();
-          const pillRect = pill.getBoundingClientRect();
-          const dx =
-            cardRect.left +
-            cardRect.width / 2 -
-            (pillRect.left + pillRect.width / 2);
-          const dy =
-            cardRect.top +
-            cardRect.height / 2 -
-            (pillRect.top + pillRect.height / 2);
-
-          // 4. Animate the orb exactly to the card center (slower flight: 1.4s)
-          // Keep opacity at 1 inline to override body.view-mine opacity: 0
-          pill.style.opacity = '1';
-          pill.style.transition =
-            'transform 1.4s cubic-bezier(0.16, 1, 0.3, 1)';
-          pill.style.transform = `translate(calc(-50% + ${dx}px), ${dy}px) scale(0.15)`;
-
-          // Wait for flight animation to get near the end (1350ms)
-          /* v8 ignore start */
-          await sleep(1350);
-
-          // Fade out the flight orb quickly as it lands
-          pill.style.transition = 'opacity 0.25s ease, filter 0.25s ease';
-          pill.style.opacity = '0';
-          pill.style.filter = 'blur(6px)';
-
-          // 5. Trigger glow-reveal morph inheritance on card
-          firstCard.classList.remove('just-added');
-          firstCard.classList.add('glow-reveal');
-
-          // Wait for the card morph animation to finish
-          await sleep(850);
-        }
-
-        // Reset states and values
+        // Reset input field and circle selection
         promptInput.value = '';
+        promptInput.style.height = '';
+        document.body.classList.remove('writing-mode', 'tall-text');
+        pill.classList.remove('writing-mode');
+        pill.classList.remove('expanded');
         resetToAllCircles();
 
-        // Clear inline style overrides
-        pill.style.transition = '';
-        pill.style.transform = '';
-        pill.style.opacity = '';
-        pill.style.filter = '';
-        pill.classList.remove('submitting');
-        pill.classList.remove('expanded');
+        // Seamlessly switch directly to "My Prayers" view
+        showView('mine');
       } else {
         showToast('Failed to share prayer request.', 'error');
-        pill.classList.remove('submitting');
-        pill.classList.remove('glowing-bar');
       }
     } catch (err) {
       console.error(err);
       showToast('Network error submitting prayer.', 'error');
-      pill.classList.remove('submitting');
-      pill.classList.remove('glowing-bar');
     } finally {
       sendBtn.disabled = false;
     }
-    /* v8 ignore stop */
   });
 
   // Modal Tab logic

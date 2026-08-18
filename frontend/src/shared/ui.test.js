@@ -236,26 +236,146 @@ describe('UI Integration tests', () => {
     // Submit form
     promptForm.dispatchEvent(new Event('submit'));
 
-    // Verify glow phase started
-    expect(pill.classList.contains('glowing-bar')).toBe(true);
+    // Advance for API response and view transition
+    await vi.advanceTimersByTimeAsync(100);
 
-    // Advance 800ms for glow phase to complete
-    await vi.advanceTimersByTimeAsync(800);
+    // Verify input cleared and view switched to 'mine'
+    expect(promptInput.value).toBe('');
+    expect(document.body.classList.contains('view-mine')).toBe(true);
 
-    // Verify glowing-bar collapsed to submitting orb
-    expect(pill.classList.contains('glowing-bar')).toBe(false);
-    expect(pill.classList.contains('submitting')).toBe(true);
-
-    // Advance 450ms for transition & API response to load card
-    await vi.advanceTimersByTimeAsync(450);
-
-    // Verify the new card is rendered in lists
+    // Verify the new card is rendered with card-arrival class
     const cardsEl = document.getElementById('cards');
-    const newCard = cardsEl.querySelector('.pcard');
+    const newCard = cardsEl.querySelector('.pcard.card-arrival');
     expect(newCard).not.toBeNull();
     expect(newCard.textContent).toContain('Please pray for my healing.');
 
     vi.useRealTimers();
+  });
+
+  it('handles multi-line textarea paragraphs, writing-mode, and tall-text states', async () => {
+    localStorage.setItem('prayer-link-device-id', 'test-device-id');
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue({ ok: true, json: async () => [] })
+    );
+    await import('../main.js');
+    document.dispatchEvent(new Event('DOMContentLoaded'));
+    await new Promise((r) => setTimeout(r, 50));
+
+    const promptInput = document.getElementById('promptInput');
+    const pill = document.getElementById('pillWrap');
+
+    expect(promptInput.tagName.toLowerCase()).toBe('textarea');
+
+    // Focus expands the pill
+    promptInput.dispatchEvent(new Event('focus'));
+    expect(pill.classList.contains('expanded')).toBe(true);
+
+    // Typing short text does not trigger writing-mode or tall-text
+    promptInput.value = 'Short prayer';
+    promptInput.dispatchEvent(new Event('input'));
+    expect(document.body.classList.contains('writing-mode')).toBe(false);
+    expect(document.body.classList.contains('tall-text')).toBe(false);
+
+    // Typing paragraphs triggers writing-mode
+    promptInput.value =
+      'Please grant strength and wisdom for this week as we navigate challenges.';
+    promptInput.dispatchEvent(new Event('input'));
+    expect(document.body.classList.contains('writing-mode')).toBe(true);
+    expect(pill.classList.contains('writing-mode')).toBe(true);
+
+    // Multi-line newline input triggers tall-text squish
+    promptInput.value = 'First paragraph.\nSecond paragraph.\nThird paragraph.';
+    promptInput.dispatchEvent(new Event('input'));
+    expect(document.body.classList.contains('tall-text')).toBe(true);
+
+    // Empty blur clears all states
+    promptInput.value = '';
+    promptInput.dispatchEvent(new Event('blur'));
+    expect(pill.classList.contains('expanded')).toBe(false);
+    expect(document.body.classList.contains('writing-mode')).toBe(false);
+    expect(document.body.classList.contains('tall-text')).toBe(false);
+  });
+
+  it('handles keyboard shortcuts for textarea submission', async () => {
+    localStorage.setItem('prayer-link-device-id', 'test-device-id');
+    let submitted = false;
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockImplementation((url) => {
+        if (url === '/api/prayers') {
+          submitted = true;
+          return Promise.resolve({
+            ok: true,
+            json: async () => ({
+              prayerId: 'p-shortcut',
+              prayerText: 'Testing keyboard shortcut',
+              createdAt: new Date().toISOString(),
+              status: 'OPEN',
+            }),
+          });
+        }
+        return Promise.resolve({ ok: true, json: async () => [] });
+      })
+    );
+    await import('../main.js');
+    document.dispatchEvent(new Event('DOMContentLoaded'));
+    await new Promise((r) => setTimeout(r, 50));
+
+    const promptInput = document.getElementById('promptInput');
+
+    // Cmd+Enter triggers submission
+    promptInput.value = 'Prayer via Cmd+Enter shortcut.';
+    const cmdEnterEvent = new KeyboardEvent('keydown', {
+      key: 'Enter',
+      metaKey: true,
+      bubbles: true,
+      cancelable: true,
+    });
+    promptInput.dispatchEvent(cmdEnterEvent);
+    expect(cmdEnterEvent.defaultPrevented).toBe(true);
+  });
+
+  it('renders answered prayers with gold aura styling and circle selector line icon', async () => {
+    localStorage.setItem('prayer-link-device-id', 'test-device-id');
+    const statusMock = vi.fn().mockImplementation((url) => {
+      if (url.includes('/api/prayers?deviceId=')) {
+        return Promise.resolve({
+          ok: true,
+          json: async () => [
+            {
+              prayerId: 'p-ans-1',
+              prayerText: 'Lord please heal my grandmother',
+              createdAt: new Date().toISOString(),
+              status: 'CLOSED',
+              prayedForCount: 7,
+              updates: [{ updateText: 'She is fully recovered, praise God!' }],
+            },
+          ],
+        });
+      }
+      return Promise.resolve({ ok: true, json: async () => [] });
+    });
+    vi.stubGlobal('fetch', statusMock);
+
+    await import('../main.js');
+    document.dispatchEvent(new Event('DOMContentLoaded'));
+    await new Promise((r) => setTimeout(r, 50));
+
+    // Switch to mine view to render cards
+    const navMine = document.querySelector('[data-view="mine"]');
+    navMine.click();
+    await new Promise((r) => setTimeout(r, 50));
+
+    const card = document.querySelector('.pcard');
+    expect(card).not.toBeNull();
+    expect(card.classList.contains('answered')).toBe(true);
+    expect(card.querySelector('.pcard-answer')).not.toBeNull();
+    expect(card.querySelector('.pcard-status.answered')).not.toBeNull();
+
+    // Verify circle selector has SVG icon
+    const circleSelect = document.getElementById('circleSelect');
+    expect(circleSelect.querySelector('.circle-icon')).not.toBeNull();
   });
 
   it('handles group joining via specific passcode', async () => {
