@@ -73,6 +73,10 @@ document.addEventListener('DOMContentLoaded', async () => {
   nav = document.getElementById('nav');
   promptForm = document.getElementById('promptForm');
   promptInput = document.getElementById('promptInput');
+  if (promptInput) {
+    promptInput.value = '';
+    promptInput.style.height = '';
+  }
   circleSelect = document.getElementById('circleSelect');
   circleLabel = document.getElementById('circleLabel');
   prayersView = document.getElementById('prayersView');
@@ -644,15 +648,20 @@ function initEventListeners() {
     promptInput.style.overflowY = newHeight > 220 ? 'auto' : 'hidden';
 
     const text = promptInput.value;
+    const hasText = text.trim().length > 0;
     const isParagraphMode = text.length > 30 || text.includes('\n');
     const isTall = newHeight > 65 || text.split('\n').length >= 3;
 
+    pill.classList.toggle('has-text', hasText);
     document.body.classList.toggle('writing-mode', isParagraphMode);
     pill.classList.toggle('writing-mode', isParagraphMode);
     document.body.classList.toggle('tall-text', isTall);
   }
 
-  promptInput.addEventListener('focus', () => pill.classList.add('expanded'));
+  promptInput.addEventListener('focus', () => {
+    pill.classList.add('expanded');
+    adjustTextareaHeight();
+  });
   promptInput.addEventListener('input', adjustTextareaHeight);
   promptInput.addEventListener('keydown', (e) => {
     if (e.key === 'Enter') {
@@ -681,9 +690,8 @@ function initEventListeners() {
       !promptInput.value.trim() &&
       !circleSelect.classList.contains('specific')
     ) {
-      pill.classList.remove('expanded');
+      pill.classList.remove('expanded', 'writing-mode', 'has-text');
       document.body.classList.remove('writing-mode', 'tall-text');
-      pill.classList.remove('writing-mode');
       promptInput.style.height = '';
     }
   });
@@ -750,8 +758,7 @@ function initEventListeners() {
         promptInput.value = '';
         promptInput.style.height = '';
         document.body.classList.remove('writing-mode', 'tall-text');
-        pill.classList.remove('writing-mode');
-        pill.classList.remove('expanded');
+        pill.classList.remove('writing-mode', 'has-text', 'expanded');
         resetToAllCircles();
 
         // Seamlessly switch directly to "My Prayers" view

@@ -626,12 +626,14 @@ body.view-mine .pill-wrap {
 }
 
 .pill {
+  position: relative;
+  z-index: 2;
   display: flex;
   align-items: center;
   gap: 0.75rem;
   padding: 0.55rem 0.6rem 0.55rem 1.4rem;
   border-radius: 28px;
-  background: rgba(28, 29, 33, 0.65);
+  background: rgba(28, 29, 33, 0.72);
   border: 1px solid rgba(244, 241, 234, 0.12);
   backdrop-filter: blur(16px) saturate(120%);
   -webkit-backdrop-filter: blur(16px) saturate(120%);
@@ -716,18 +718,20 @@ body.view-mine .pill-wrap {
 
 .circle-select {
   position: absolute;
-  bottom: calc(100% + 12px);
-  left: 6px;
+  bottom: calc(100% + 10px);
+  left: 12px;
+  z-index: 10;
   display: flex;
   align-items: center;
   gap: 0.55rem;
-  min-height: 42px;
+  min-height: 38px;
   max-width: 280px;
-  opacity: 1;
-  padding: 0.5rem 1.05rem;
+  opacity: 0;
+  pointer-events: none;
+  padding: 0.45rem 1.05rem;
   border: 1px solid rgba(244, 241, 234, 0.14);
   border-radius: 999px;
-  background: rgba(28, 29, 33, 0.88);
+  background: rgba(28, 29, 33, 0.94);
   backdrop-filter: blur(20px) saturate(160%);
   -webkit-backdrop-filter: blur(20px) saturate(160%);
   box-shadow:
@@ -738,20 +742,32 @@ body.view-mine .pill-wrap {
   font-size: 0.92rem;
   font-weight: 500;
   cursor: pointer;
-  transform: translateY(0);
+  transform: translateY(18px) scale(0.9);
+  transform-origin: left bottom;
+  will-change: transform, opacity;
   transition:
-    transform 0.25s cubic-bezier(0.16, 0.84, 0.3, 1),
-    opacity 0.3s ease,
+    transform 0.38s cubic-bezier(0.16, 1.25, 0.3, 1),
+    opacity 0.25s ease,
     border-color 0.2s ease,
     background 0.2s ease,
     box-shadow 0.2s ease;
+}
+
+/* Pops up smoothly from behind the top edge of the text input and stays pinned/sticky to the top */
+.pill-wrap.expanded .circle-select,
+.pill-wrap:focus-within .circle-select,
+.circle-select.specific,
+.pill-wrap.writing-mode .circle-select,
+.pill-wrap.has-text .circle-select {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0) scale(1);
 }
 
 .circle-select:hover,
 .circle-select:active {
   background: rgba(38, 40, 48, 0.96);
   border-color: rgba(56, 182, 196, 0.5);
-  transform: translateY(-2px);
   box-shadow:
     0 12px 35px -4px rgba(56, 182, 196, 0.25),
     0 0 0 1px rgba(56, 182, 196, 0.4);
@@ -1038,54 +1054,8 @@ body.view-mine .pill-wrap {
         font-size: 1.02rem;
         padding-right: 0.5rem;
     }
-    .circle-select {
-        position: absolute;
-        bottom: calc(100% + 12px);
-        left: 4px;
-        min-height: 44px;
-        max-width: 280px !important;
-        opacity: 1 !important;
-        padding: 0.5rem 1.05rem !important;
-        gap: 0.55rem;
-        background: rgba(28, 29, 33, 0.88) !important;
-        border: 1px solid rgba(244, 241, 234, 0.14) !important;
-        border-radius: 999px !important;
-        backdrop-filter: blur(20px) saturate(160%) !important;
-        -webkit-backdrop-filter: blur(20px) saturate(160%) !important;
-        box-shadow: 0 10px 30px -4px rgba(0, 0, 0, 0.75), 0 0 0 1px rgba(244, 241, 234, 0.08) !important;
-        font-size: 0.92rem;
-        font-weight: 500;
-        transform: translateY(0);
-        transition: transform 0.25s cubic-bezier(.16,.84,.3,1), opacity 0.3s ease, border-color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease !important;
-    }
-    .circle-select:hover, .circle-select:active {
-        background: rgba(38, 40, 48, 0.96) !important;
-        border-color: rgba(56, 182, 196, 0.5) !important;
-        transform: translateY(-2px);
-        box-shadow: 0 12px 35px -4px rgba(56, 182, 196, 0.25), 0 0 0 1px rgba(56, 182, 196, 0.4) !important;
-    }
-    .circle-select.specific {
-        border-color: rgba(224, 69, 123, 0.55) !important;
-        background: rgba(36, 26, 36, 0.92) !important;
-        box-shadow: 0 10px 30px -4px rgba(224, 69, 123, 0.25), 0 0 0 1px rgba(224, 69, 123, 0.35) !important;
-    }
-    .circle-select .circle-icon {
-        width: 18px;
-        height: 18px;
-        opacity: 0.9;
-    }
     .circle-label {
-        max-width: 175px;
-        font-size: 0.92rem;
-    }
-    .circle-dot {
-        width: 8px;
-        height: 8px;
-    }
-    .circle-select .chev {
-        width: 16px;
-        height: 16px;
-        opacity: 0.75;
+        max-width: 160px;
     }
     body.writing-mode .stage {
         opacity: 0.85;
