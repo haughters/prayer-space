@@ -5,6 +5,7 @@ import com.prayerlink.common.dto.GroupMemberDTO;
 import com.prayerlink.common.dto.PrayerDTO;
 import com.prayerlink.common.event.PrayerCreatedEvent;
 import com.prayerlink.common.event.PrayerUpdatedEvent;
+import com.prayerlink.common.util.UrlUtils;
 import io.awspring.cloud.sqs.annotation.SqsListener;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -44,6 +45,14 @@ public class NotificationListener {
 
     @Value("${hmac.secret-key:default-secret-key-change-me-in-production}")
     private String hmacSecretKey;
+
+    private String getGroupServiceUrl() {
+        return UrlUtils.cleanBaseUrl(groupServiceUrl);
+    }
+
+    private String getPrayerServiceUrl() {
+        return UrlUtils.cleanBaseUrl(prayerServiceUrl);
+    }
 
     public NotificationListener(RestTemplate restTemplate, SesClient sesClient, ObjectMapper objectMapper) {
         this.restTemplate = restTemplate;
@@ -131,7 +140,7 @@ public class NotificationListener {
         // Fetch Group details
         GroupDTO group;
         try {
-            group = restTemplate.getForObject(groupServiceUrl + "/api/groups/" + assignedGroupId, GroupDTO.class);
+            group = restTemplate.getForObject(getGroupServiceUrl() + "/api/groups/" + assignedGroupId, GroupDTO.class);
         } catch (Exception e) {
             log.error("Failed to fetch group info for ID: {}", assignedGroupId, e);
             return;
@@ -146,7 +155,7 @@ public class NotificationListener {
         List<GroupMemberDTO> members;
         try {
             ResponseEntity<List<GroupMemberDTO>> response = restTemplate.exchange(
-                    groupServiceUrl + "/api/groups/" + assignedGroupId + "/members",
+                    getGroupServiceUrl() + "/api/groups/" + assignedGroupId + "/members",
                     HttpMethod.GET,
                     null,
                     new ParameterizedTypeReference<List<GroupMemberDTO>>() {});
@@ -196,7 +205,7 @@ public class NotificationListener {
         PrayerDTO prayer;
         try {
             prayer = restTemplate.getForObject(
-                    prayerServiceUrl + "/api/prayers/" + event.getPrayerId(), PrayerDTO.class);
+                    getPrayerServiceUrl() + "/api/prayers/" + event.getPrayerId(), PrayerDTO.class);
         } catch (Exception e) {
             log.error("Failed to fetch prayer details for ID: {}", event.getPrayerId(), e);
             return;
@@ -212,7 +221,7 @@ public class NotificationListener {
         // Fetch Group details
         GroupDTO group;
         try {
-            group = restTemplate.getForObject(groupServiceUrl + "/api/groups/" + assignedGroupId, GroupDTO.class);
+            group = restTemplate.getForObject(getGroupServiceUrl() + "/api/groups/" + assignedGroupId, GroupDTO.class);
         } catch (Exception e) {
             log.error("Failed to fetch group info for ID: {}", assignedGroupId, e);
             return;
@@ -227,7 +236,7 @@ public class NotificationListener {
         List<GroupMemberDTO> members;
         try {
             ResponseEntity<List<GroupMemberDTO>> response = restTemplate.exchange(
-                    groupServiceUrl + "/api/groups/" + assignedGroupId + "/members",
+                    getGroupServiceUrl() + "/api/groups/" + assignedGroupId + "/members",
                     HttpMethod.GET,
                     null,
                     new ParameterizedTypeReference<List<GroupMemberDTO>>() {});
@@ -373,7 +382,7 @@ public class NotificationListener {
 
     private void markEmailAsBounced(String email) {
         try {
-            restTemplate.put(groupServiceUrl + "/api/groups/members/bounce", Map.of("email", email));
+            restTemplate.put(getGroupServiceUrl() + "/api/groups/members/bounce", Map.of("email", email));
             log.info("Successfully marked email as bounced in group-service: {}", email);
         } catch (Exception e) {
             log.error("Failed to mark email as bounced in group-service: {}", email, e);
@@ -383,8 +392,8 @@ public class NotificationListener {
     private void processMemberAdded(com.prayerlink.common.event.MemberAddedEvent event) {
         try {
             // Fetch Group details to get group name
-            GroupDTO group =
-                    restTemplate.getForObject(groupServiceUrl + "/api/groups/" + event.getGroupId(), GroupDTO.class);
+            GroupDTO group = restTemplate.getForObject(
+                    getGroupServiceUrl() + "/api/groups/" + event.getGroupId(), GroupDTO.class);
             if (group == null) {
                 log.warn("Group not found for ID: {}, skipping invitation.", event.getGroupId());
                 return;

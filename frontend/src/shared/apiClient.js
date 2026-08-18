@@ -52,13 +52,38 @@ async function getCredentials() {
 }
 
 export async function fetchSecureData(path, options = {}) {
+  // If running in local development mode or without Cognito Identity Pool, bypass AWS SigV4 and use native fetch via Vite proxy
+  const isLocalDev = import.meta.env.DEV || import.meta.env.VITE_USE_LOCAL_API === 'true' || !IDENTITY_POOL_ID;
+
+  if (isLocalDev) {
+    const headers = {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    };
+
+    const authToken = localStorage.getItem('pl-auth-token');
+    if (authToken) {
+      headers['X-Auth-Token'] = authToken;
+    }
+
+    const deviceId = localStorage.getItem('pl-device-id');
+    if (deviceId) {
+      headers['X-Device-Id'] = deviceId;
+    }
+
+    return fetch(path, {
+      ...options,
+      headers,
+    });
+  }
+
   // We determine the correct base URL based on the path (e.g. /api/identity/...)
   // Wait, the API routes are like /api/identity/..., /api/prayers/...
   // The Lambda function URLs don't have the /api/identity prefix mapped in Spring Boot?
   // Actually, they DO have the prefix in Spring Boot!
   // Spring Boot controller has @RequestMapping("/api/identity")
   // So the request must be to `https://<lambda-url>/api/identity/...`
-  
+
   const credentials = await getCredentials();
 
   const aws = new AwsClient({
@@ -66,7 +91,7 @@ export async function fetchSecureData(path, options = {}) {
     secretAccessKey: credentials.SecretKey,
     sessionToken: credentials.SessionToken,
     region: REGION,
-    service: 'lambda' 
+    service: 'lambda',
   });
 
   let baseUrl = '';
@@ -81,14 +106,14 @@ export async function fetchSecureData(path, options = {}) {
 
   const headers = {
     'Content-Type': 'application/json',
-    ...options.headers
+    ...options.headers,
   };
 
   const authToken = localStorage.getItem('pl-auth-token');
   if (authToken) {
     headers['X-Auth-Token'] = authToken;
   }
-  
+
   const deviceId = localStorage.getItem('pl-device-id');
   if (deviceId) {
     headers['X-Device-Id'] = deviceId;
@@ -97,17 +122,18 @@ export async function fetchSecureData(path, options = {}) {
   const response = await aws.fetch(url, {
     ...options,
     credentials: 'omit', // Force omit credentials for SigV4 cross-origin requests to allow wildcard CORS origin responses
-    headers
+    headers,
   });
 
   return response;
 }
 
-// Globally intercept fetch to automatically upgrade /api/ requests to SigV4
+// Globally intercept fetch to automatically upgrade /api/ requests to SigV4 in production
 if (typeof window !== 'undefined' && typeof window.vitest === 'undefined' && !window.__vitest_environment__) {
   const isVitest = typeof process !== 'undefined' && process.env && process.env.NODE_ENV === 'test';
-  
-  if (!isVitest) {
+  const isLocalDev = import.meta.env.DEV || import.meta.env.VITE_USE_LOCAL_API === 'true' || !IDENTITY_POOL_ID;
+
+  if (!isVitest && !isLocalDev) {
     const originalFetch = window.fetch;
     window.fetch = async (input, init = {}) => {
       let path = '';
@@ -120,7 +146,7 @@ if (typeof window !== 'undefined' && typeof window.vitest === 'undefined' && !wi
         try {
           const u = new URL(input.url);
           path = u.pathname + u.search;
-        } catch(e) {
+        } catch (e) {
           path = input.url;
         }
       }
@@ -136,7 +162,7 @@ if (typeof window !== 'undefined' && typeof window.vitest === 'undefined' && !wi
             // aws4fetch converts the URL to absolute AWS endpoint, we MUST NOT intercept it
             const parsedUrl = new URL(input.url);
             shouldIntercept = parsedUrl.origin === window.location.origin && parsedUrl.pathname.startsWith('/api/');
-          } catch(e) {
+          } catch (e) {
             shouldIntercept = false;
           }
         } else if (input instanceof URL) {
@@ -152,7 +178,7 @@ if (typeof window !== 'undefined' && typeof window.vitest === 'undefined' && !wi
             headers: Object.fromEntries(input.headers.entries()),
             body: input.body,
             credentials: input.credentials,
-            ...init
+            ...init,
           };
         }
         return fetchSecureData(path, init);

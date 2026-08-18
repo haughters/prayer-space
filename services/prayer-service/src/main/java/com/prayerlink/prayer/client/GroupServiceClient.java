@@ -2,6 +2,7 @@ package com.prayerlink.prayer.client;
 
 import com.prayerlink.common.dto.GroupDTO;
 import com.prayerlink.common.dto.GroupMemberDTO;
+import com.prayerlink.common.util.UrlUtils;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -24,7 +25,7 @@ public class GroupServiceClient {
     public GroupServiceClient(
             RestTemplate restTemplate, @Value("${services.group-service.url}") String groupServiceUrl) {
         this.restTemplate = restTemplate;
-        this.groupServiceUrl = groupServiceUrl;
+        this.groupServiceUrl = UrlUtils.cleanBaseUrl(groupServiceUrl);
     }
 
     public Optional<GroupDTO> fetchGroup(UUID groupId) {
