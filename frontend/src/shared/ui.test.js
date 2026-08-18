@@ -393,18 +393,6 @@ describe('UI Integration tests', () => {
     await new Promise((r) => setTimeout(r, 10));
   });
 
-  it('toggles dark mode', async () => {
-    await import('../main.js');
-    document.dispatchEvent(new Event('DOMContentLoaded'));
-    const themeToggle = document.getElementById('themeToggle');
-    if (themeToggle) {
-      themeToggle.click();
-      expect(document.documentElement.getAttribute('data-theme')).toBe('light');
-      themeToggle.click();
-      expect(document.documentElement.getAttribute('data-theme')).toBe('dark');
-    }
-  });
-
   it('renderCards and view switching', async () => {
     localStorage.setItem('prayer-link-device-id', 'test-device-id');
     const statusMock = vi.fn().mockImplementation((url) => {

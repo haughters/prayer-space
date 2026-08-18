@@ -5,8 +5,8 @@ import { Html5Qrcode } from 'html5-qrcode';
 console.log('Prayer Link Client Version:', __APP_VERSION__);
 
 const CONFIG = {
-  acronyms: ['Let', 'Us'],
-  managementWord: 'PRAY',
+  acronyms: ['Let', 'us'],
+  managementWord: 'Pray',
   chatPlaceholder: 'Enter your prayer here...',
   navNewLabel: 'New Prayer',
   navMineLabel: 'My Prayers',
@@ -628,7 +628,7 @@ function closeDetailModal() {
 // === 8. Event Listeners & Binding ===
 function initEventListeners() {
   nav
-    .querySelectorAll('.nav-btn')
+    .querySelectorAll('.nav-btn:not(.theme-toggle)')
     .forEach((b) =>
       b.addEventListener('click', () => showView(b.dataset.view))
     );

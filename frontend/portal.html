@@ -504,7 +504,7 @@
                 <label class="admin-form-label" for="filter-status"
                   >Status</label
                 >
-                <select id="filter-status" class="input" style="height: 42px">
+                <select id="filter-status" class="input">
                   <option value="all">All Statuses</option>
                   <option value="OPEN">Open</option>
                   <option value="CLOSED">Closed</option>
@@ -518,7 +518,7 @@
                 <label class="admin-form-label" for="filter-group"
                   >Group Circle</label
                 >
-                <select id="filter-group" class="input" style="height: 42px">
+                <select id="filter-group" class="input">
                   <option value="all">All Groups</option>
                 </select>
               </div>
@@ -530,7 +530,6 @@
                   type="date"
                   id="filter-from-date"
                   class="input"
-                  style="height: 42px"
                 />
               </div>
               <div class="admin-form-group" style="margin-bottom: 0">
@@ -541,16 +540,15 @@
                   type="date"
                   id="filter-to-date"
                   class="input"
-                  style="height: 42px"
                 />
               </div>
-              <div style="display: flex; gap: var(--space-2)">
+              <div class="filter-actions-group" style="display: flex; gap: var(--space-2)">
                 <button
                   type="submit"
                   class="btn-primary"
                   style="
                     flex: 1;
-                    height: 42px;
+                    min-height: 44px;
                     display: flex;
                     align-items: center;
                     justify-content: center;
@@ -563,7 +561,7 @@
                   id="btn-reset-filters"
                   class="btn-secondary"
                   style="
-                    height: 42px;
+                    min-height: 44px;
                     display: flex;
                     align-items: center;
                     justify-content: center;
@@ -635,14 +633,7 @@
 
         <!-- 3. Groups Management View -->
         <section id="groups-view" style="display: none">
-          <div
-            style="
-              display: flex;
-              justify-content: space-between;
-              align-items: center;
-              margin-bottom: var(--space-6);
-            "
-          >
+          <div class="admin-section-header">
             <div>
               <h2
                 class="font-display mb-2"
@@ -709,15 +700,7 @@
               >
             </nav>
 
-            <div
-              style="
-                display: flex;
-                justify-content: space-between;
-                align-items: flex-start;
-                flex-wrap: wrap;
-                gap: var(--space-4);
-              "
-            >
+            <div class="admin-section-header">
               <div>
                 <h2
                   class="font-display mb-2"
@@ -730,7 +713,7 @@
                   Intercessors registered to pray for this group's needs.
                 </p>
               </div>
-              <div style="display: flex; gap: var(--space-2)">
+              <div class="admin-section-header__actions">
                 <button class="btn-secondary" id="btn-bulk-add-trigger">
                   Bulk CSV Import
                 </button>
@@ -854,14 +837,7 @@
 
         <!-- 5. Admin Account Management View (APP_ADMIN only) -->
         <section id="admins-view" style="display: none">
-          <div
-            style="
-              display: flex;
-              justify-content: space-between;
-              align-items: center;
-              margin-bottom: var(--space-6);
-            "
-          >
+          <div class="admin-section-header">
             <div>
               <h2
                 class="font-display mb-2"

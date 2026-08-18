@@ -556,8 +556,8 @@ function renderGroupsTable() {
 
     tr.innerHTML = `
       <td data-label="Circle Name" class="table-cell-title">
-        <div style="font-weight: 600; color: var(--color-text-primary);">${escapeHtml(g.name)}</div>
-        ${g.description ? `<div style="font-size: var(--font-size-xs); color: var(--color-text-muted);">${escapeHtml(g.description)}</div>` : ''}
+        <div style="font-weight: 600; color: var(--offwhite, #f4f1ea);">${escapeHtml(g.name)}</div>
+        ${g.description ? `<div style="font-size: var(--font-size-xs); color: var(--muted, #9a9aa2);">${escapeHtml(g.description)}</div>` : ''}
       </td>
       <td data-label="Intercessors" style="text-align: right; font-weight: 600;">${g.memberCount || 0}</td>
       <td data-label="Passcode"><code style="background: rgba(0,0,0,0.04); padding: 2px 6px; border-radius: 4px; font-weight: 700;">${g.passcode}</code></td>
