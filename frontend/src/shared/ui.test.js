@@ -30,7 +30,7 @@ describe('UI Logic tests', () => {
   beforeEach(() => {
     vi.restoreAllMocks();
     localStorage.clear();
-    
+
     // Set up standard minimalist DOM for simple unit tests
     document.body.innerHTML = `
       <div id="app">
@@ -70,7 +70,7 @@ describe('UI Logic tests', () => {
 
   it('prayerCardRendersTextAndDate', () => {
     const cardsEl = document.getElementById('cards');
-    
+
     // Simulate rendering a prayer card DOM element
     const prayer = {
       prayerId: 'prayer-123',
@@ -90,13 +90,15 @@ describe('UI Logic tests', () => {
     cardsEl.appendChild(card);
 
     expect(cardsEl.children.length).toBe(1);
-    expect(cardsEl.querySelector('.text').textContent).toBe('Please pray for my exams.');
+    expect(cardsEl.querySelector('.text').textContent).toBe(
+      'Please pray for my exams.'
+    );
     expect(cardsEl.querySelector('.count').textContent).toBe('5 prayers');
   });
 
   it('prayerCardWithClosedStatusShowsBadge', () => {
     const cardsEl = document.getElementById('cards');
-    
+
     const prayer = {
       prayerId: 'prayer-123',
       prayerText: 'Please pray for my exams.',
@@ -108,7 +110,7 @@ describe('UI Logic tests', () => {
     const card = document.createElement('article');
     card.className = 'pcard';
     card.setAttribute('data-id', prayer.prayerId);
-    
+
     const isClosed = prayer.status === 'CLOSED';
     card.innerHTML = `
       <span class="pcard-status${isClosed ? ' answered' : ''}">${isClosed ? 'Answered' : 'Praying'}</span>
@@ -126,7 +128,7 @@ describe('UI Integration tests', () => {
     vi.restoreAllMocks();
     vi.resetModules();
     localStorage.clear();
-    
+
     // Set up standard DOM using actual index.html
     document.documentElement.innerHTML = indexHtml;
   });
@@ -164,7 +166,7 @@ describe('UI Integration tests', () => {
     // Trigger DOMContentLoaded
     const domLoadedEvent = new Event('DOMContentLoaded');
     document.dispatchEvent(domLoadedEvent);
-    
+
     // Flush microtasks
     await new Promise((resolve) => setTimeout(resolve, 50));
 
@@ -184,7 +186,9 @@ describe('UI Integration tests', () => {
     const circleSelect = document.getElementById('circleSelect');
     expect(circleLabel.textContent).toBe('Alpha Group');
     expect(circleSelect.classList.contains('specific')).toBe(true);
-    expect(circleSelect.getAttribute('aria-label')).toBe('Select circle - currently Alpha Group');
+    expect(circleSelect.getAttribute('aria-label')).toBe(
+      'Select circle - currently Alpha Group'
+    );
   });
 
   it('submissionAnimationTriggersOnSubmit', async () => {
@@ -228,7 +232,7 @@ describe('UI Integration tests', () => {
     const pill = document.getElementById('pillWrap');
 
     promptInput.value = 'Please pray for my healing.';
-    
+
     // Submit form
     promptForm.dispatchEvent(new Event('submit'));
 
@@ -255,15 +259,18 @@ describe('UI Integration tests', () => {
   });
 
   it('handles group joining via specific passcode', async () => {
-    vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: true, json: async () => [] }));
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue({ ok: true, json: async () => [] })
+    );
     await import('../main.js');
     document.dispatchEvent(new Event('DOMContentLoaded'));
-    await new Promise(r => setTimeout(r, 10));
+    await new Promise((r) => setTimeout(r, 10));
 
     const passcodeInput = document.getElementById('passcodeInput');
     passcodeInput.value = 'TESTING';
     document.getElementById('confirmCircleBtn').click();
-    await new Promise(r => setTimeout(r, 10));
+    await new Promise((r) => setTimeout(r, 10));
   });
 
   it('toggles dark mode', async () => {
@@ -281,33 +288,51 @@ describe('UI Integration tests', () => {
   it('renderCards and view switching', async () => {
     localStorage.setItem('prayer-link-device-id', 'test-device-id');
     const statusMock = vi.fn().mockImplementation((url) => {
-      if (url === '/api/identity/test-device-id/seen') return Promise.resolve({ ok: true });
-      if (url.includes('/api/prayers?deviceId=')) return Promise.resolve({
-        ok: true,
-        json: async () => [
-          { prayerId: 'p-1', prayerText: 'Prayer 1', createdAt: new Date().toISOString(), status: 'OPEN', prayedForCount: 2, groupId: 'g-1' },
-          ...Array(25).fill().map((_, i) => ({ prayerId: `p-${i+2}`, prayerText: `Prayer ${i+2}`, createdAt: new Date().toISOString(), status: 'OPEN', prayedForCount: 1 }))
-        ],
-      });
-      if (url.includes('/api/groups/g-1')) return Promise.resolve({
-        ok: true,
-        json: async () => ({ groupId: 'g-1', name: 'Group 1' }),
-      });
+      if (url === '/api/identity/test-device-id/seen')
+        return Promise.resolve({ ok: true });
+      if (url.includes('/api/prayers?deviceId='))
+        return Promise.resolve({
+          ok: true,
+          json: async () => [
+            {
+              prayerId: 'p-1',
+              prayerText: 'Prayer 1',
+              createdAt: new Date().toISOString(),
+              status: 'OPEN',
+              prayedForCount: 2,
+              groupId: 'g-1',
+            },
+            ...Array(25)
+              .fill()
+              .map((_, i) => ({
+                prayerId: `p-${i + 2}`,
+                prayerText: `Prayer ${i + 2}`,
+                createdAt: new Date().toISOString(),
+                status: 'OPEN',
+                prayedForCount: 1,
+              })),
+          ],
+        });
+      if (url.includes('/api/groups/g-1'))
+        return Promise.resolve({
+          ok: true,
+          json: async () => ({ groupId: 'g-1', name: 'Group 1' }),
+        });
       return Promise.resolve({ ok: true, json: async () => ({}) });
     });
     vi.stubGlobal('fetch', statusMock);
 
     await import('../main.js');
     document.dispatchEvent(new Event('DOMContentLoaded'));
-    await new Promise(r => setTimeout(r, 50));
+    await new Promise((r) => setTimeout(r, 50));
 
     // Test view switching
     const navMine = document.querySelector('[data-view="mine"]');
     navMine.click();
-    await new Promise(r => setTimeout(r, 50));
+    await new Promise((r) => setTimeout(r, 50));
 
     expect(document.body.classList.contains('view-mine')).toBe(true);
-    
+
     // Check pagination btn
     const btnLoadMore = document.getElementById('btn-load-more');
     expect(btnLoadMore.style.display).toBe('inline-block');
@@ -321,45 +346,57 @@ describe('UI Integration tests', () => {
     localStorage.setItem('prayer-link-device-id', 'test-device-id');
     let prayersCallCount = 0;
     const statusMock = vi.fn().mockImplementation((url, options) => {
-      if (url === '/api/identity/test-device-id/seen') return Promise.resolve({ ok: true });
+      if (url === '/api/identity/test-device-id/seen')
+        return Promise.resolve({ ok: true });
       if (url.includes('/api/prayers?deviceId=')) {
         prayersCallCount++;
         return Promise.resolve({
           ok: true,
-          json: async () => [{
-            prayerId: 'p-1', prayerText: 'Open Prayer', createdAt: new Date().toISOString(), status: 'OPEN', prayedForCount: 0
-          }]
+          json: async () => [
+            {
+              prayerId: 'p-1',
+              prayerText: 'Open Prayer',
+              createdAt: new Date().toISOString(),
+              status: 'OPEN',
+              prayedForCount: 0,
+            },
+          ],
         });
       }
-      if (url === '/api/prayers/p-1') return Promise.resolve({
-        ok: true,
-        json: async () => ({
-          prayerId: 'p-1',
-          prayerText: 'Open Prayer',
-          createdAt: new Date().toISOString(),
-          status: 'OPEN',
-          prayedForCount: 0
-        })
-      });
-      if (url === '/api/prayers/p-1/updates' && options?.method === 'POST') return Promise.resolve({
-        ok: true,
-        json: async () => ({ success: true })
-      });
+      if (url === '/api/prayers/p-1')
+        return Promise.resolve({
+          ok: true,
+          json: async () => ({
+            prayerId: 'p-1',
+            prayerText: 'Open Prayer',
+            createdAt: new Date().toISOString(),
+            status: 'OPEN',
+            prayedForCount: 0,
+          }),
+        });
+      if (url === '/api/prayers/p-1/updates' && options?.method === 'POST')
+        return Promise.resolve({
+          ok: true,
+          json: async () => ({ success: true }),
+        });
       return Promise.resolve({ ok: true, json: async () => ({}) });
     });
     vi.stubGlobal('fetch', statusMock);
-    vi.stubGlobal('confirm', vi.fn(() => true));
+    vi.stubGlobal(
+      'confirm',
+      vi.fn(() => true)
+    );
 
     await import('../main.js');
     document.dispatchEvent(new Event('DOMContentLoaded'));
-    await new Promise(r => setTimeout(r, 50));
+    await new Promise((r) => setTimeout(r, 50));
 
     document.querySelector('[data-view="mine"]').click();
-    await new Promise(r => setTimeout(r, 50));
+    await new Promise((r) => setTimeout(r, 50));
 
     const card = document.querySelector('.pcard');
     card.click();
-    await new Promise(r => setTimeout(r, 50));
+    await new Promise((r) => setTimeout(r, 50));
 
     const detailModal = document.getElementById('detailModal');
     expect(detailModal.classList.contains('open')).toBe(true);
@@ -370,43 +407,46 @@ describe('UI Integration tests', () => {
 
     const form = document.getElementById('update-prayer-form');
     form.dispatchEvent(new Event('submit'));
-    
-    await new Promise(r => setTimeout(r, 50));
-    
+
+    await new Promise((r) => setTimeout(r, 50));
+
     expect(prayersCallCount).toBeGreaterThan(1);
     expect(detailModal.classList.contains('open')).toBe(false);
   });
 
   it('checkUrlForGroup parses groupId from url', async () => {
     localStorage.setItem('prayer-link-device-id', 'test-device-id');
-    
+
     const originalLocation = window.location;
     Object.defineProperty(window, 'location', {
       value: { search: '?groupId=group-url-123' },
-      writable: true
+      writable: true,
     });
 
     const statusMock = vi.fn().mockImplementation((url) => {
-      if (url === '/api/identity/test-device-id/seen') return Promise.resolve({ ok: true });
-      if (url.includes('/api/prayers?deviceId=')) return Promise.resolve({ ok: true, json: async () => [] });
-      if (url === '/api/groups/group-url-123') return Promise.resolve({
-        ok: true,
-        json: async () => ({ groupId: 'group-url-123', name: 'URL Group' })
-      });
+      if (url === '/api/identity/test-device-id/seen')
+        return Promise.resolve({ ok: true });
+      if (url.includes('/api/prayers?deviceId='))
+        return Promise.resolve({ ok: true, json: async () => [] });
+      if (url === '/api/groups/group-url-123')
+        return Promise.resolve({
+          ok: true,
+          json: async () => ({ groupId: 'group-url-123', name: 'URL Group' }),
+        });
       return Promise.resolve({ ok: true, json: async () => ({}) });
     });
     vi.stubGlobal('fetch', statusMock);
 
     await import('../main.js');
     document.dispatchEvent(new Event('DOMContentLoaded'));
-    await new Promise(r => setTimeout(r, 50));
+    await new Promise((r) => setTimeout(r, 50));
 
     const circleLabel = document.getElementById('circleLabel');
     expect(circleLabel.textContent).toBe('URL Group');
-    
+
     Object.defineProperty(window, 'location', {
       value: originalLocation,
-      writable: true
+      writable: true,
     });
   });
 
@@ -419,14 +459,15 @@ describe('UI Integration tests', () => {
         const body = JSON.parse(options.body);
         return Promise.resolve({ ok: true, json: async () => body });
       }
-      if (url.includes('/api/prayers?deviceId=')) return Promise.resolve({ ok: true, json: async () => [] });
+      if (url.includes('/api/prayers?deviceId='))
+        return Promise.resolve({ ok: true, json: async () => [] });
       return Promise.resolve({ ok: true, json: async () => ({}) });
     });
     vi.stubGlobal('fetch', statusMock);
 
     await import('../main.js');
     document.dispatchEvent(new Event('DOMContentLoaded'));
-    await new Promise(r => setTimeout(r, 50));
+    await new Promise((r) => setTimeout(r, 50));
 
     expect(localStorage.getItem('prayer-link-device-id')).not.toBeNull();
   });
@@ -434,35 +475,45 @@ describe('UI Integration tests', () => {
   it('handles QR tab and scanner initialization', async () => {
     localStorage.setItem('prayer-link-device-id', 'test-device-id');
     const statusMock = vi.fn().mockImplementation((url) => {
-      if (url === '/api/identity/test-device-id/seen') return Promise.resolve({ ok: true });
-      if (url.includes('/api/prayers?deviceId=')) return Promise.resolve({ ok: true, json: async () => [] });
-      if (url.includes('/api/groups/12345678-1234-1234-1234-123456789012')) return Promise.resolve({
-          ok: true, json: async () => ({ groupId: '12345678-1234-1234-1234-123456789012', name: 'QR Group' })
-      });
+      if (url === '/api/identity/test-device-id/seen')
+        return Promise.resolve({ ok: true });
+      if (url.includes('/api/prayers?deviceId='))
+        return Promise.resolve({ ok: true, json: async () => [] });
+      if (url.includes('/api/groups/12345678-1234-1234-1234-123456789012'))
+        return Promise.resolve({
+          ok: true,
+          json: async () => ({
+            groupId: '12345678-1234-1234-1234-123456789012',
+            name: 'QR Group',
+          }),
+        });
       return Promise.resolve({ ok: true, json: async () => ({}) });
     });
     vi.stubGlobal('fetch', statusMock);
 
     // Mock Html5Qrcode since it's used when launching the scanner
-    const Html5QrcodeMock = vi.fn().mockImplementation(function() {
+    const Html5QrcodeMock = vi.fn().mockImplementation(function () {
       this.start = vi.fn((config, options, callback) => {
-        setTimeout(() => callback('groupId=12345678-1234-1234-1234-123456789012'), 10);
+        setTimeout(
+          () => callback('groupId=12345678-1234-1234-1234-123456789012'),
+          10
+        );
         return Promise.resolve();
       });
       this.stop = vi.fn().mockResolvedValue();
     });
     vi.doMock('html5-qrcode', () => ({
-      Html5Qrcode: Html5QrcodeMock
+      Html5Qrcode: Html5QrcodeMock,
     }));
 
     await import('../main.js');
     document.dispatchEvent(new Event('DOMContentLoaded'));
-    await new Promise(r => setTimeout(r, 50));
+    await new Promise((r) => setTimeout(r, 50));
 
     // Open circle modal
     const circleSelect = document.getElementById('circleSelect');
     circleSelect.click();
-    
+
     // Switch to QR tab
     const tabQr = document.getElementById('tab-qr');
     tabQr.click();
@@ -471,7 +522,7 @@ describe('UI Integration tests', () => {
     // Click launch scanner
     const btnStartQr = document.getElementById('btn-start-qr');
     btnStartQr.click();
-    
+
     // Check if Html5Qrcode was mocked or at least started
     expect(btnStartQr.disabled).toBe(true);
 
@@ -484,102 +535,138 @@ describe('UI Integration tests', () => {
   it('opens detail modal for a closed prayer', async () => {
     localStorage.setItem('prayer-link-device-id', 'test-device-id');
     const statusMock = vi.fn().mockImplementation((url) => {
-      if (url === '/api/identity/test-device-id/seen') return Promise.resolve({ ok: true });
+      if (url === '/api/identity/test-device-id/seen')
+        return Promise.resolve({ ok: true });
       if (url.includes('/api/prayers?deviceId=')) {
         return Promise.resolve({
           ok: true,
-          json: async () => [{
-            prayerId: 'p-closed', prayerText: 'Closed Prayer', createdAt: new Date().toISOString(), status: 'CLOSED', prayedForCount: 1, updates: [{updateText: 'Answered!'}]
-          }]
+          json: async () => [
+            {
+              prayerId: 'p-closed',
+              prayerText: 'Closed Prayer',
+              createdAt: new Date().toISOString(),
+              status: 'CLOSED',
+              prayedForCount: 1,
+              updates: [{ updateText: 'Answered!' }],
+            },
+          ],
         });
       }
-      if (url === '/api/prayers/p-closed') return Promise.resolve({
-        ok: true,
-        json: async () => ({
-          prayerId: 'p-closed',
-          prayerText: 'Closed Prayer',
-          createdAt: new Date().toISOString(),
-          status: 'CLOSED',
-          prayedForCount: 1,
-          updates: [{updateText: 'Answered!'}]
-        })
-      });
+      if (url === '/api/prayers/p-closed')
+        return Promise.resolve({
+          ok: true,
+          json: async () => ({
+            prayerId: 'p-closed',
+            prayerText: 'Closed Prayer',
+            createdAt: new Date().toISOString(),
+            status: 'CLOSED',
+            prayedForCount: 1,
+            updates: [{ updateText: 'Answered!' }],
+          }),
+        });
       return Promise.resolve({ ok: true, json: async () => ({}) });
     });
     vi.stubGlobal('fetch', statusMock);
 
     await import('../main.js');
     document.dispatchEvent(new Event('DOMContentLoaded'));
-    await new Promise(r => setTimeout(r, 50));
+    await new Promise((r) => setTimeout(r, 50));
 
     document.querySelector('[data-view="mine"]').click();
-    await new Promise(r => setTimeout(r, 50));
+    await new Promise((r) => setTimeout(r, 50));
 
     const card = document.querySelector('.pcard');
-    if(card) {
-        card.click();
-        await new Promise(r => setTimeout(r, 50));
+    if (card) {
+      card.click();
+      await new Promise((r) => setTimeout(r, 50));
 
-        const detailContentArea = document.getElementById('detail-content-area');
-        expect(detailContentArea.innerHTML).toContain('Answered!');
-        
-        // Close modal
-        const btnCloseDetail = document.getElementById('btn-close-detail');
-        if (btnCloseDetail) btnCloseDetail.click();
-        
-        const detailModal = document.getElementById('detailModal');
-        expect(detailModal.classList.contains('open')).toBe(false);
+      const detailContentArea = document.getElementById('detail-content-area');
+      expect(detailContentArea.innerHTML).toContain('Answered!');
+
+      // Close modal
+      const btnCloseDetail = document.getElementById('btn-close-detail');
+      if (btnCloseDetail) btnCloseDetail.click();
+
+      const detailModal = document.getElementById('detailModal');
+      expect(detailModal.classList.contains('open')).toBe(false);
     }
   });
 
   it('covers remaining branches in main.js', async () => {
     localStorage.setItem('prayer-link-device-id', 'test-device-id');
     const statusMock = vi.fn().mockImplementation((url) => {
-      if (url === '/api/identity/test-device-id/seen') return Promise.resolve({ ok: true });
-      if (url.includes('/api/prayers?deviceId=')) return Promise.resolve({
-        ok: true,
-        json: async () => [
-          { prayerId: 'p-min', prayerText: 'Min', createdAt: new Date(Date.now() - 5 * 60000).toISOString(), status: 'OPEN', prayedForCount: 1 },
-          { prayerId: 'p-hr', prayerText: 'Hr', createdAt: new Date(Date.now() - 5 * 3600000).toISOString(), status: 'OPEN', prayedForCount: 1 },
-          { prayerId: 'p-day', prayerText: 'Day', createdAt: new Date(Date.now() - 25 * 3600000).toISOString(), status: 'OPEN', prayedForCount: 1 },
-          ...Array(18).fill().map((_, i) => ({ prayerId: `p-${i+4}`, prayerText: `Filler ${i+4}`, createdAt: new Date().toISOString(), status: 'OPEN', prayedForCount: 1 }))
-        ]
-      });
+      if (url === '/api/identity/test-device-id/seen')
+        return Promise.resolve({ ok: true });
+      if (url.includes('/api/prayers?deviceId='))
+        return Promise.resolve({
+          ok: true,
+          json: async () => [
+            {
+              prayerId: 'p-min',
+              prayerText: 'Min',
+              createdAt: new Date(Date.now() - 5 * 60000).toISOString(),
+              status: 'OPEN',
+              prayedForCount: 1,
+            },
+            {
+              prayerId: 'p-hr',
+              prayerText: 'Hr',
+              createdAt: new Date(Date.now() - 5 * 3600000).toISOString(),
+              status: 'OPEN',
+              prayedForCount: 1,
+            },
+            {
+              prayerId: 'p-day',
+              prayerText: 'Day',
+              createdAt: new Date(Date.now() - 25 * 3600000).toISOString(),
+              status: 'OPEN',
+              prayedForCount: 1,
+            },
+            ...Array(18)
+              .fill()
+              .map((_, i) => ({
+                prayerId: `p-${i + 4}`,
+                prayerText: `Filler ${i + 4}`,
+                createdAt: new Date().toISOString(),
+                status: 'OPEN',
+                prayedForCount: 1,
+              })),
+          ],
+        });
       return Promise.resolve({ ok: true, json: async () => ({}) });
     });
     vi.stubGlobal('fetch', statusMock);
 
-    const Html5QrcodeMock = vi.fn().mockImplementation(function() {
+    const Html5QrcodeMock = vi.fn().mockImplementation(function () {
       this.start = vi.fn().mockRejectedValue(new Error('Camera Error'));
       this.stop = vi.fn().mockResolvedValue();
     });
     vi.doMock('html5-qrcode', () => ({
-      Html5Qrcode: Html5QrcodeMock
+      Html5Qrcode: Html5QrcodeMock,
     }));
 
     await import('../main.js');
     document.dispatchEvent(new Event('DOMContentLoaded'));
-    await new Promise(r => setTimeout(r, 50));
+    await new Promise((r) => setTimeout(r, 50));
 
     const navMine = document.querySelector('[data-view="mine"]');
     navMine.click();
-    await new Promise(r => setTimeout(r, 50));
+    await new Promise((r) => setTimeout(r, 50));
 
     const btnLoadMore = document.getElementById('btn-load-more');
-    if(btnLoadMore) btnLoadMore.click();
-    
+    if (btnLoadMore) btnLoadMore.click();
+
     const promptInput = document.getElementById('promptInput');
     promptInput.value = 'abc';
     const form = document.getElementById('promptForm');
     form.dispatchEvent(new Event('submit'));
-    
+
     vi.useFakeTimers();
     vi.advanceTimersByTime(4500);
     const toast = document.querySelector('.toast');
-    if(toast) {
-        toast.dispatchEvent(new Event('animationend'));
+    if (toast) {
+      toast.dispatchEvent(new Event('animationend'));
     }
     vi.useRealTimers();
-    
   });
 });

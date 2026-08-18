@@ -9,7 +9,7 @@ vi.mock('qrcode', () => {
     default: {
       toCanvas: vi.fn(),
       toDataURL: vi.fn(),
-    }
+    },
   };
 });
 
@@ -21,7 +21,7 @@ describe('Portal Auth tests', () => {
   beforeEach(() => {
     vi.restoreAllMocks();
     vi.resetModules();
-    
+
     // Set up standard DOM using actual portal.html
     document.documentElement.innerHTML = portalHtml;
     window.location.hash = '';
@@ -121,8 +121,10 @@ describe('Portal Auth tests', () => {
     await new Promise((resolve) => setTimeout(resolve, 50));
 
     // Check login fetch payload
-    const loginCall = statusMock.mock.calls.find(call => call[0] === '/api/auth/login');
-    expect(logoutBtn => true); // dummy check to keep type signature
+    const loginCall = statusMock.mock.calls.find(
+      (call) => call[0] === '/api/auth/login'
+    );
+    expect((logoutBtn) => true); // dummy check to keep type signature
     expect(loginCall).toBeDefined();
     expect(JSON.parse(loginCall[1].body)).toEqual({
       identifier: 'admin',
@@ -218,11 +220,13 @@ describe('Portal Auth tests', () => {
     // Click static intercessor logout button
     const logoutBtn = document.getElementById('btn-intercessor-logout');
     expect(logoutBtn).toBeDefined();
-    
+
     logoutBtn.dispatchEvent(new Event('click'));
     await new Promise((resolve) => setTimeout(resolve, 50));
 
-    const logoutCall = statusMock.mock.calls.find(call => call[0] === '/api/auth/logout');
+    const logoutCall = statusMock.mock.calls.find(
+      (call) => call[0] === '/api/auth/logout'
+    );
     expect(logoutCall).toBeDefined();
     expect(logoutCall[1].method).toBe('POST');
   });
@@ -314,22 +318,44 @@ describe('Portal Auth tests', () => {
   });
 
   it('loads admin dashboard and switches tabs', async () => {
-    vi.stubGlobal('fetch', vi.fn().mockImplementation((url) => {
-      if (url.includes('auth/status')) return Promise.resolve({ ok: true, json: async () => ({ initialized: true, authenticated: true, role: 'APP_ADMIN', groups: [] }) });
-      if (url.includes('admin/groups')) return Promise.resolve({ ok: true, json: async () => ([{ groupId: 'g1', name: 'Group 1', memberCount: 5 }]) });
-      if (url.includes('admin/prayers')) return Promise.resolve({ ok: true, json: async () => ({ items: [], totalCount: 0 }) });
-      return Promise.resolve({ ok: true, json: async () => ({}) });
-    }));
-    
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockImplementation((url) => {
+        if (url.includes('auth/status'))
+          return Promise.resolve({
+            ok: true,
+            json: async () => ({
+              initialized: true,
+              authenticated: true,
+              role: 'APP_ADMIN',
+              groups: [],
+            }),
+          });
+        if (url.includes('admin/groups'))
+          return Promise.resolve({
+            ok: true,
+            json: async () => [
+              { groupId: 'g1', name: 'Group 1', memberCount: 5 },
+            ],
+          });
+        if (url.includes('admin/prayers'))
+          return Promise.resolve({
+            ok: true,
+            json: async () => ({ items: [], totalCount: 0 }),
+          });
+        return Promise.resolve({ ok: true, json: async () => ({}) });
+      })
+    );
+
     await import('../portal.js');
     document.dispatchEvent(new Event('DOMContentLoaded'));
-    await new Promise(r => setTimeout(r, 50));
+    await new Promise((r) => setTimeout(r, 50));
 
     // Click tabs
     const groupsTab = document.querySelector('[data-target="groups"]');
     const prayersTab = document.querySelector('[data-target="prayers"]');
     const adminsTab = document.querySelector('[data-target="admins"]');
-    
+
     if (prayersTab) prayersTab.click();
     if (adminsTab) adminsTab.click();
     if (groupsTab) groupsTab.click();
@@ -361,8 +387,20 @@ describe('Portal Auth tests', () => {
         return Promise.resolve({
           ok: true,
           json: async () => [
-            { groupId: 'g1', name: 'Group 1', memberCount: 5, passcode: '123456', createdAt: '2023-01-01' },
-            { groupId: 'g2', name: 'Group 2', memberCount: 0, passcode: '654321', createdAt: '2023-01-02' }
+            {
+              groupId: 'g1',
+              name: 'Group 1',
+              memberCount: 5,
+              passcode: '123456',
+              createdAt: '2023-01-01',
+            },
+            {
+              groupId: 'g2',
+              name: 'Group 2',
+              memberCount: 0,
+              passcode: '654321',
+              createdAt: '2023-01-02',
+            },
           ],
         });
       }
@@ -371,10 +409,25 @@ describe('Portal Auth tests', () => {
           ok: true,
           json: async () => ({
             items: [
-              { prayerId: 'p1', prayerText: 'Pray for me', assignedGroupId: 'g1', status: 'OPEN', prayedForCount: 2, createdAt: '2023-01-01', updates: [{ updateText: 'Better', updatedAt: '2023-01-02' }] },
-              { prayerId: 'p2', prayerText: 'Pray for us', assignedGroupId: null, status: 'CLOSED', prayedForCount: 0, createdAt: '2023-01-02' }
+              {
+                prayerId: 'p1',
+                prayerText: 'Pray for me',
+                assignedGroupId: 'g1',
+                status: 'OPEN',
+                prayedForCount: 2,
+                createdAt: '2023-01-01',
+                updates: [{ updateText: 'Better', updatedAt: '2023-01-02' }],
+              },
+              {
+                prayerId: 'p2',
+                prayerText: 'Pray for us',
+                assignedGroupId: null,
+                status: 'CLOSED',
+                prayedForCount: 0,
+                createdAt: '2023-01-02',
+              },
             ],
-            totalCount: 2
+            totalCount: 2,
           }),
         });
       }
@@ -382,8 +435,19 @@ describe('Portal Auth tests', () => {
         return Promise.resolve({
           ok: true,
           json: async () => [
-            { adminId: 'a1', username: 'admin', role: 'APP_ADMIN', createdAt: '2023-01-01' },
-            { adminId: 'a2', username: 'group_admin', role: 'GROUP_ADMIN', groupId: 'g1', createdAt: '2023-01-02' }
+            {
+              adminId: 'a1',
+              username: 'admin',
+              role: 'APP_ADMIN',
+              createdAt: '2023-01-01',
+            },
+            {
+              adminId: 'a2',
+              username: 'group_admin',
+              role: 'GROUP_ADMIN',
+              groupId: 'g1',
+              createdAt: '2023-01-02',
+            },
           ],
         });
       }
@@ -397,21 +461,37 @@ describe('Portal Auth tests', () => {
         return Promise.resolve({
           ok: true,
           json: async () => [
-            { memberId: 'm1', name: 'Member 1', email: 'm1@test.com', joinedAt: '2023-01-01', bounced: false },
-            { memberId: 'm2', name: 'Member 2', email: 'm2@test.com', joinedAt: '2023-01-02', bounced: true }
+            {
+              memberId: 'm1',
+              name: 'Member 1',
+              email: 'm1@test.com',
+              joinedAt: '2023-01-01',
+              bounced: false,
+            },
+            {
+              memberId: 'm2',
+              name: 'Member 2',
+              email: 'm2@test.com',
+              joinedAt: '2023-01-02',
+              bounced: true,
+            },
           ],
         });
       }
       if (url.startsWith('/api/groups/g1')) {
         return Promise.resolve({
           ok: true,
-          json: async () => ({ groupId: 'g1', name: 'Group 1', passcode: '123456' })
+          json: async () => ({
+            groupId: 'g1',
+            name: 'Group 1',
+            passcode: '123456',
+          }),
         });
       }
       if (url.startsWith('/api/admin/groups/g1/regenerate-passcode')) {
         return Promise.resolve({
           ok: true,
-          json: async () => ({ passcode: 'ABCDEF' })
+          json: async () => ({ passcode: 'ABCDEF' }),
         });
       }
       return Promise.reject(new Error(`Unhandled request to ${url}`));
@@ -437,11 +517,11 @@ describe('Portal Auth tests', () => {
     // Confirm Modal for regen
     const confirmActionBtn = document.getElementById('btn-confirm-action');
     if (confirmActionBtn) confirmActionBtn.click();
-    await new Promise(r => setTimeout(r, 10));
+    await new Promise((r) => setTimeout(r, 10));
 
     const editGroupBtn = groupsTbody.querySelector('.btn-edit-group');
     if (editGroupBtn) editGroupBtn.click();
-    
+
     const closeGroupBtn = document.getElementById('btn-modal-group-close');
     if (closeGroupBtn) closeGroupBtn.click();
 
@@ -449,7 +529,7 @@ describe('Portal Auth tests', () => {
     window.location.hash = '#admins';
     window.dispatchEvent(new Event('hashchange'));
     await new Promise((resolve) => setTimeout(resolve, 50));
-    
+
     const adminsTbody = document.getElementById('admins-table-body');
     expect(adminsTbody.children.length).toBeGreaterThan(0);
 
@@ -466,11 +546,13 @@ describe('Portal Auth tests', () => {
     window.dispatchEvent(new Event('hashchange'));
     await new Promise((resolve) => setTimeout(resolve, 50));
 
-    const prayersTbody = document.getElementById('dashboard-prayers-table-body');
+    const prayersTbody = document.getElementById(
+      'dashboard-prayers-table-body'
+    );
     expect(prayersTbody.children.length).toBeGreaterThan(0);
 
     if (prayersTbody.firstElementChild) prayersTbody.firstElementChild.click();
-    
+
     const closePrayerBtn = document.getElementById('btn-modal-prayer-close');
     if (closePrayerBtn) closePrayerBtn.click();
 
@@ -481,7 +563,7 @@ describe('Portal Auth tests', () => {
     // Pagination
     const nextBtn = document.getElementById('btn-prayers-next');
     if (nextBtn && !nextBtn.disabled) nextBtn.click();
-    
+
     const prevBtn = document.getElementById('btn-prayers-prev');
     if (prevBtn && !prevBtn.disabled) prevBtn.click();
   });
@@ -505,9 +587,30 @@ describe('Portal Auth tests', () => {
         return Promise.resolve({
           ok: true,
           json: async () => [
-            { prayerId: 'p1', prayerText: 'Pray for me', status: 'OPEN', prayedForCount: 2, createdAt: '2023-01-01', hasPrayed: false },
-            { prayerId: 'p2', prayerText: 'Pray for us', status: 'CLOSED', prayedForCount: 0, createdAt: '2023-01-02', hasPrayed: false },
-            { prayerId: 'p3', prayerText: 'Prayed', status: 'OPEN', prayedForCount: 5, createdAt: '2023-01-03', hasPrayed: true }
+            {
+              prayerId: 'p1',
+              prayerText: 'Pray for me',
+              status: 'OPEN',
+              prayedForCount: 2,
+              createdAt: '2023-01-01',
+              hasPrayed: false,
+            },
+            {
+              prayerId: 'p2',
+              prayerText: 'Pray for us',
+              status: 'CLOSED',
+              prayedForCount: 0,
+              createdAt: '2023-01-02',
+              hasPrayed: false,
+            },
+            {
+              prayerId: 'p3',
+              prayerText: 'Prayed',
+              status: 'OPEN',
+              prayedForCount: 5,
+              createdAt: '2023-01-03',
+              hasPrayed: true,
+            },
           ],
         });
       }
@@ -531,20 +634,24 @@ describe('Portal Auth tests', () => {
 
     await new Promise((resolve) => setTimeout(resolve, 50));
 
-    const prayersListContainer = document.getElementById('prayers-list-container');
+    const prayersListContainer = document.getElementById(
+      'prayers-list-container'
+    );
     expect(prayersListContainer.children.length).toBeGreaterThan(0);
 
-    const prayBtn = prayersListContainer.querySelector('.btn-pray[data-id="p1"]');
+    const prayBtn = prayersListContainer.querySelector(
+      '.btn-pray[data-id="p1"]'
+    );
     if (prayBtn) prayBtn.click();
-    
+
     await new Promise((resolve) => setTimeout(resolve, 50));
 
     const filterClosed = document.getElementById('filter-closed');
     if (filterClosed) filterClosed.click();
-    
+
     await new Promise((resolve) => setTimeout(resolve, 50));
     expect(prayersListContainer.children.length).toBeGreaterThan(0);
-    
+
     const filterOpen = document.getElementById('filter-open');
     if (filterOpen) filterOpen.click();
   });
@@ -570,27 +677,46 @@ describe('Portal Auth tests', () => {
           },
         });
       }
-      if (url === '/api/admin/setup') return Promise.resolve({ ok: true, status: 201 });
+      if (url === '/api/admin/setup')
+        return Promise.resolve({ ok: true, status: 201 });
       if (url === '/api/admin/groups') {
-        if (options && options.method === 'POST') return Promise.resolve({ ok: true, status: 201 });
+        if (options && options.method === 'POST')
+          return Promise.resolve({ ok: true, status: 201 });
         return Promise.resolve({ ok: true, json: async () => [] });
       }
       if (url === '/api/admin/admins') {
-        if (options && options.method === 'POST') return Promise.resolve({ ok: true, status: 201 });
+        if (options && options.method === 'POST')
+          return Promise.resolve({ ok: true, status: 201 });
         return Promise.resolve({ ok: true, json: async () => [] });
       }
       if (url.startsWith('/api/admin/groups/g1/members')) {
-        if (options && options.method === 'POST') return Promise.resolve({ ok: true, status: 201 });
+        if (options && options.method === 'POST')
+          return Promise.resolve({ ok: true, status: 201 });
         return Promise.resolve({ ok: true, json: async () => [] });
       }
       if (url.startsWith('/api/admin/groups/g1/members/bulk')) {
-        return Promise.resolve({ ok: true, json: async () => ({ added: 1, errors: [] }) });
+        return Promise.resolve({
+          ok: true,
+          json: async () => ({ added: 1, errors: [] }),
+        });
       }
       if (url.startsWith('/api/groups/g1')) {
-        return Promise.resolve({ ok: true, json: async () => ({ groupId: 'g1', name: 'Group 1', passcode: '123456' }) });
+        return Promise.resolve({
+          ok: true,
+          json: async () => ({
+            groupId: 'g1',
+            name: 'Group 1',
+            passcode: '123456',
+          }),
+        });
       }
-      if (url.startsWith('/api/admin/prayers')) return Promise.resolve({ ok: true, json: async () => ({ items: [], totalCount: 0 }) });
-      if (url === '/api/identity/intercessor/register') return Promise.resolve({ ok: true, json: async () => ({}) });
+      if (url.startsWith('/api/admin/prayers'))
+        return Promise.resolve({
+          ok: true,
+          json: async () => ({ items: [], totalCount: 0 }),
+        });
+      if (url === '/api/identity/intercessor/register')
+        return Promise.resolve({ ok: true, json: async () => ({}) });
       return Promise.reject(new Error(`Unhandled request to ${url}`));
     });
     vi.stubGlobal('fetch', statusMock);
@@ -637,7 +763,8 @@ describe('Portal Auth tests', () => {
     // Bulk Add
     const bulkAddBtn = document.getElementById('btn-bulk-add-trigger');
     if (bulkAddBtn) bulkAddBtn.click();
-    document.getElementById('member-bulk-textarea').value = 'Test Bulk, bulk@test.com\nInvalid Name';
+    document.getElementById('member-bulk-textarea').value =
+      'Test Bulk, bulk@test.com\nInvalid Name';
     const validateBulkBtn = document.getElementById('btn-member-bulk-validate');
     if (validateBulkBtn) validateBulkBtn.click();
     const bulkForm = document.getElementById('member-bulk-form');
@@ -672,7 +799,7 @@ describe('Portal Auth tests', () => {
   it('covers deletion and remaining modal interactions', async () => {
     let callLog = [];
     const statusMock = vi.fn().mockImplementation((url, options) => {
-      callLog.push({url, method: options?.method || 'GET'});
+      callLog.push({ url, method: options?.method || 'GET' });
       if (url === '/api/auth/status') {
         return Promise.resolve({
           ok: true,
@@ -689,7 +816,13 @@ describe('Portal Auth tests', () => {
         return Promise.resolve({
           ok: true,
           json: async () => [
-            { groupId: 'g1', name: 'Group 1', memberCount: 5, passcode: '123456', createdAt: '2023-01-01' }
+            {
+              groupId: 'g1',
+              name: 'Group 1',
+              memberCount: 5,
+              passcode: '123456',
+              createdAt: '2023-01-01',
+            },
           ],
         });
       }
@@ -698,10 +831,22 @@ describe('Portal Auth tests', () => {
           ok: true,
           json: async () => ({
             items: [
-              { prayerId: 'p1', prayerText: 'A', assignedGroupId: 'g1', status: 'OPEN', prayedForCount: 2 },
-              { prayerId: 'p2', prayerText: 'B', assignedGroupId: null, status: 'CLOSED', prayedForCount: 0 }
+              {
+                prayerId: 'p1',
+                prayerText: 'A',
+                assignedGroupId: 'g1',
+                status: 'OPEN',
+                prayedForCount: 2,
+              },
+              {
+                prayerId: 'p2',
+                prayerText: 'B',
+                assignedGroupId: null,
+                status: 'CLOSED',
+                prayedForCount: 0,
+              },
             ],
-            totalCount: 2
+            totalCount: 2,
           }),
         });
       }
@@ -709,23 +854,38 @@ describe('Portal Auth tests', () => {
         return Promise.resolve({
           ok: true,
           json: async () => [
-            { adminId: 'a1', username: 'admin', role: 'APP_ADMIN', createdAt: '2023-01-01' },
-            { adminId: 'a2', username: 'other', role: 'GROUP_ADMIN', createdAt: '2023-01-02' }
+            {
+              adminId: 'a1',
+              username: 'admin',
+              role: 'APP_ADMIN',
+              createdAt: '2023-01-01',
+            },
+            {
+              adminId: 'a2',
+              username: 'other',
+              role: 'GROUP_ADMIN',
+              createdAt: '2023-01-02',
+            },
           ],
         });
       }
       if (url.startsWith('/api/admin/groups/g1/members')) {
-        if (options && options.method === 'DELETE') return Promise.resolve({ ok: true, status: 204 });
+        if (options && options.method === 'DELETE')
+          return Promise.resolve({ ok: true, status: 204 });
         return Promise.resolve({
           ok: true,
-          json: async () => [{ memberId: 'm1', name: 'M1', email: 'm1@test.com' }],
+          json: async () => [
+            { memberId: 'm1', name: 'M1', email: 'm1@test.com' },
+          ],
         });
       }
       if (url.startsWith('/api/admin/groups/g1')) {
-        if (options && options.method === 'DELETE') return Promise.resolve({ ok: true, status: 204 });
+        if (options && options.method === 'DELETE')
+          return Promise.resolve({ ok: true, status: 204 });
       }
       if (url.startsWith('/api/admin/admins/a2')) {
-        if (options && options.method === 'DELETE') return Promise.resolve({ ok: true, status: 204 });
+        if (options && options.method === 'DELETE')
+          return Promise.resolve({ ok: true, status: 204 });
       }
       return Promise.resolve({ ok: true, json: async () => ({}) });
     });
@@ -733,7 +893,7 @@ describe('Portal Auth tests', () => {
 
     Object.defineProperty(window, 'matchMedia', {
       writable: true,
-      value: vi.fn().mockImplementation(query => ({
+      value: vi.fn().mockImplementation((query) => ({
         matches: false,
         media: query,
         onchange: null,
@@ -811,7 +971,7 @@ describe('Portal Auth tests', () => {
     const dlQrBtn = document.getElementById('btn-download-qr');
     if (dlQrBtn) dlQrBtn.click();
 
-    // Sorting 
+    // Sorting
     const sortThs = ['th-prayer-status', 'th-prayer-count', 'th-prayer-group'];
     for (const th of sortThs) {
       document.getElementById(th)?.click();
@@ -820,10 +980,17 @@ describe('Portal Auth tests', () => {
   });
 
   it('covers auth card setup and register', async () => {
-    vi.stubGlobal('fetch', vi.fn().mockImplementation((url) => {
-      if (url === '/api/auth/status') return Promise.resolve({ ok: true, json: async () => ({ initialized: false, authenticated: false }) });
-      return Promise.resolve({ ok: true, json: async () => ({}) });
-    }));
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockImplementation((url) => {
+        if (url === '/api/auth/status')
+          return Promise.resolve({
+            ok: true,
+            json: async () => ({ initialized: false, authenticated: false }),
+          });
+        return Promise.resolve({ ok: true, json: async () => ({}) });
+      })
+    );
     await import('../portal.js');
     window.location.hash = '#register?email=test@test.com';
     document.dispatchEvent(new Event('DOMContentLoaded'));
@@ -831,14 +998,233 @@ describe('Portal Auth tests', () => {
 
     const regEmail = document.getElementById('register-email');
     if (regEmail) expect(regEmail.value).toBe('test@test.com');
-    
+
     // Hash change to #login
     window.location.hash = '#login';
     window.dispatchEvent(new Event('hashchange'));
     await new Promise((resolve) => setTimeout(resolve, 50));
-    
+
     // Test the register navigation buttons
     document.getElementById('go-to-register')?.click();
     document.getElementById('go-to-login')?.click();
+  });
+
+  it('renders all tables with mobile responsive data-labels and only prayer-hands emojis', async () => {
+    const statusMock = vi.fn().mockImplementation((url) => {
+      if (url === '/api/auth/status') {
+        return Promise.resolve({
+          ok: true,
+          json: async () => ({
+            initialized: true,
+            authenticated: true,
+            role: 'APP_ADMIN',
+            username: 'admin',
+            name: 'John Admin',
+            groups: [],
+          }),
+        });
+      }
+      if (url === '/api/admin/groups') {
+        return Promise.resolve({
+          ok: true,
+          json: async () => [
+            {
+              groupId: 'g1',
+              name: 'Alpha Circle',
+              memberCount: 12,
+              passcode: 'ALPHA1',
+              optOutGeneral: false,
+              createdAt: '2026-01-01',
+            },
+            {
+              groupId: 'g2',
+              name: 'Beta Circle',
+              memberCount: 5,
+              passcode: 'BETA02',
+              optOutGeneral: true,
+              createdAt: '2026-01-02',
+            },
+          ],
+        });
+      }
+      if (url.startsWith('/api/admin/prayers')) {
+        return Promise.resolve({
+          ok: true,
+          json: async () => ({
+            items: [
+              {
+                prayerId: 'p1',
+                prayerText: 'Healing for community members',
+                assignedGroupId: 'g1',
+                status: 'OPEN',
+                prayedForCount: 7,
+                createdAt: '2026-01-01',
+                updates: [],
+              },
+              {
+                prayerId: 'p2',
+                prayerText: 'Strength during exams',
+                assignedGroupId: null,
+                status: 'CLOSED',
+                prayedForCount: 3,
+                createdAt: '2026-01-02',
+                updates: [{ updateText: 'Passed!', updatedAt: '2026-01-03' }],
+              },
+            ],
+            totalCount: 2,
+          }),
+        });
+      }
+      if (url === '/api/admin/admins') {
+        return Promise.resolve({
+          ok: true,
+          json: async () => [
+            {
+              adminId: 'a1',
+              username: 'admin',
+              role: 'APP_ADMIN',
+              createdAt: '2026-01-01',
+            },
+            {
+              adminId: 'a2',
+              username: 'groupadmin',
+              role: 'GROUP_ADMIN',
+              groupId: 'g1',
+              createdAt: '2026-01-02',
+            },
+          ],
+        });
+      }
+      if (url.startsWith('/api/admin/groups/g1/members')) {
+        return Promise.resolve({
+          ok: true,
+          json: async () => [
+            {
+              memberId: 'm1',
+              name: 'Jane Doe',
+              email: 'jane@example.com',
+              joinedAt: '2026-01-01',
+              bounced: false,
+            },
+            {
+              memberId: 'm2',
+              name: 'Bob Smith',
+              email: 'bob@example.com',
+              joinedAt: '2026-01-02',
+              bounced: true,
+            },
+          ],
+        });
+      }
+      if (url.startsWith('/api/groups/g1')) {
+        return Promise.resolve({
+          ok: true,
+          json: async () => ({
+            groupId: 'g1',
+            name: 'Alpha Circle',
+            passcode: 'ALPHA1',
+          }),
+        });
+      }
+      return Promise.resolve({ ok: true, json: async () => ({}) });
+    });
+    vi.stubGlobal('fetch', statusMock);
+
+    await import('../portal.js');
+    document.dispatchEvent(new Event('DOMContentLoaded'));
+    await new Promise((resolve) => setTimeout(resolve, 50));
+
+    // 1. Dashboard Prayers Table data-labels
+    window.location.hash = '#dashboard';
+    window.dispatchEvent(new Event('hashchange'));
+    await new Promise((resolve) => setTimeout(resolve, 50));
+
+    const prayersTbody = document.getElementById(
+      'dashboard-prayers-table-body'
+    );
+    const firstPrayerRow = prayersTbody.querySelector('tr');
+    expect(firstPrayerRow).not.toBeNull();
+    const prayerCells = firstPrayerRow.querySelectorAll('td');
+    expect(prayerCells[0].getAttribute('data-label')).toBe('Request Preview');
+    expect(prayerCells[1].getAttribute('data-label')).toBe('Assigned Circle');
+    expect(prayerCells[2].getAttribute('data-label')).toBe('Status');
+    expect(prayerCells[3].getAttribute('data-label')).toBe('Prayers');
+    expect(prayerCells[4].getAttribute('data-label')).toBe('Date Submitted');
+    expect(prayerCells[3].textContent).toContain('🙏');
+
+    // 2. Groups Table data-labels
+    window.location.hash = '#groups';
+    window.dispatchEvent(new Event('hashchange'));
+    await new Promise((resolve) => setTimeout(resolve, 50));
+
+    const groupsTbody = document.getElementById('groups-table-body');
+    const firstGroupRow = groupsTbody.querySelector('tr');
+    expect(firstGroupRow).not.toBeNull();
+    const groupCells = firstGroupRow.querySelectorAll('td');
+    expect(groupCells[0].getAttribute('data-label')).toBe('Circle Name');
+    expect(groupCells[1].getAttribute('data-label')).toBe('Intercessors');
+    expect(groupCells[2].getAttribute('data-label')).toBe('Passcode');
+    expect(groupCells[3].getAttribute('data-label')).toBe('General Prayers');
+    expect(groupCells[4].getAttribute('data-label')).toBe('Created Date');
+
+    // 3. Members Table data-labels
+    window.location.hash = '#members?groupId=g1';
+    window.dispatchEvent(new Event('hashchange'));
+    await new Promise((resolve) => setTimeout(resolve, 50));
+
+    const membersTbody = document.getElementById('members-table-body');
+    const firstMemberRow = membersTbody.querySelector('tr');
+    expect(firstMemberRow).not.toBeNull();
+    const memberCells = firstMemberRow.querySelectorAll('td');
+    expect(memberCells[0].getAttribute('data-label')).toBe('Intercessor Name');
+    expect(memberCells[1].getAttribute('data-label')).toBe('Email Address');
+    expect(memberCells[2].getAttribute('data-label')).toBe('Delivery Status');
+    expect(memberCells[3].getAttribute('data-label')).toBe('Date Joined');
+
+    // 4. Admins Table data-labels
+    window.location.hash = '#admins';
+    window.dispatchEvent(new Event('hashchange'));
+    await new Promise((resolve) => setTimeout(resolve, 50));
+
+    const adminsTbody = document.getElementById('admins-table-body');
+    const firstAdminRow = adminsTbody.querySelector('tr');
+    expect(firstAdminRow).not.toBeNull();
+    const adminCells = firstAdminRow.querySelectorAll('td');
+    expect(adminCells[0].getAttribute('data-label')).toBe('Username');
+    expect(adminCells[1].getAttribute('data-label')).toBe('System Role');
+    expect(adminCells[2].getAttribute('data-label')).toBe('Assigned Circle');
+    expect(adminCells[3].getAttribute('data-label')).toBe('Date Created');
+
+    // 5. Bulk Preview Table data-labels
+    const bulkAddBtn = document.getElementById('btn-bulk-add-trigger');
+    window.location.hash = '#members?groupId=g1';
+    window.dispatchEvent(new Event('hashchange'));
+    await new Promise((resolve) => setTimeout(resolve, 50));
+    if (bulkAddBtn) bulkAddBtn.click();
+    document.getElementById('member-bulk-textarea').value =
+      'Jane, jane@example.com\nInvalid';
+    document.getElementById('btn-member-bulk-validate')?.click();
+
+    const bulkTbody = document.getElementById('bulk-preview-table-body');
+    const firstBulkRow = bulkTbody.querySelector('tr');
+    expect(firstBulkRow).not.toBeNull();
+    const bulkCells = firstBulkRow.querySelectorAll('td');
+    expect(bulkCells[0].getAttribute('data-label')).toBe('Status');
+    expect(bulkCells[1].getAttribute('data-label')).toBe('Name');
+    expect(bulkCells[2].getAttribute('data-label')).toBe('Email');
+    expect(bulkCells[3].getAttribute('data-label')).toBe('Issue');
+
+    // 6. Verify no non-prayer emojis anywhere in rendered tables
+    const emojiRegex = /\p{Extended_Pictographic}/gu;
+    const allTableHtml =
+      prayersTbody.innerHTML +
+      groupsTbody.innerHTML +
+      membersTbody.innerHTML +
+      adminsTbody.innerHTML +
+      bulkTbody.innerHTML;
+    const emojisFound = allTableHtml.match(emojiRegex) || [];
+    const nonPrayerEmojis = emojisFound.filter((char) => char !== '🙏');
+    expect(nonPrayerEmojis).toEqual([]);
+    expect(emojisFound.length).toBeGreaterThan(0); // confirms prayer hands exists
   });
 });

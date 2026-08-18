@@ -333,18 +333,18 @@
   display: inline-flex;
   align-items: center;
   gap: var(--space-1);
-  padding: 0.2rem 0.5rem;
-  border-radius: var(--radius-sm);
+  padding: 0.25rem 0.65rem;
+  border-radius: var(--radius-full);
   font-size: var(--font-size-xs);
   font-weight: var(--font-weight-semibold);
 }
 .status-badge.open {
-  background-color: var(--color-success-bg);
-  color: var(--color-success);
+  background-color: var(--color-accent-light);
+  color: var(--color-accent);
 }
 .status-badge.closed {
-  background-color: #f3f3f8;
   color: var(--color-text-muted);
+  background-color: rgba(244, 241, 234, 0.08);
 }
 
 /* === Closed Prayer Card === */

@@ -1,5 +1,10 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { registerDevice, fetchPrayers, submitPrayer, validatePasscode } from './api';
+import {
+  registerDevice,
+  fetchPrayers,
+  submitPrayer,
+  validatePasscode,
+} from './api';
 import * as apiClient from './apiClient';
 
 describe('API Client tests', () => {
@@ -28,8 +33,13 @@ describe('API Client tests', () => {
   });
 
   it('registerDevice throws error on !res.ok', async () => {
-    vi.spyOn(apiClient, 'fetchSecureData').mockResolvedValue({ ok: false, status: 500 });
-    await expect(registerDevice('d123')).rejects.toThrow('Registration failed with status 500');
+    vi.spyOn(apiClient, 'fetchSecureData').mockResolvedValue({
+      ok: false,
+      status: 500,
+    });
+    await expect(registerDevice('d123')).rejects.toThrow(
+      'Registration failed with status 500'
+    );
   });
 
   it('fetchPrayersPassesDeviceId', async () => {
@@ -46,8 +56,13 @@ describe('API Client tests', () => {
   });
 
   it('fetchPrayers throws error on !res.ok', async () => {
-    vi.spyOn(apiClient, 'fetchSecureData').mockResolvedValue({ ok: false, status: 500 });
-    await expect(fetchPrayers('d123')).rejects.toThrow('Failed to fetch prayers: 500');
+    vi.spyOn(apiClient, 'fetchSecureData').mockResolvedValue({
+      ok: false,
+      status: 500,
+    });
+    await expect(fetchPrayers('d123')).rejects.toThrow(
+      'Failed to fetch prayers: 500'
+    );
   });
 
   it('submitPrayerSendsCorrectPayload', async () => {
@@ -57,7 +72,11 @@ describe('API Client tests', () => {
       json: async () => mockResponse,
     });
 
-    const result = await submitPrayer('This is a long prayer text of 10+ chars', 'device-123', 'group-456');
+    const result = await submitPrayer(
+      'This is a long prayer text of 10+ chars',
+      'device-123',
+      'group-456'
+    );
 
     expect(fetchMock).toHaveBeenCalledWith('/api/prayers', {
       method: 'POST',
@@ -71,12 +90,19 @@ describe('API Client tests', () => {
   });
 
   it('submitPrayer throws error if text is too short', async () => {
-    await expect(submitPrayer('short', 'd123')).rejects.toThrow('Prayer text must be at least 10 characters long');
+    await expect(submitPrayer('short', 'd123')).rejects.toThrow(
+      'Prayer text must be at least 10 characters long'
+    );
   });
 
   it('submitPrayer throws error on !res.ok', async () => {
-    vi.spyOn(apiClient, 'fetchSecureData').mockResolvedValue({ ok: false, status: 500 });
-    await expect(submitPrayer('This is a long prayer text of 10+ chars', 'd123')).rejects.toThrow('Submission failed with status 500');
+    vi.spyOn(apiClient, 'fetchSecureData').mockResolvedValue({
+      ok: false,
+      status: 500,
+    });
+    await expect(
+      submitPrayer('This is a long prayer text of 10+ chars', 'd123')
+    ).rejects.toThrow('Submission failed with status 500');
   });
 
   it('validatePasscodeReturnsGroupOnSuccess', async () => {
@@ -89,7 +115,9 @@ describe('API Client tests', () => {
 
     const result = await validatePasscode('AAABBB');
 
-    expect(fetchMock).toHaveBeenCalledWith('/api/groups/validate?passcode=AAABBB');
+    expect(fetchMock).toHaveBeenCalledWith(
+      '/api/groups/validate?passcode=AAABBB'
+    );
     expect(result).toEqual(mockGroup);
   });
 
@@ -101,16 +129,25 @@ describe('API Client tests', () => {
 
     const result = await validatePasscode('NOTFND');
 
-    expect(fetchMock).toHaveBeenCalledWith('/api/groups/validate?passcode=NOTFND');
+    expect(fetchMock).toHaveBeenCalledWith(
+      '/api/groups/validate?passcode=NOTFND'
+    );
     expect(result).toBeNull();
   });
 
   it('validatePasscode throws error if passcode length is invalid', async () => {
-    await expect(validatePasscode('123')).rejects.toThrow('Passcode must be exactly 6 characters');
+    await expect(validatePasscode('123')).rejects.toThrow(
+      'Passcode must be exactly 6 characters'
+    );
   });
 
   it('validatePasscode throws error on !res.ok', async () => {
-    vi.spyOn(apiClient, 'fetchSecureData').mockResolvedValue({ ok: false, status: 500 });
-    await expect(validatePasscode('AAABBB')).rejects.toThrow('Passcode validation failed: 500');
+    vi.spyOn(apiClient, 'fetchSecureData').mockResolvedValue({
+      ok: false,
+      status: 500,
+    });
+    await expect(validatePasscode('AAABBB')).rejects.toThrow(
+      'Passcode validation failed: 500'
+    );
   });
 });

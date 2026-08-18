@@ -13,7 +13,9 @@ document.addEventListener('DOMContentLoaded', () => {
   const loadingText = document.getElementById('loading-text');
   const card = document.getElementById('prayer-display-card');
   const prayContainer = document.getElementById('pray-container');
-  const statusMessageContainer = document.getElementById('status-message-container');
+  const statusMessageContainer = document.getElementById(
+    'status-message-container'
+  );
   const groupHeaderTitle = document.getElementById('group-header-title');
 
   // Extract parameters from URL path: /pray/prayerId/token
@@ -48,7 +50,7 @@ document.addEventListener('DOMContentLoaded', () => {
     showError('This link is invalid. Malformed intercessor token.');
     return;
   }
-  
+
   let expiryTimestamp;
   let tokenGroupId = null;
   if (parts.length === 3) {
@@ -88,20 +90,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
       const activeGroupId = tokenGroupId || prayer.assignedGroupId;
       renderPrayer(prayer, decodedToken);
-      
+
       if (activeGroupId) {
         // Fetch group details to display the group name
         fetch(`/api/groups/${activeGroupId}`)
-          .then(res => {
+          .then((res) => {
             if (res.ok) return res.json();
             return null;
           })
-          .then(group => {
+          .then((group) => {
             if (group && group.name && groupHeaderTitle) {
               groupHeaderTitle.textContent = `${group.name}`;
             }
           })
-          .catch(err => console.error('Error fetching group info', err));
+          .catch((err) => console.error('Error fetching group info', err));
 
         fetchOtherPrayers(activeGroupId, decodedToken, finalPrayerId);
       }
@@ -117,9 +119,8 @@ document.addEventListener('DOMContentLoaded', () => {
       if (loadingEl) {
         loadingEl.parentElement.innerHTML = `
           <div class="text-center" style="padding: var(--space-4);">
-            <span style="font-size: var(--font-size-3xl);">⚠️</span>
-            <h3 class="font-display mt-4 mb-4" style="color: var(--color-error); font-size: var(--font-size-lg);">Error</h3>
-            <p class="color-text-secondary" style="font-weight: 300; line-height: 1.6;">${msg}</p>
+            <h3 class="font-display mb-4" style="color: var(--color-error); font-size: var(--font-size-lg);">Error</h3>
+            <p class="color-text-secondary" style="font-weight: 300; line-height: 1.6;">${escapeHtml(msg)}</p>
           </div>
         `;
       }
@@ -128,9 +129,11 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function fetchOtherPrayers(groupId, tokenVal, primaryPrayerId) {
-    const otherPrayersContainer = document.getElementById('other-prayers-container');
+    const otherPrayersContainer = document.getElementById(
+      'other-prayers-container'
+    );
     const otherPrayersList = document.getElementById('other-prayers-list');
-    
+
     fetch(`/api/prayers/group/${groupId}?token=${encodeURIComponent(tokenVal)}`)
       .then((res) => {
         if (!res.ok) {
@@ -139,18 +142,22 @@ document.addEventListener('DOMContentLoaded', () => {
         return res.json();
       })
       .then((prayers) => {
-        const filteredPrayers = prayers.filter(p => p.prayerId !== primaryPrayerId);
-        
+        const filteredPrayers = prayers.filter(
+          (p) => p.prayerId !== primaryPrayerId
+        );
+
         if (filteredPrayers.length === 0) {
-          if (otherPrayersContainer) otherPrayersContainer.style.display = 'none';
+          if (otherPrayersContainer)
+            otherPrayersContainer.style.display = 'none';
           return;
         }
-        
-        if (otherPrayersContainer) otherPrayersContainer.style.display = 'block';
+
+        if (otherPrayersContainer)
+          otherPrayersContainer.style.display = 'block';
         if (otherPrayersList) {
           otherPrayersList.innerHTML = '';
-          
-          filteredPrayers.forEach(prayer => {
+
+          filteredPrayers.forEach((prayer) => {
             const item = document.createElement('div');
             item.className = 'card';
             item.style.padding = 'var(--space-4)';
@@ -158,10 +165,10 @@ document.addEventListener('DOMContentLoaded', () => {
             item.style.display = 'flex';
             item.style.flexDirection = 'column';
             item.style.gap = 'var(--space-3)';
-            
+
             item.innerHTML = `
               <p style="font-weight: 300; line-height: 1.5; color: var(--color-text-primary); white-space: pre-wrap; font-size: var(--font-size-sm); margin: 0;">
-                "${prayer.prayerText}"
+                "${escapeHtml(prayer.prayerText)}"
               </p>
               <div class="flex justify-between items-center" style="border-top: 1px solid rgba(18, 44, 38, 0.03); padding-top: var(--space-2); margin-top: auto;">
                 <button class="btn-primary inline-pray-btn" data-id="${prayer.prayerId}" style="min-height: 36px; padding: 0.4rem 1.2rem; font-size: var(--font-size-xs);">
@@ -172,38 +179,41 @@ document.addEventListener('DOMContentLoaded', () => {
                 </div>
               </div>
             `;
-            
+
             otherPrayersList.appendChild(item);
-            
+
             const btn = item.querySelector('.inline-pray-btn');
             const countVal = item.querySelector('.count-val');
-            
+
             btn.addEventListener('click', (e) => {
               btn.disabled = true;
               btn.textContent = '...';
-              
+
               fetch(`/api/prayers/${prayer.prayerId}/prayed`, {
                 method: 'POST',
                 headers: {
-                  'Content-Type': 'application/json'
+                  'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ intercessorToken: tokenVal })
+                body: JSON.stringify({ intercessorToken: tokenVal }),
               })
-                .then(res => {
+                .then((res) => {
                   if (res.status === 409) throw new Error('ALREADY_PRAYED');
                   if (!res.ok) throw new Error('Failed to record prayer');
                   return res.json();
                 })
-                .then(data => {
+                .then((data) => {
                   countVal.textContent = data.prayedForCount;
                   btn.textContent = '✓';
                   btn.style.backgroundColor = 'var(--color-success)';
                   btn.style.borderColor = 'transparent';
                   btn.style.color = 'var(--color-text-inverse)';
                   triggerEmojiBurst(e, btn);
-                  showToast('Thank you! Your prayer has been recorded.', 'success');
+                  showToast(
+                    'Thank you! Your prayer has been recorded.',
+                    'success'
+                  );
                 })
-                .catch(err => {
+                .catch((err) => {
                   btn.disabled = false;
                   btn.textContent = 'Pray';
                   if (err.message === 'ALREADY_PRAYED') {
@@ -211,7 +221,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     btn.textContent = '✓';
                     btn.style.backgroundColor = 'var(--color-secondary)';
                     btn.style.color = 'var(--color-text-primary)';
-                    showToast("You've already recorded your prayer for this request.", 'info');
+                    showToast(
+                      "You've already recorded your prayer for this request.",
+                      'info'
+                    );
                   } else {
                     showToast(err.message, 'error');
                   }
@@ -220,7 +233,7 @@ document.addEventListener('DOMContentLoaded', () => {
           });
         }
       })
-      .catch(err => {
+      .catch((err) => {
         console.error('Error fetching other group prayers:', err);
       });
   }
@@ -236,7 +249,7 @@ document.addEventListener('DOMContentLoaded', () => {
         updateHtml = `
           <div class="mt-6 mb-6" style="background: rgba(74, 222, 128, 0.08); border-left: 4px solid var(--color-success); padding: var(--space-4); border-radius: 0 var(--radius-sm) var(--radius-sm) 0; text-align: left;">
             <p style="font-weight: 600; font-size: var(--font-size-sm); margin-bottom: var(--space-2); color: var(--color-text-primary);">The requester shared this update:</p>
-            <p style="font-style: italic; line-height: 1.6; color: var(--color-text-secondary); white-space: pre-wrap;">"${latestUpdate.updateText}"</p>
+            <p style="font-style: italic; line-height: 1.6; color: var(--color-text-secondary); white-space: pre-wrap;">"${escapeHtml(latestUpdate.updateText)}"</p>
           </div>
         `;
       }
@@ -244,7 +257,7 @@ document.addEventListener('DOMContentLoaded', () => {
       card.innerHTML = `
         <div style="text-align: center;">
           <blockquote class="mb-6 font-display" style="font-size: var(--font-size-xl); font-style: italic; line-height: 1.6; color: var(--color-text-primary); border: none; padding: 0;">
-            "${prayer.prayerText}"
+            "${escapeHtml(prayer.prayerText)}"
           </blockquote>
           ${updateHtml}
           <div style="border-top: 1px solid rgba(18, 44, 38, 0.05); padding-top: var(--space-4); color: var(--color-text-secondary); font-weight: 300;">
@@ -259,7 +272,7 @@ document.addEventListener('DOMContentLoaded', () => {
     card.innerHTML = `
       <div>
         <blockquote class="mb-8 font-display" id="prayer-text" style="font-size: var(--font-size-xl); font-style: italic; line-height: 1.6; color: var(--color-text-primary); text-align: center; border: none; padding: 0;">
-          "${prayer.prayerText}"
+          "${escapeHtml(prayer.prayerText)}"
         </blockquote>
         
         <div id="thank-you-message" style="display: none; text-align: center; margin-bottom: var(--space-6); background: rgba(74, 222, 128, 0.08); border: 1px solid var(--color-success); border-radius: var(--radius-sm); padding: var(--space-4);">
@@ -379,7 +392,7 @@ function triggerEmojiBurst(event, anchorElement) {
     return;
   }
   const burstCount = 6;
-  const emojis = ['🙏', '✨', '🤍', '🕊️', '🌸'];
+  const emojis = ['🙏'];
 
   for (let i = 0; i < burstCount; i++) {
     const floating = document.createElement('span');
@@ -426,4 +439,14 @@ function showToast(message, type = 'info') {
       toast.remove();
     });
   }, 4000);
+}
+
+function escapeHtml(str) {
+  if (!str) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
 }

@@ -15,7 +15,9 @@ describe('formatDate', () => {
 
   it('handles exceptions gracefully', () => {
     const throwingObj = {
-      toString: () => { throw new Error('stub'); }
+      toString: () => {
+        throw new Error('stub');
+      },
     };
     expect(formatDate(throwingObj)).toBe('');
   });
