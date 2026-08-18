@@ -102,7 +102,10 @@ export class ComputeStack extends cdk.Stack {
     props.groupMembersTable.grantReadData(this.identityServiceAlias);
 
     // 2. group-service
-    const groupSvc = createLambda('group-service', {}, true);
+    const groupSvc = createLambda('group-service', {
+      AWS_EVENTBRIDGE_BUS: props.eventBus.eventBusName,
+      AWS_EVENTBRIDGE_BUS_NAME: props.eventBus.eventBusName,
+    }, true);
     this.groupServiceAlias = groupSvc.alias;
     this.groupFunctionUrl = groupSvc.functionUrl!;
     props.groupsTable.grantReadWriteData(this.groupServiceAlias);
