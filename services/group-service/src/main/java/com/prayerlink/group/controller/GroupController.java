@@ -26,10 +26,12 @@ import software.amazon.awssdk.services.eventbridge.model.PutEventsRequest;
 import software.amazon.awssdk.services.eventbridge.model.PutEventsRequestEntry;
 import software.amazon.awssdk.services.eventbridge.model.PutEventsResponse;
 import tools.jackson.databind.ObjectMapper;
+import org.springframework.aot.hint.annotation.RegisterReflectionForBinding;
 
 @RestController
 @RequestMapping("/api/groups")
 @Validated
+@RegisterReflectionForBinding({MemberAddedEvent.class, GroupDTO.class, GroupMemberDTO.class})
 public class GroupController {
 
     private static final Logger log = LoggerFactory.getLogger(GroupController.class);

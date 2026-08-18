@@ -8,6 +8,9 @@ import software.amazon.awssdk.services.eventbridge.model.PutEventsRequest;
 import software.amazon.awssdk.services.eventbridge.model.PutEventsRequestEntry;
 import software.amazon.awssdk.services.eventbridge.model.PutEventsResponse;
 import tools.jackson.databind.ObjectMapper;
+import org.springframework.aot.hint.annotation.RegisterReflectionForBinding;
+import com.prayerlink.common.event.PrayerCreatedEvent;
+import com.prayerlink.common.event.PrayerUpdatedEvent;
 
 /**
  * Publishes domain events to AWS EventBridge. Failures are logged but never propagated — events are
@@ -15,6 +18,7 @@ import tools.jackson.databind.ObjectMapper;
  */
 @Slf4j
 @Component
+@RegisterReflectionForBinding({PrayerCreatedEvent.class, PrayerUpdatedEvent.class})
 public class PrayerEventPublisher {
 
     private final EventBridgeClient eventBridgeClient;

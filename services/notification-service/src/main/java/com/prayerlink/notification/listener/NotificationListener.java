@@ -3,6 +3,7 @@ package com.prayerlink.notification.listener;
 import com.prayerlink.common.dto.GroupDTO;
 import com.prayerlink.common.dto.GroupMemberDTO;
 import com.prayerlink.common.dto.PrayerDTO;
+import com.prayerlink.common.event.MemberAddedEvent;
 import com.prayerlink.common.event.PrayerCreatedEvent;
 import com.prayerlink.common.event.PrayerUpdatedEvent;
 import com.prayerlink.common.util.UrlUtils;
@@ -24,8 +25,15 @@ import software.amazon.awssdk.services.ses.SesClient;
 import software.amazon.awssdk.services.ses.model.*;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.ObjectMapper;
+import org.springframework.aot.hint.annotation.RegisterReflectionForBinding;
 
 @Component
+@RegisterReflectionForBinding({
+    MemberAddedEvent.class,
+    PrayerCreatedEvent.class,
+    PrayerUpdatedEvent.class,
+    GroupMemberDTO.class
+})
 public class NotificationListener {
 
     private static final Logger log = LoggerFactory.getLogger(NotificationListener.class);

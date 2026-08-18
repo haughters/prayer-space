@@ -7,11 +7,13 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.aot.hint.annotation.RegisterReflectionForBinding;
 
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@RegisterReflectionForBinding(PrayerUpdatedEvent.class)
 public class PrayerUpdatedEvent {
     private UUID prayerId;
     private String updateText;
