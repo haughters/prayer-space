@@ -70,11 +70,17 @@ public class AwsSigV4Interceptor implements ClientHttpRequestInterceptor {
         // Convert Spring HttpRequest → AWS SDK SdkHttpFullRequest
         SdkHttpFullRequest.Builder sdkBuilder = SdkHttpFullRequest.builder()
                 .uri(normalizedUri)
-                .method(SdkHttpMethod.fromValue(request.getMethod().name()));
+                .method(SdkHttpMethod.fromValue(request.getMethod().name()))
+                .appendHeader("Host", normalizedUri.getHost());
 
+        // Only include canonical AWS headers in SigV4 SignedHeaders (Content-Type, Content-MD5, and x-amz-*)
+        // Exclude client-negotiation headers (like Accept, User-Agent) which are normalized/rewritten by HTTP gateways
         request.getHeaders().forEach((name, values) -> {
-            for (String value : values) {
-                sdkBuilder.appendHeader(name, value);
+            String lower = name.toLowerCase();
+            if (lower.equals("content-type") || lower.equals("content-md5") || lower.startsWith("x-amz-")) {
+                for (String value : values) {
+                    sdkBuilder.appendHeader(name, value);
+                }
             }
         });
 
@@ -91,7 +97,10 @@ public class AwsSigV4Interceptor implements ClientHttpRequestInterceptor {
 
         SdkHttpRequest signed = signedRequest.request();
         HttpHeaders signedHeaders = new HttpHeaders();
-        signed.headers().forEach((name, values) -> signedHeaders.addAll(name, new ArrayList<>(values)));
+        // Preserve original request headers (e.g. Accept, Custom headers)
+        request.getHeaders().forEach(signedHeaders::addAll);
+        // Overlay SigV4 signed headers (Authorization, X-Amz-Date, X-Amz-Security-Token, etc.)
+        signed.headers().forEach((name, values) -> signedHeaders.put(name, new ArrayList<>(values)));
 
         HttpRequest wrappedRequest = new HttpRequestWrapper(request) {
             @Override

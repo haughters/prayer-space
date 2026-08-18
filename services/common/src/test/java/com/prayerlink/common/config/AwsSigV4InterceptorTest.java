@@ -24,19 +24,26 @@ public class AwsSigV4InterceptorTest {
                 StaticCredentialsProvider.create(AwsSessionCredentials.create(
                         "ASIATEMPKEY", "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY", "SESSIONTOKEN123")));
 
-        // Intentionally test with double slash URL
+        // Intentionally test with double slash URL and Accept header
         MockClientHttpRequest request = new MockClientHttpRequest(
                 HttpMethod.GET,
                 URI.create("https://qltqrgv27bov7jm2ivjbevyegy0lvqwk.lambda-url.eu-west-1.on.aws//api/groups"));
+        request.getHeaders().set("Accept", "application/json, application/*+json");
 
         ClientHttpRequestExecution execution = (req, body) -> {
             assertEquals(
                     URI.create("https://qltqrgv27bov7jm2ivjbevyegy0lvqwk.lambda-url.eu-west-1.on.aws/api/groups"),
                     req.getURI());
-            assertNotNull(req.getHeaders().getFirst("Authorization"));
+            assertEquals(
+                    "application/json, application/*+json", req.getHeaders().getFirst("Accept"));
+            String authHeader = req.getHeaders().getFirst("Authorization");
+            assertNotNull(authHeader);
             assertNotNull(req.getHeaders().getFirst("X-Amz-Date"));
             assertNotNull(req.getHeaders().getFirst("X-Amz-Security-Token"));
-            assertTrue(req.getHeaders().getFirst("Authorization").contains("SignedHeaders="));
+            assertTrue(authHeader.contains("SignedHeaders="));
+            // Verify Accept is not in SignedHeaders to prevent proxy normalization signature mismatches
+            assertFalse(authHeader.contains("SignedHeaders=accept") || authHeader.contains(";accept"));
+            assertTrue(authHeader.contains("host"));
             return new MockClientHttpResponse(new byte[0], org.springframework.http.HttpStatus.OK);
         };
 
