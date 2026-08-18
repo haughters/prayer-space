@@ -4,6 +4,11 @@ server:
 spring:
   application:
     name: notification-service
+  cloud:
+    aws:
+      sqs:
+        listener:
+          auto-startup: false
 
 management:
   health:
@@ -16,11 +21,21 @@ management:
   endpoint:
     health:
       show-details: always
+  observations:
+    http:
+      server:
+        requests:
+          enabled: false
 ---
 spring:
   config:
     activate:
       on-profile: local
+  cloud:
+    aws:
+      sqs:
+        listener:
+          auto-startup: true
 
 aws:
   sqs:
