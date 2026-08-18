@@ -29,6 +29,7 @@ import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.server.ResponseStatusException;
 
 @ExtendWith(MockitoExtension.class)
 public class AdminControllerTest {
@@ -53,6 +54,7 @@ public class AdminControllerTest {
     private final String secret = "secret12345678901234567890123456";
     private final UUID adminId = UUID.randomUUID();
     private final UUID groupId = UUID.randomUUID();
+    private final UUID otherGroupId = UUID.randomUUID();
     private final UUID prayerId = UUID.randomUUID();
     private final UUID memberId = UUID.randomUUID();
 
@@ -185,6 +187,22 @@ public class AdminControllerTest {
     }
 
     @Test
+    void testCreateGroupAdmin_Success() {
+        mockJwtVerification(validAdminToken);
+        when(adminRepository.findByUsername("grpadmin")).thenReturn(Optional.empty());
+        when(passwordEncoder.encode("secretpass")).thenReturn("encoded");
+
+        Map<String, String> body = Map.of(
+                "username", "grpadmin",
+                "password", "secretpass",
+                "role", "GROUP_ADMIN",
+                "groupId", groupId.toString());
+        ResponseEntity<?> res = controller.createAdmin(validAdminToken, body);
+        assertEquals(HttpStatus.CREATED, res.getStatusCode());
+        verify(adminRepository).save(any(Admin.class));
+    }
+
+    @Test
     void testDeleteAdmin_CannotDeleteSelf() {
         mockJwtVerification(validAdminToken);
 
@@ -206,9 +224,20 @@ public class AdminControllerTest {
         when(prayerRepository.findUpdatesByPrayerId(prayerId)).thenReturn(Collections.emptyList());
 
         ResponseEntity<Map<String, Object>> res =
-                controller.getPrayers(validAdminToken, 0, 20, "OPEN", null, null, null);
+                controller.getPrayers(validAdminToken, 0, 20, "OPEN", null, "2026-01-01", "2026-01-31");
         assertEquals(HttpStatus.OK, res.getStatusCode());
         assertEquals(1, res.getBody().get("totalCount"));
+    }
+
+    @Test
+    void testGetPrayers_AsGroupAdmin() {
+        mockJwtVerification(validGroupAdminToken);
+
+        when(prayerRepository.searchPrayers(any(), eq(groupId), any(), any())).thenReturn(Collections.emptyList());
+
+        ResponseEntity<Map<String, Object>> res =
+                controller.getPrayers(validGroupAdminToken, 0, 20, null, null, null, null);
+        assertEquals(HttpStatus.OK, res.getStatusCode());
     }
 
     @Test
@@ -272,8 +301,7 @@ public class AdminControllerTest {
     void testUpdateGroup_AsGroupAdmin_ForbiddenForOtherGroup() {
         mockJwtVerification(validGroupAdminToken);
 
-        UUID otherGroup = UUID.randomUUID();
-        ResponseEntity<?> response = controller.updateGroup(validGroupAdminToken, otherGroup, new GroupDTO());
+        ResponseEntity<?> response = controller.updateGroup(validGroupAdminToken, otherGroupId, new GroupDTO());
         assertEquals(HttpStatus.FORBIDDEN, response.getStatusCode());
     }
 
@@ -287,7 +315,7 @@ public class AdminControllerTest {
     }
 
     @Test
-    void testRegeneratePasscode() {
+    void testRegeneratePasscode_AsAppAdmin() {
         mockJwtVerification(validAdminToken);
 
         ResponseEntity<?> response = controller.regeneratePasscode(validAdminToken, groupId);
@@ -296,7 +324,23 @@ public class AdminControllerTest {
     }
 
     @Test
-    void testGetMembers() {
+    void testRegeneratePasscode_AsGroupAdmin_Success() {
+        mockJwtVerification(validGroupAdminToken);
+
+        ResponseEntity<?> response = controller.regeneratePasscode(validGroupAdminToken, groupId);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+    }
+
+    @Test
+    void testRegeneratePasscode_AsGroupAdmin_ForbiddenForOtherGroup() {
+        mockJwtVerification(validGroupAdminToken);
+
+        ResponseEntity<?> response = controller.regeneratePasscode(validGroupAdminToken, otherGroupId);
+        assertEquals(HttpStatus.FORBIDDEN, response.getStatusCode());
+    }
+
+    @Test
+    void testGetMembers_AsAppAdmin() {
         mockJwtVerification(validAdminToken);
 
         GroupMemberDTO m =
@@ -307,6 +351,28 @@ public class AdminControllerTest {
 
         ResponseEntity<?> response = controller.getMembers(validAdminToken, groupId);
         assertEquals(HttpStatus.OK, response.getStatusCode());
+    }
+
+    @Test
+    void testGetMembers_AsGroupAdmin_Success() {
+        mockJwtVerification(validGroupAdminToken);
+
+        GroupMemberDTO m =
+                GroupMemberDTO.builder().memberId(memberId).name("Bob").build();
+        when(restTemplate.exchange(
+                        contains("/members"), eq(HttpMethod.GET), isNull(), any(ParameterizedTypeReference.class)))
+                .thenReturn(ResponseEntity.ok(List.of(m)));
+
+        ResponseEntity<?> response = controller.getMembers(validGroupAdminToken, groupId);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+    }
+
+    @Test
+    void testGetMembers_AsGroupAdmin_ForbiddenForOtherGroup() {
+        mockJwtVerification(validGroupAdminToken);
+
+        ResponseEntity<?> response = controller.getMembers(validGroupAdminToken, otherGroupId);
+        assertEquals(HttpStatus.FORBIDDEN, response.getStatusCode());
     }
 
     @Test
@@ -325,6 +391,18 @@ public class AdminControllerTest {
     }
 
     @Test
+    void testAddMember_AsGroupAdmin_ForbiddenForOtherGroup() {
+        mockJwtVerification(validGroupAdminToken);
+
+        GroupMemberDTO dto = GroupMemberDTO.builder()
+                .email("valid@example.com")
+                .name("Valid")
+                .build();
+        ResponseEntity<?> response = controller.addMember(validGroupAdminToken, otherGroupId, dto);
+        assertEquals(HttpStatus.FORBIDDEN, response.getStatusCode());
+    }
+
+    @Test
     void testAddMember_InvalidEmail() {
         mockJwtVerification(validAdminToken);
 
@@ -334,7 +412,7 @@ public class AdminControllerTest {
     }
 
     @Test
-    void testBulkAddMembers() {
+    void testBulkAddMembers_AsAppAdmin() {
         mockJwtVerification(validAdminToken);
 
         Map<String, List<Map<String, String>>> body = Map.of(
@@ -352,7 +430,18 @@ public class AdminControllerTest {
     }
 
     @Test
-    void testRemoveMember() {
+    void testBulkAddMembers_AsGroupAdmin_ForbiddenForOtherGroup() {
+        mockJwtVerification(validGroupAdminToken);
+
+        Map<String, List<Map<String, String>>> body =
+                Map.of("members", List.of(Map.of("name", "User1", "email", "user1@example.com")));
+
+        ResponseEntity<?> response = controller.bulkAddMembers(validGroupAdminToken, otherGroupId, body);
+        assertEquals(HttpStatus.FORBIDDEN, response.getStatusCode());
+    }
+
+    @Test
+    void testRemoveMember_AsAppAdmin() {
         mockJwtVerification(validAdminToken);
 
         ResponseEntity<?> response = controller.removeMember(validAdminToken, groupId, memberId);
@@ -361,7 +450,24 @@ public class AdminControllerTest {
     }
 
     @Test
+    void testRemoveMember_AsGroupAdmin_Success() {
+        mockJwtVerification(validGroupAdminToken);
+
+        ResponseEntity<?> response = controller.removeMember(validGroupAdminToken, groupId, memberId);
+        assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
+        verify(restTemplate).delete(contains("/members/" + memberId));
+    }
+
+    @Test
+    void testRemoveMember_AsGroupAdmin_ForbiddenForOtherGroup() {
+        mockJwtVerification(validGroupAdminToken);
+
+        ResponseEntity<?> response = controller.removeMember(validGroupAdminToken, otherGroupId, memberId);
+        assertEquals(HttpStatus.FORBIDDEN, response.getStatusCode());
+    }
+
+    @Test
     void testCheckAuth_MissingTokenThrows() {
-        assertThrows(org.springframework.web.server.ResponseStatusException.class, () -> controller.getGroups(null));
+        assertThrows(ResponseStatusException.class, () -> controller.getGroups(null));
     }
 }
