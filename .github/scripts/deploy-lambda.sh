@@ -107,21 +107,16 @@ get_dependency_url() {
   echo "$url"
 }
 
-URL_GROUP_SERVICE="http://localhost:8083"
-URL_PRAYER_SERVICE="http://localhost:8082"
+# Group Service URL
+if [ "$SVC" != "group-service" ]; then
+  URL_GROUP_SERVICE=$(get_dependency_url "group-service")
+  [ -z "$URL_GROUP_SERVICE" ] && URL_GROUP_SERVICE="http://localhost:8083"
+fi
 
-if [ "${HAS_URL:-}" = "true" ]; then
-  # Group Service URL
-  if [ "$SVC" != "group-service" ]; then
-    URL_GROUP_SERVICE=$(get_dependency_url "group-service")
-    [ -z "$URL_GROUP_SERVICE" ] && URL_GROUP_SERVICE="http://localhost"
-  fi
-  
-  # Prayer Service URL
-  if [ "$SVC" = "admin-service" ] || [ "$SVC" = "notification-service" ]; then
-    URL_PRAYER_SERVICE=$(get_dependency_url "prayer-service")
-    [ -z "$URL_PRAYER_SERVICE" ] && URL_PRAYER_SERVICE="http://localhost"
-  fi
+# Prayer Service URL
+if [ "$SVC" = "admin-service" ] || [ "$SVC" = "notification-service" ]; then
+  URL_PRAYER_SERVICE=$(get_dependency_url "prayer-service")
+  [ -z "$URL_PRAYER_SERVICE" ] && URL_PRAYER_SERVICE="http://localhost:8082"
 fi
 
 # 3. Configure Environment Variables
@@ -131,7 +126,12 @@ ENV_VARS="${ENV_VARS},APP_TABLE_PREFIX=${TABLE_PREFIX}"
 [ -n "${PR_NUMBER:-}" ] && ENV_VARS="${ENV_VARS},PR_NUMBER=${PR_NUMBER}"
 
 case "$SVC" in
+  group-service)
+    ENV_VARS="${ENV_VARS},AWS_EVENTBRIDGE_BUS=${BUS_ENV}-prayer-link-bus"
+    ENV_VARS="${ENV_VARS},AWS_EVENTBRIDGE_BUS_NAME=${BUS_ENV}-prayer-link-bus"
+    ;;
   prayer-service)
+    ENV_VARS="${ENV_VARS},AWS_EVENTBRIDGE_BUS=${BUS_ENV}-prayer-link-bus"
     ENV_VARS="${ENV_VARS},AWS_EVENTBRIDGE_BUS_NAME=${BUS_ENV}-prayer-link-bus"
     ENV_VARS="${ENV_VARS},SERVICES_GROUP_SERVICE_URL=${URL_GROUP_SERVICE}"
     ;;
@@ -149,6 +149,10 @@ case "$SVC" in
     ENV_VARS="${ENV_VARS},AWS_SQS_BOUNCE_QUEUE=${SQS_ENV}-bounce-queue"
     ENV_VARS="${ENV_VARS},SERVICES_GROUP_SERVICE_URL=${URL_GROUP_SERVICE}"
     ENV_VARS="${ENV_VARS},SERVICES_PRAYER_SERVICE_URL=${URL_PRAYER_SERVICE}"
+    ENV_VARS="${ENV_VARS},APP_DOMAIN=d1cxrvnhii2caq.cloudfront.net"
+    if [ -n "${APP_MAIL_FROM:-}" ]; then
+      ENV_VARS="${ENV_VARS},APP_MAIL_FROM=${APP_MAIL_FROM}"
+    fi
     ;;
 esac
 
