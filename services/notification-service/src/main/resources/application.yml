@@ -12,7 +12,7 @@ spring:
     aws:
       sqs:
         listener:
-          auto-startup: false
+          auto-startup: true
 
 management:
   health:
