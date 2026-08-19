@@ -173,6 +173,7 @@ export class ComputeStack extends cdk.Stack {
     // Pass Queue Names to Notification Listener SpEL
     notificationSvc.fn.addEnvironment('AWS_SQS_NOTIFICATION_QUEUE', props.notificationQueue.queueName);
     notificationSvc.fn.addEnvironment('AWS_SQS_BOUNCE_QUEUE', props.bounceQueue.queueName);
+    notificationSvc.fn.addEnvironment('APP_DOMAIN', 'd1cxrvnhii2caq.cloudfront.net');
     if (process.env.APP_MAIL_FROM) {
       notificationSvc.fn.addEnvironment('APP_MAIL_FROM', process.env.APP_MAIL_FROM);
     }
