@@ -34,34 +34,41 @@ public class SqsLambdaEventFilter implements Filter {
         HttpServletRequest httpRequest = (HttpServletRequest) request;
         HttpServletResponse httpResponse = (HttpServletResponse) response;
 
-        try {
-            byte[] bodyBytes = httpRequest.getInputStream().readAllBytes();
-            if (bodyBytes != null && bodyBytes.length > 0) {
-                JsonNode root = objectMapper.readTree(bodyBytes);
-                if (root != null
-                        && root.has("Records")
-                        && root.path("Records").isArray()
-                        && !root.path("Records").isEmpty()) {
-                    log.info(
-                            "SqsLambdaEventFilter: Processing SQS event with {} records",
-                            root.path("Records").size());
-                    for (JsonNode record : root.path("Records")) {
-                        String body = record.path("body").asText();
-                        String eventSourceArn = record.path("eventSourceARN").asText();
-                        if (eventSourceArn != null && eventSourceArn.contains("bounce")) {
-                            notificationListener.listenToBounces(body);
-                        } else {
-                            notificationListener.listenToNotifications(body);
+        // If HTTP method is null or empty, this is a non-HTTP Lambda invocation (e.g. SQS Event Source Mapping)
+        if (httpRequest.getMethod() == null || httpRequest.getMethod().isBlank()) {
+            log.info("SqsLambdaEventFilter: Intercepting non-HTTP Lambda event (null HTTP method)");
+            try {
+                byte[] bodyBytes = httpRequest.getInputStream().readAllBytes();
+                if (bodyBytes != null && bodyBytes.length > 0) {
+                    JsonNode root = objectMapper.readTree(bodyBytes);
+                    if (root != null
+                            && root.has("Records")
+                            && root.path("Records").isArray()
+                            && !root.path("Records").isEmpty()) {
+                        log.info(
+                                "SqsLambdaEventFilter: Processing SQS event with {} records",
+                                root.path("Records").size());
+                        for (JsonNode record : root.path("Records")) {
+                            String body = record.path("body").asText();
+                            String eventSourceArn =
+                                    record.path("eventSourceARN").asText();
+                            if (eventSourceArn != null && eventSourceArn.contains("bounce")) {
+                                notificationListener.listenToBounces(body);
+                            } else {
+                                notificationListener.listenToNotifications(body);
+                            }
                         }
                     }
-                    httpResponse.setStatus(HttpServletResponse.SC_OK);
-                    httpResponse.setContentType("application/json");
-                    httpResponse.getOutputStream().write("{\"batchItemFailures\":[]}".getBytes(StandardCharsets.UTF_8));
-                    return;
                 }
+            } catch (Exception e) {
+                log.warn("SqsLambdaEventFilter: Error inspecting Lambda event body: {}", e.getMessage());
             }
-        } catch (Exception e) {
-            log.debug("Not an SQS JSON payload or error reading body: {}", e.getMessage());
+
+            // Immediately complete response with 200 OK so FrameworkServlet is NEVER invoked with null method
+            httpResponse.setStatus(HttpServletResponse.SC_OK);
+            httpResponse.setContentType("application/json");
+            httpResponse.getOutputStream().write("{\"batchItemFailures\":[]}".getBytes(StandardCharsets.UTF_8));
+            return;
         }
 
         chain.doFilter(request, response);
