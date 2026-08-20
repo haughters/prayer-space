@@ -43,6 +43,12 @@
             <groupId>software.amazon.awssdk</groupId>
             <artifactId>ses</artifactId>
         </dependency>
+        <!-- Provided: AOT scans HeaderToCookieFilter from common which implements jakarta.servlet.Filter -->
+        <dependency>
+            <groupId>jakarta.servlet</groupId>
+            <artifactId>jakarta.servlet-api</artifactId>
+            <scope>provided</scope>
+        </dependency>
     <dependency><groupId>software.amazon.awssdk</groupId><artifactId>url-connection-client</artifactId></dependency></dependencies>
 
     <build>
