@@ -196,8 +196,11 @@ public class NotificationListenerTest {
 
     @Test
     void testListenToMemberAddedEvent_Success() {
-        GroupDTO group =
-                GroupDTO.builder().groupId(groupId).name("Young Adults").build();
+        GroupDTO group = GroupDTO.builder()
+                .groupId(groupId)
+                .name("Young Adults")
+                .passcode("YA2026")
+                .build();
 
         when(restTemplate.getForObject(contains("/api/groups/" + groupId), eq(GroupDTO.class)))
                 .thenReturn(group);
@@ -217,6 +220,8 @@ public class NotificationListenerTest {
         assertEquals(
                 "You're Invited to Join Prayer Link", sent.message().subject().data());
         assertTrue(sent.message().body().html().data().contains("Young Adults"));
+        assertTrue(sent.message().body().html().data().contains("YA2026"));
+        assertTrue(sent.message().body().html().data().contains("inviteCode=YA2026"));
     }
 
     @Test

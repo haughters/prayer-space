@@ -114,6 +114,7 @@ export class ComputeStack extends cdk.Stack {
 
     // 3. prayer-service
     const prayerSvc = createLambda('prayer-service', {
+      AWS_EVENTBRIDGE_BUS: props.eventBus.eventBusName,
       AWS_EVENTBRIDGE_BUS_NAME: props.eventBus.eventBusName,
     }, true);
     this.prayerServiceAlias = prayerSvc.alias;

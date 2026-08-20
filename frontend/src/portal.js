@@ -148,7 +148,7 @@ function showAuthCard(cardType) {
   } else if (cardType === 'register') {
     registerCard.style.display = 'block';
 
-    // Parse email param if register?email=...
+    // Parse email and inviteCode params if register?email=...&inviteCode=...
     const hash = window.location.hash || '';
     const pathAndQuery = hash.split('?');
     const queryString = pathAndQuery[1] || '';
@@ -156,6 +156,13 @@ function showAuthCard(cardType) {
     const emailParam = urlParams.get('email');
     if (emailParam) {
       document.getElementById('register-email').value = emailParam;
+    }
+    const inviteCodeParam =
+      urlParams.get('inviteCode') ||
+      urlParams.get('passcode') ||
+      urlParams.get('code');
+    if (inviteCodeParam) {
+      document.getElementById('register-invite-code').value = inviteCodeParam;
     }
   } else {
     loginCard.style.display = 'block';

@@ -410,18 +410,36 @@ public class NotificationListener {
             }
 
             String scheme = appDomain.startsWith("localhost") ? "http://" : "https://";
+            String passcodeParam = (group.getPasscode() != null
+                            && !group.getPasscode().isBlank())
+                    ? "&inviteCode="
+                            + java.net.URLEncoder.encode(group.getPasscode(), java.nio.charset.StandardCharsets.UTF_8)
+                    : "";
             String actionUrl = scheme + appDomain + "/portal.html#register?email="
-                    + java.net.URLEncoder.encode(event.getEmail(), java.nio.charset.StandardCharsets.UTF_8);
+                    + java.net.URLEncoder.encode(event.getEmail(), java.nio.charset.StandardCharsets.UTF_8)
+                    + passcodeParam;
 
-            sendInvitationEmail(event.getEmail(), group.getName(), event.getName(), actionUrl);
+            sendInvitationEmail(event.getEmail(), group.getName(), event.getName(), group.getPasscode(), actionUrl);
         } catch (Exception e) {
             log.error("Failed to process member added event: {}", event.getEmail(), e);
         }
     }
 
     private void sendInvitationEmail(
-            String recipientEmail, String groupName, String intercessorName, String actionUrl) {
+            String recipientEmail, String groupName, String intercessorName, String passcode, String actionUrl) {
         String subject = "You're Invited to Join Prayer Link";
+
+        String passcodeHtml = (passcode != null && !passcode.isBlank())
+                ? "  <div style=\"background: #f8f8fc; border-left: 4px solid #d4a574; padding: 16px 20px; margin: 24px 0; border-radius: 0 8px 8px 0;\">\n"
+                        + "    <p style=\"margin: 0; font-size: 14px; color: #555;\">Your Circle Passcode (Invite Code):</p>\n"
+                        + "    <p style=\"margin: 4px 0 0 0; font-size: 20px; font-weight: 700; letter-spacing: 2px; color: #1a1a2e;\">"
+                        + passcode + "</p>\n"
+                        + "  </div>\n"
+                : "";
+
+        String passcodeText = (passcode != null && !passcode.isBlank())
+                ? "\nYour Circle Passcode (Invite Code): " + passcode + "\n"
+                : "";
 
         String htmlBody =
                 "<div style=\"max-width: 600px; margin: 0 auto; font-family: Inter, sans-serif; color: #1a1a2e;\">\n"
@@ -430,6 +448,7 @@ public class NotificationListener {
                         + intercessorName + ",</p>\n"
                         + "  <p>You have been added as an intercessor for the group <strong>"
                         + groupName + "</strong> on Prayer Link.</p>\n"
+                        + passcodeHtml
                         + "  <p>To view prayer requests and share your support, please register your account by clicking the link below:</p>\n"
                         + "  <div style=\"text-align: center; margin: 32px 0;\">\n"
                         + "    <a href=\""
@@ -446,7 +465,8 @@ public class NotificationListener {
 
         String textBody = "Welcome to Prayer Link\n\n" + "Hello "
                 + intercessorName + ",\n\n" + "You have been added as an intercessor for the group "
-                + groupName + " on Prayer Link.\n\n"
+                + groupName + " on Prayer Link.\n"
+                + passcodeText + "\n"
                 + "To view prayer requests and share your support, please register your account at:\n"
                 + actionUrl
                 + "\n\n" + "---\n"

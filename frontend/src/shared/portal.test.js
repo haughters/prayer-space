@@ -992,12 +992,14 @@ describe('Portal Auth tests', () => {
       })
     );
     await import('../portal.js');
-    window.location.hash = '#register?email=test@test.com';
+    window.location.hash = '#register?email=test@test.com&inviteCode=YA2026';
     document.dispatchEvent(new Event('DOMContentLoaded'));
     await new Promise((resolve) => setTimeout(resolve, 50));
 
     const regEmail = document.getElementById('register-email');
     if (regEmail) expect(regEmail.value).toBe('test@test.com');
+    const regInviteCode = document.getElementById('register-invite-code');
+    if (regInviteCode) expect(regInviteCode.value).toBe('YA2026');
 
     // Hash change to #login
     window.location.hash = '#login';

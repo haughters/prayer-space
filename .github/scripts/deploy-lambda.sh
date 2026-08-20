@@ -76,31 +76,31 @@ get_dependency_url() {
   local dep=$1
   local url=""
 
-  if [ -n "${PR_NUMBER:-}" ] && [ -n "${GITHUB_TOKEN:-}" ] && [ -n "${GITHUB_REPOSITORY:-}" ]; then
-    # Query GitHub API to see if the dependency service was changed in this PR
-    CHANGED_FILES=$(curl -s -H "Authorization: Bearer ${GITHUB_TOKEN}" \
-      "https://api.github.com/repos/${GITHUB_REPOSITORY}/pulls/${PR_NUMBER}/files?per_page=100" \
-      | jq -r '.[].filename' || echo "")
+  if [ -n "${PR_NUMBER:-}" ]; then
+    if [ -n "${GITHUB_TOKEN:-}" ] && [ -n "${GITHUB_REPOSITORY:-}" ]; then
+      # Query GitHub API to see if the dependency service was changed in this PR
+      CHANGED_FILES=$(curl -s -H "Authorization: Bearer ${GITHUB_TOKEN}" \
+        "https://api.github.com/repos/${GITHUB_REPOSITORY}/pulls/${PR_NUMBER}/files?per_page=100" \
+        | jq -r '.[].filename' || echo "")
 
-    if echo "$CHANGED_FILES" | grep -q "^services/${dep}/"; then
-      echo "Waiting for parallel PR deployment of ${dep}..." >&2
-      for i in $(seq 1 40); do
+      if echo "$CHANGED_FILES" | grep -q "^services/${dep}/"; then
+        echo "Waiting for parallel PR deployment of ${dep}..." >&2
+        for i in $(seq 1 40); do
+          url=$(aws lambda get-function-url-config --function-name "pr-${PR_NUMBER}-${dep}" --query 'FunctionUrl' --output text 2>/dev/null || echo "")
+          [ -n "$url" ] && break
+          sleep 15
+        done
+      else
         url=$(aws lambda get-function-url-config --function-name "pr-${PR_NUMBER}-${dep}" --query 'FunctionUrl' --output text 2>/dev/null || echo "")
-        [ -n "$url" ] && break
-        sleep 15
-      done
-    else
-      url=$(aws lambda get-function-url-config --function-name "pr-${PR_NUMBER}-${dep}" --query 'FunctionUrl' --output text 2>/dev/null || echo "")
+      fi
     fi
-  fi
 
-  if [ -z "$url" ]; then
-    # Fallback to the test environment's alias URL (using qualifier stable)
-    url=$(aws lambda get-function-url-config --function-name "test-${dep}" --qualifier stable --query 'FunctionUrl' --output text 2>/dev/null || echo "")
-  fi
-  
-  # If still empty (or it's the live env), query the environment-specific URL
-  if [ -z "$url" ] && [ -z "${PR_NUMBER:-}" ]; then
+    # Fallback for PR environments: use test environment's alias URL
+    if [ -z "$url" ]; then
+      url=$(aws lambda get-function-url-config --function-name "test-${dep}" --qualifier stable --query 'FunctionUrl' --output text 2>/dev/null || echo "")
+    fi
+  else
+    # Environment deployment (test or live): query the environment-specific URL directly
     url=$(aws lambda get-function-url-config --function-name "${DEP_PREFIX}${dep}" --qualifier stable --query 'FunctionUrl' --output text 2>/dev/null || echo "")
   fi
 

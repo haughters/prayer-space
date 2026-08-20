@@ -28,7 +28,7 @@ public class PrayerEventPublisher {
     public PrayerEventPublisher(
             EventBridgeClient eventBridgeClient,
             ObjectMapper objectMapper,
-            @Value("${aws.eventbridge.bus}") String eventBusName) {
+            @Value("${aws.eventbridge.bus:${aws.eventbridge.bus-name:prayer-link-bus}}") String eventBusName) {
         this.eventBridgeClient = eventBridgeClient;
         this.objectMapper = objectMapper;
         this.eventBusName = eventBusName;
