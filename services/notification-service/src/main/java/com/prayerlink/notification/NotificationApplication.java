@@ -1,5 +1,6 @@
 package com.prayerlink.notification;
 
+import com.prayerlink.common.config.HeaderToCookieFilter;
 import com.prayerlink.common.config.RestTemplateConfig;
 import com.prayerlink.notification.listener.NotificationListener;
 import java.net.URI;
@@ -11,11 +12,16 @@ import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.FilterType;
 import org.springframework.context.annotation.Import;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.ObjectMapper;
 
 @SpringBootApplication(scanBasePackages = "com.prayerlink")
+@ComponentScan(
+        basePackages = "com.prayerlink",
+        excludeFilters = @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = HeaderToCookieFilter.class))
 @Import(RestTemplateConfig.class)
 public class NotificationApplication implements CommandLineRunner {
 
