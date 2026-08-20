@@ -4,37 +4,20 @@ server:
 spring:
   application:
     name: notification-service
-  autoconfigure:
-    exclude:
-      - org.springframework.boot.webmvc.autoconfigure.WebMvcObservationAutoConfiguration
-      - org.springframework.boot.actuate.autoconfigure.observation.web.servlet.WebMvcObservationAutoConfiguration
+  main:
+    web-application-type: none
   cloud:
     aws:
       sqs:
         listener:
-          auto-startup: true
-
-management:
-  health:
-    diskspace:
-      enabled: false
-  endpoints:
-    web:
-      exposure:
-        include: health,prometheus
-  endpoint:
-    health:
-      show-details: always
-  observations:
-    http:
-      server:
-        requests:
-          enabled: false
+          auto-startup: false
 ---
 spring:
   config:
     activate:
       on-profile: local
+  main:
+    web-application-type: none
   cloud:
     aws:
       sqs:
