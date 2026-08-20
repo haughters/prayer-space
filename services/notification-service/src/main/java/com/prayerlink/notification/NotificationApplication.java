@@ -47,10 +47,13 @@ public class NotificationApplication implements CommandLineRunner {
         while (true) {
             String requestId = null;
             try {
-                HttpRequest request = HttpRequest.newBuilder().uri(URI.create(nextUrl)).GET().build();
+                HttpRequest request =
+                        HttpRequest.newBuilder().uri(URI.create(nextUrl)).GET().build();
                 HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
-                requestId = response.headers().firstValue("Lambda-Runtime-Aws-Request-Id").orElse(null);
+                requestId = response.headers()
+                        .firstValue("Lambda-Runtime-Aws-Request-Id")
+                        .orElse(null);
                 String body = response.body();
 
                 if (body != null && !body.isBlank()) {
@@ -59,7 +62,8 @@ public class NotificationApplication implements CommandLineRunner {
                     if (root.has("Records")) {
                         for (JsonNode record : root.path("Records")) {
                             String recordBody = record.path("body").asText();
-                            String eventSourceArn = record.path("eventSourceARN").asText();
+                            String eventSourceArn =
+                                    record.path("eventSourceARN").asText();
                             if (eventSourceArn != null && eventSourceArn.contains("bounce")) {
                                 notificationListener.listenToBounces(recordBody);
                             } else {
@@ -70,7 +74,8 @@ public class NotificationApplication implements CommandLineRunner {
                 }
 
                 if (requestId != null) {
-                    String responseUrl = "http://" + runtimeApi + "/2018-06-01/runtime/invocation/" + requestId + "/response";
+                    String responseUrl =
+                            "http://" + runtimeApi + "/2018-06-01/runtime/invocation/" + requestId + "/response";
                     HttpRequest responseReq = HttpRequest.newBuilder()
                             .uri(URI.create(responseUrl))
                             .POST(HttpRequest.BodyPublishers.ofString("{\"batchItemFailures\":[]}"))
@@ -81,10 +86,12 @@ public class NotificationApplication implements CommandLineRunner {
                 log.error("Error processing Lambda event {}: {}", requestId, e.getMessage(), e);
                 if (requestId != null) {
                     try {
-                        String errorUrl = "http://" + runtimeApi + "/2018-06-01/runtime/invocation/" + requestId + "/error";
+                        String errorUrl =
+                                "http://" + runtimeApi + "/2018-06-01/runtime/invocation/" + requestId + "/error";
                         HttpRequest errorReq = HttpRequest.newBuilder()
                                 .uri(URI.create(errorUrl))
-                                .POST(HttpRequest.BodyPublishers.ofString("{\"errorMessage\":\"" + e.getMessage() + "\"}"))
+                                .POST(HttpRequest.BodyPublishers.ofString(
+                                        "{\"errorMessage\":\"" + e.getMessage() + "\"}"))
                                 .build();
                         client.send(errorReq, HttpResponse.BodyHandlers.discarding());
                     } catch (Exception ignored) {
