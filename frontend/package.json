@@ -18,7 +18,7 @@
     "jsdom": "^30.0.1",
     "prettier": "^3.9.6",
     "vite": "^8.2.1",
-    "vitest": "^4.1.10"
+    "vitest": "^5.0.0"
   },
   "dependencies": {
     "aws4fetch": "^1.0.20",
